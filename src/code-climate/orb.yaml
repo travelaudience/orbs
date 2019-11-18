@@ -36,7 +36,7 @@ commands:
         type: string
     steps:
     - run:
-        command: cc-test-reporter format-coverage "<<parameters.cc_additional_flags>>" "<<parameters.coverage_file>>" --input-type <<parameters.input_type>> --output "<<parameters.output>>"
+        command: cc-test-reporter format-coverage "<<parameters.additional_flags>>" "<<parameters.coverage_file>>" --input-type <<parameters.input_type>> --output "<<parameters.output>>"
         name: Formatting coverage report
 
   install:
