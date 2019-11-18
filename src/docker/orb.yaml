@@ -1,0 +1,195 @@
+version: 2.1
+
+description:  |
+  CircleCI Orb for docker. Provides similar functionality to orb: circleci/docker (supporting persistent workspace & multiple tags)
+  But also includes image scanning with: ovotech/clair-scanner
+  see github page for more info: https://github.com/travelaudience/orbs
+
+orbs:
+  docker-orb: circleci/docker@0.5.13
+  clair-scanner: ovotech/clair-scanner@1.6.0
+
+executors:
+  golang:
+    description: Any executor should be sufficient
+    docker:
+      - image: circleci/golang:1.12
+
+commands:
+  get_change_name:
+    description: Set env var with either branch name OR git tag
+    steps:
+      - run: |
+              if [ ! -z "$CIRCLE_TAG" ];
+              then
+                echo 'export CHANGE_NAME=$CIRCLE_TAG' >> $BASH_ENV
+              elif [ ! -z "$CIRCLE_BRANCH" ];
+              then
+                echo 'export CHANGE_NAME=$CIRCLE_BRANCH' >> $BASH_ENV
+              fi
+              source $BASH_ENV
+              echo $CHANGE_NAME
+  collect_image_names:
+    description: Save image name to persisted directory, that will be used later to scan all images collected
+    parameters:
+      image:
+        type: string
+      tag:
+        type: string
+        default: $CHANGE_NAME
+    steps:
+      - run: mkdir -p tmp/image-names
+      - run: echo "<<parameters.image>>:<<parameters.tag>> " >> tmp/image-names/${CIRCLE_JOB}.txt
+      - persist_to_workspace:
+          root: tmp
+          paths:
+            - image-names/*
+
+jobs:
+  build_and_push:
+    description: |
+      Standard docker workflow for building an image, and pushing to private repository
+    parameters:
+      image-name:
+        description: Name of image to build
+        type: string
+      dockerfile:
+        description: Relative or absolute path, including name, to the Dockerfile
+        type: string
+        default: Dockerfile
+      lint-enabled:
+        description: Option flag to enable linting of Dockerfile
+        type: boolean
+        default: false
+      registry:
+        description: Name of registry to use
+        type: string
+        default: 'docker.io'
+      docker-username:
+        description: Name of environment variable storing your Docker username
+        type: env_var_name
+        default: DOCKER_LOGIN
+      docker-password:
+        description: Name of environment variable storing your Docker password
+        type: env_var_name
+        default: DOCKER_PASSWORD
+      extra-tag:
+        description: Additional tag to apply to the image besides the default SHA tag. Defaults to the change name (git branch OR tag)
+        type: string
+        default: $CHANGE_NAME
+      executor:
+        description: Executor to use for this job
+        default: golang
+        type: executor
+    executor: <<parameters.executor>>
+    steps:
+      - checkout
+      - setup_remote_docker
+      - attach_workspace:
+          at: ./
+      - docker-orb/check:
+          registry: << parameters.registry >>
+          docker-username: << parameters.docker-username >>
+          docker-password: << parameters.docker-password >>
+      - get_change_name
+      - when:
+          condition: <<parameters.lint_enabled>>
+          steps:
+            - docker-orb/dockerlint:
+                dockerfile: <<parameters.dockerfile>>
+      - docker-orb/build:
+          image: <<parameters.image-name>>
+          extra_build_args: '-t << parameters.registry >>/<< parameters.image-name >>:<< parameters.extra-tag >>'
+          registry: <<parameters.registry>>
+          dockerfile: <<parameters.dockerfile>>
+      - docker-orb/push:
+          image: <<parameters.image-name>>
+          registry: <<parameters.registry>>
+      - docker-orb/push:
+          image: <<parameters.image-name>>
+          tag: <<parameters.extra-tag>>
+          registry: <<parameters.registry>>
+      - collect_image_names:
+          image: <<parameters.registry>>/<<parameters.image-name>>
+          tag: <<parameters.extra-tag>>
+
+  docker_git_tag:
+    description: |
+      Retag an existing SHA image with a git tag that maps to the specified sha.
+      Should be triggered in workflows that filter for tags.
+    parameters:
+      retry_count:
+        description: Amount of attempts to make while waiting for the image to exist in the registry
+        type: integer
+        default: 5
+      wait_period:
+        description: Seconds to wait between retries
+        type: integer
+        default: 60
+      image-name:
+        description: Name of image to re-tag
+        type: string
+      docker-username:
+        description: Name of environment variable storing your Docker username
+        type: env_var_name
+        default: DOCKER_LOGIN
+      docker-password:
+        description: Name of environment variable storing your Docker password
+        type: env_var_name
+        default: DOCKER_PASSWORD
+      registry:
+        description: Name of registry to use
+        type: string
+        default: 'docker.io'
+      executor:
+        description: Executor to use for this job
+        default: golang
+        type: executor
+    executor: <<parameters.executor>>
+    steps:
+      - setup_remote_docker
+      - run: docker login -u "$<<parameters.docker-username>>" -p "$<<parameters.docker-password>>"  <<parameters.registry>>
+      - run: |
+          set +e
+          count=0
+          exit=1
+          while [[ "$count" -lt <<parameters.retry_count>> ]] && [[ "$exit" -gt 0 ]]; do
+            docker pull -q <<parameters.registry>>/<< parameters.image-name >>:"$CIRCLE_SHA1"
+            exit=$?
+            let count=count+1
+            if [[ $exit -gt 0 ]] && [[ "$count" -eq <<parameters.retry_count>> ]]; then
+              echo "Failed to find the image <<parameters.registry>>/<< parameters.image-name >>:$CIRCLE_SHA1 in registry."
+              exit 1
+            elif [[ $exit -gt 0 ]]; then
+              sleep <<parameters.wait_period>>
+            fi
+          done
+      - run:
+          command: docker tag <<parameters.registry>>/<< parameters.image-name >>:"$CIRCLE_SHA1" <<parameters.registry>>/<< parameters.image-name >>:"$CIRCLE_TAG"
+          when: on_success
+      - run:
+          command: docker push <<parameters.registry>>/<< parameters.image-name >>:"$CIRCLE_TAG"
+          when: on_success
+
+  docker_scan:
+    executor: clair-scanner/default
+    parameters:
+      docker-username:
+        description: Name of environment variable storing your Docker username
+        type: env_var_name
+        default: DOCKER_LOGIN
+      docker-password:
+        description: Name of environment variable storing your Docker password
+        type: env_var_name
+        default: DOCKER_PASSWORD
+      registry:
+        description: Name of registry to use
+        type: string
+        default: 'docker.io'
+    steps:
+      - attach_workspace:
+          at: /tmp
+      - run: find /tmp/image-names -type f -name '*.txt' -exec cat {} + >> /images.file
+      - run: docker login -u "$<<parameters.docker-username>>" -p "$<<parameters.docker-password>>"  <<parameters.registry>>
+      - clair-scanner/scan:
+          image_file: /images.file
