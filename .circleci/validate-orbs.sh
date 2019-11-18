@@ -3,6 +3,9 @@
 for ORB in src/*; do
   echo "Validating $ORB ..."
 
+  ls .
+  ls $ORB
+
   circleci orb validate $ORB/orb.yml; RETURN_CODE=$?
 
   if [[ $RETURN_CODE != 0 ]]; then
