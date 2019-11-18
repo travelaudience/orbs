@@ -93,7 +93,7 @@ jobs:
           docker-password: << parameters.docker-password >>
       - get_change_name
       - when:
-          condition: <<parameters.lint_enabled>>
+          condition: <<parameters.lint-enabled>>
           steps:
             - docker-orb/dockerlint:
                 dockerfile: <<parameters.dockerfile>>
