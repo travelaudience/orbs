@@ -1,0 +1,12 @@
+version: 2.1
+
+executors:
+  cli:
+    docker:
+      - image: circleci/circleci-cli:0.1.2709
+
+jobs:
+  echo:
+    executor: cli
+    steps:
+      - run: echo "empty build"
