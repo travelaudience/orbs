@@ -1,6 +1,6 @@
 version: 2.1
 
-description:  |
+description: |
   CircleCI Orb for helm CI. Provides helm package and pushing charts to github helm repo, amongst other things...
   see github page for more info: https://github.com/travelaudience/orbs
 
@@ -207,4 +207,4 @@ jobs:
       - checkout
       - package
       - push:
-          chart_git_repo:  <<parameters.chart_git_repo>>
+          chart_git_repo: <<parameters.chart_git_repo>>

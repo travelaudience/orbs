@@ -1,6 +1,6 @@
 version: 2.1
 
-description:  |
+description: |
   CircleCI Orb for golang CI. Provides static analysis, go test, go build, amongst other things...
   see github page for more info: https://github.com/travelaudience/orbs
 
@@ -177,7 +177,7 @@ commands:
             fi
           name: Downloading Code Climate test reporter
   submit_coverage:
-    description:|
+    description: |
       Submit test analysis to Code Climate.
       Using custom command that takes in additional flags (afrase/code-climate is broken)
     parameters:
