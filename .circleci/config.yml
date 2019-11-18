@@ -12,7 +12,7 @@ jobs:
     steps:
       - checkout
       - run:
-          'yamllint .'
+          'yamllint . --strict'
 
   build:
     executor: cli
