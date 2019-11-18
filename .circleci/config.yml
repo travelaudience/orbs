@@ -19,7 +19,7 @@ jobs:
     steps:
       - checkout
       - run: "echo -e \"token: placeholder\nverbose: false > ~/.circleci/cli.yml\""
-      - run: bash scripts/validate-orbs.sh
+      - run: bash .circleci/validate-orbs.sh
 
 
 workflows:
