@@ -6,7 +6,27 @@ executors:
       - image: circleci/circleci-cli:0.1.2709
 
 jobs:
-  echo:
+  lint:
+    docker:
+      - image: singapore/lint-condo
+    steps:
+      - checkout
+      - run:
+          'yamllint . --strict'
+
+  build:
     executor: cli
     steps:
-      - run: echo "empty build"
+      - checkout
+      - run: "echo -e \"token: placeholder\nverbose: false > ~/.circleci/cli.yml\""
+      - run: bash .circleci/validate-orbs.sh
+
+
+workflows:
+  version: 2
+  main:
+    jobs:
+      - lint
+      - build
+
+      # TODO: add publishing....
