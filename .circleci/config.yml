@@ -17,11 +17,6 @@ jobs:
             git branch --contains ${CIRCLE_SHA1} | grep "master"
 
   publish-orb-into-production:
-    parameters:
-      source-dir:
-        type: string
-        description: |
-          Path to the root of the orb source directory to be packed. (ie: src/my-orb)
     executor: cli/default
     steps:
       - checkout
@@ -59,7 +54,6 @@ workflows:
       - pre-orb-promotion-check
       - publish-orb-into-production:
           context: orb-publishing
-          orb-name: travelaudience/code-climate
           filters:
             branches:
               ignore: /.*/
