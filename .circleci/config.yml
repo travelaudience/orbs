@@ -44,14 +44,19 @@ workflows:
       - orb-tools/publish-dev:
           context: orb-publishing
           orb-name: travelaudience/code-climate
-          orb-path:
+          orb-path: src/code-climate
           requires:
             - code-climate-lint
             - code-climate-pack
 
   orb-promotion:
     jobs:
-      - pre-orb-promotion-check
+      - pre-orb-promotion-check:
+          filters:
+            branches:
+              ignore: /.*/
+            tags:
+              only: /^[a-z,-]+-v[0-9]+(\.[0-9]+)*$/
       - publish-orb-into-production:
           context: orb-publishing
           filters:
