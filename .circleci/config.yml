@@ -45,6 +45,7 @@ workflows:
           context: orb-publishing
           orb-name: travelaudience/code-climate
           orb-path: src/code-climate
+          publish-token-variable: CIRCLE_ORB_TOKEN
           requires:
             - code-climate-lint
             - code-climate-pack
