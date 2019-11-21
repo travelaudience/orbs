@@ -1,32 +1,67 @@
 version: 2.1
 
-executors:
-  cli:
-    docker:
-      - image: circleci/circleci-cli:0.1.2709
+orbs:
+  cli: circleci/circleci-cli@0.1.2
+  orb-tools: circleci/orb-tools@8.27.5
 
 jobs:
-  lint:
-    docker:
-      - image: singapore/lint-condo
+  pre-orb-promotion-check:
+    executor: cli/default
     steps:
       - checkout
       - run:
-          'yamllint . --strict'
+          name: Check that the tag is a mapped to master branch commit
+          command: |
+            git clone "$CIRCLE_REPOSITORY_URL" repository
+            cd repository
+            git branch --contains ${CIRCLE_SHA1} | grep "master"
 
-  build:
-    executor: cli
+  publish-orb-into-production:
+    parameters:
+      source-dir:
+        type: string
+        description: |
+          Path to the root of the orb source directory to be packed. (ie: src/my-orb)
+    executor: cli/default
     steps:
       - checkout
-      - run: "echo -e \"token: placeholder\nverbose: false > ~/.circleci/cli.yml\""
-      - run: bash .circleci/validate-orbs.sh
+      - run:
+          name: >
+            Publish orb at to production, based on $CIRCLE_TAG
+          command: |
+            ORB_NAME="$(echo $CIRCLE_TAG | sed 's/-v[0-9].*/\1/')"
+            VERSION="$(echo $CIRCLE_TAG | sed 's/.*\-/\1/')"
+            circleci orb publish "src/$ORB_NAME" "travelaudience/${ORB_NAME}@${VERSION}" --token ${CIRCLE_ORB_TOKEN}
+
 
 
 workflows:
   version: 2
-  main:
+  orb-validate-dev-push:
     jobs:
-      - lint
-      - build
+      - orb-tools/lint:
+          lint-dir: src/code-climate
+          name: code-climate-lint
+      - orb-tools/pack:
+          source-dir: src/code-climate
+          name: code-climate-pack
 
-      # TODO: add publishing....
+      - orb-tools/publish-dev:
+          context: orb-publishing
+          orb-name: travelaudience/code-climate
+          orb-path:
+          requires:
+            - code-climate-lint
+            - code-climate-pack
+
+  orb-promotion:
+    jobs:
+      - pre-orb-promotion-check
+      - publish-orb-into-production:
+          context: orb-publishing
+          orb-name: travelaudience/code-climate
+          filters:
+            branches:
+              ignore: /.*/
+            tags:
+              only: /^[a-z,-]+-v[0-9]+(\.[0-9]+)*$/
