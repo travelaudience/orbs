@@ -123,8 +123,8 @@ jobs:
             - attach_workspace:
                 at: <<parameters.workspace-root>>
       - run: ls .
-      - run: ls src
-      - run: ls src/code-climate
+      - run: ls workspace
+      - run: ls workspace/src
       - when:
           condition: <<parameters.validate>>
           steps:
