@@ -124,7 +124,6 @@ jobs:
                 at: <<parameters.workspace-root>>
       - run: ls .
       - run: ls workspace
-      - run: ls workspace/src
       - when:
           condition: <<parameters.validate>>
           steps:
@@ -177,7 +176,7 @@ workflows:
       - publish-dev:
           context: orb-publishing
           orb-name: travelaudience/code-climate
-          orb-path: src/code-climate/orb.yaml
+          orb-path: orb.yaml
           alpha-version-ref: "dev:$CIRCLE_BRANCH"
           publish-token-variable: CIRCLE_ORB_TOKEN
           requires:
