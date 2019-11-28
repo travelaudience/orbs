@@ -1,0 +1,12 @@
+description: Set env var with either branch name OR git tag
+steps:
+  - run: |
+          if [ ! -z "$CIRCLE_TAG" ];
+          then
+            echo 'export CHANGE_NAME=$CIRCLE_TAG' >> $BASH_ENV
+          elif [ ! -z "$CIRCLE_BRANCH" ];
+          then
+            echo 'export CHANGE_NAME=$CIRCLE_BRANCH' >> $BASH_ENV
+          fi
+          source $BASH_ENV
+          echo $CHANGE_NAME

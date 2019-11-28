@@ -1,0 +1,21 @@
+executor: clair-scanner/default
+parameters:
+  docker-username:
+    description: Name of environment variable storing your Docker username
+    type: env_var_name
+    default: DOCKER_LOGIN
+  docker-password:
+    description: Name of environment variable storing your Docker password
+    type: env_var_name
+    default: DOCKER_PASSWORD
+  registry:
+    description: Name of registry to use
+    type: string
+    default: 'docker.io'
+steps:
+  - attach_workspace:
+      at: /tmp
+  - run: find /tmp/image-names -type f -name '*.txt' -exec cat {} + >> /images.file
+  - run: docker login -u "$<<parameters.docker-username>>" -p "$<<parameters.docker-password>>"  <<parameters.registry>>
+  - clair-scanner/scan:
+      image_file: /images.file

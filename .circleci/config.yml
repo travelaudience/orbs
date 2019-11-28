@@ -35,6 +35,7 @@ workflows:
   version: 2
   orb-validate-dev-push:
     jobs:
+      # Code Climate
       - orb-tools/lint:
           lint-dir: src/code-climate
           name: code-climate-lint
@@ -43,7 +44,6 @@ workflows:
           destination-orb-path: code-climate.yaml
           name: code-climate-pack
           workspace-path: code-climate.yaml
-
       - orb-tools/publish-dev:
           context: orb-publishing
           orb-name: travelaudience/code-climate
@@ -53,6 +53,25 @@ workflows:
           requires:
             - code-climate-lint
             - code-climate-pack
+
+      # Docker
+      - orb-tools/lint:
+          lint-dir: src/docker
+          name: docker-lint
+      - orb-tools/pack:
+          source-dir: src/docker
+          destination-orb-path: docker.yaml
+          name: docker-pack
+          workspace-path: docker.yaml
+      - orb-tools/publish-dev:
+          context: orb-publishing
+          orb-name: travelaudience/docker
+          orb-path: workspace/docker.yaml
+          alpha-version-ref: "dev:$CIRCLE_BRANCH"
+          publish-token-variable: CIRCLE_ORB_TOKEN
+          requires:
+            - docker-lint
+            - docker-pack
 
   orb-promotion:
     jobs:

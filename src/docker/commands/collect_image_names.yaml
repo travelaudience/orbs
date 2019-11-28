@@ -1,0 +1,14 @@
+description: Save image name to persisted directory, that will be used later to scan all images collected
+parameters:
+  image:
+    type: string
+  tag:
+    type: string
+    default: $CHANGE_NAME
+steps:
+  - run: mkdir -p tmp/image-names
+  - run: echo "<<parameters.image>>:<<parameters.tag>> " >> tmp/image-names/${CIRCLE_JOB}.txt
+  - persist_to_workspace:
+      root: tmp
+      paths:
+        - image-names/*

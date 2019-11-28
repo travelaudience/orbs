@@ -1,0 +1,3 @@
+description: Any executor should be sufficient
+docker:
+  - image: circleci/golang:1.12

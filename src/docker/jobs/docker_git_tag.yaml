@@ -1,0 +1,56 @@
+description: |
+  Retag an existing SHA image with a git tag that maps to the specified sha.
+  Should be triggered in workflows that filter for tags.
+parameters:
+  retry_count:
+    description: Amount of attempts to make while waiting for the image to exist in the registry
+    type: integer
+    default: 5
+  wait_period:
+    description: Seconds to wait between retries
+    type: integer
+    default: 60
+  image-name:
+    description: Name of image to re-tag
+    type: string
+  docker-username:
+    description: Name of environment variable storing your Docker username
+    type: env_var_name
+    default: DOCKER_LOGIN
+  docker-password:
+    description: Name of environment variable storing your Docker password
+    type: env_var_name
+    default: DOCKER_PASSWORD
+  registry:
+    description: Name of registry to use
+    type: string
+    default: 'docker.io'
+  executor:
+    description: Executor to use for this job
+    default: default
+    type: executor
+executor: <<parameters.executor>>
+steps:
+  - setup_remote_docker
+  - run: docker login -u "$<<parameters.docker-username>>" -p "$<<parameters.docker-password>>"  <<parameters.registry>>
+  - run: |
+      set +e
+      count=0
+      exit=1
+      while [[ "$count" -lt <<parameters.retry_count>> ]] && [[ "$exit" -gt 0 ]]; do
+        docker pull -q <<parameters.registry>>/<< parameters.image-name >>:"$CIRCLE_SHA1"
+        exit=$?
+        let count=count+1
+        if [[ $exit -gt 0 ]] && [[ "$count" -eq <<parameters.retry_count>> ]]; then
+          echo "Failed to find the image <<parameters.registry>>/<< parameters.image-name >>:$CIRCLE_SHA1 in registry."
+          exit 1
+        elif [[ $exit -gt 0 ]]; then
+          sleep <<parameters.wait_period>>
+        fi
+      done
+  - run:
+      command: docker tag <<parameters.registry>>/<< parameters.image-name >>:"$CIRCLE_SHA1" <<parameters.registry>>/<< parameters.image-name >>:"$CIRCLE_TAG"
+      when: on_success
+  - run:
+      command: docker push <<parameters.registry>>/<< parameters.image-name >>:"$CIRCLE_TAG"
+      when: on_success
