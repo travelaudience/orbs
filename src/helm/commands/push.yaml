@@ -4,7 +4,7 @@ parameters:
     description: The path where packaged charts were saved (defaults to a local, relative path)
     type: string
     default: ".cr-release-packages"
-  chart_git_repo: &chart_git_repo
+  chart_git_repo:
     description: The github repo that keeps packaged charts
     type: string
   clone_depth:
