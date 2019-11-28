@@ -51,7 +51,7 @@ workflows:
           publish-token-variable: CIRCLE_ORB_TOKEN
           requires:
             - code-climate-lint
-            - code-climate-pack
+            # - code-climate-pack
 
   orb-promotion:
     jobs:
