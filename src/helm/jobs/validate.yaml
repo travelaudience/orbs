@@ -1,7 +1,14 @@
 description: |
   Checkout, lint, and install charts into local k8s cluster (install is currently disabled).
 parameters:
-  chart_test_config: *chart_test_config
+  chart_test_config:
+    description: |
+      Path to local config file with settings to be used by Chart Tester
+      For example:
+        helm-extra-args: --timeout 600
+        validate-maintainers: false
+    type: string
+    default: ".circleci/helmTest.yaml"
   exec:
     description: The name of custom executor to use
     type: executor
