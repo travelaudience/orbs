@@ -39,12 +39,14 @@ workflows:
           name: code-climate-lint
       - orb-tools/pack:
           source-dir: src/code-climate
+          destination-orb-path: src/code-climate/orb.yaml
           name: code-climate-pack
 
       - orb-tools/publish-dev:
           context: orb-publishing
           orb-name: travelaudience/code-climate
           orb-path: src/code-climate
+          alpha-version-ref: "dev:$CIRCLE_BRANCH"
           publish-token-variable: CIRCLE_ORB_TOKEN
           requires:
             - code-climate-lint
@@ -60,6 +62,8 @@ workflows:
               only: /^[a-z,-]+-v[0-9]+(\.[0-9]+)*$/
       - publish-orb-into-production:
           context: orb-publishing
+          requires:
+            - pre-orb-promotion-check
           filters:
             branches:
               ignore: /.*/
