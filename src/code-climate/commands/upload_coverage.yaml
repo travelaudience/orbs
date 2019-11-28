@@ -1,0 +1,10 @@
+description: Upload pre-formatted coverage payloads to Code Climate servers.
+parameters:
+  input:
+    default: coverage/codeclimate.json
+    description: The input path. (default "coverage/codeclimate.json")
+    type: string
+steps:
+  - run:
+      command: cc-test-reporter upload-coverage --input "<<parameters.input>>"
+      name: Uploading coverage report

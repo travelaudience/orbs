@@ -37,11 +37,10 @@ workflows:
       - orb-tools/lint:
           lint-dir: src/code-climate
           name: code-climate-lint
-      # Orbs that are single files, don't work with `circleci config pack`
-      # - orb-tools/pack:
-      #     source-dir: src/code-climate
-      #     destination-orb-path: src/code-climate/orb.yaml
-      #     name: code-climate-pack
+      - orb-tools/pack:
+          source-dir: src/code-climate
+          destination-orb-path: src/code-climate/orb.yaml
+          name: code-climate-pack
 
       - orb-tools/publish-dev:
           context: orb-publishing
@@ -51,7 +50,7 @@ workflows:
           publish-token-variable: CIRCLE_ORB_TOKEN
           requires:
             - code-climate-lint
-            # - code-climate-pack
+            - code-climate-pack
 
   orb-promotion:
     jobs:

@@ -1,0 +1,17 @@
+description: Combine (sum) multiple pre-formatted coverage payloads into one.
+parameters:
+  input:
+    description: File glob of the files to combine.
+    type: string
+  output:
+    default: coverage/codeclimate.json
+    description: The output path. (default "coverage/codeclimate.json")
+    type: string
+  parts:
+    default: 1
+    description: The total number of parts to sum. (default 1)
+    type: integer
+steps:
+  - run:
+      command: cc-test-reporter sum-coverage <<parameters.input>> --parts <<parameters.parts>> --output "<<parameters.output>>"
+      name: Combining coverage reports
