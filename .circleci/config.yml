@@ -41,6 +41,8 @@ workflows:
           source-dir: src/code-climate
           destination-orb-path: src/code-climate/orb.yaml
           name: code-climate-pack
+          workspace-path: orb.yaml
+          workspace-root: src/code-climate
 
       - orb-tools/publish-dev:
           context: orb-publishing
