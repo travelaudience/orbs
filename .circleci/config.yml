@@ -29,6 +29,136 @@ jobs:
             circleci orb publish "src/$ORB_NAME/orb.yaml" "travelaudience/${ORB_NAME}@${VERSION}" --token ${CIRCLE_ORB_TOKEN}
 
 
+  publish-dev:
+    executor: cli/default
+    parameters:
+      alpha-version-ref:
+        default: 'dev:alpha'
+        description: |
+          Dev:reference to use for orb alpha version, defaults to 'dev:alpha'
+        type: string
+      attach-workspace:
+        default: true
+        description: >
+          Boolean for whether or not to attach to an existing workspace. Default is
+          true.
+        type: boolean
+      branch-sha-version-ref:
+        default: 'dev:$CIRCLE_BRANCH-${CIRCLE_SHA1:0:7}'
+        description: >
+          Dev:reference to use for third dev version of the orb, defaults to
+          'dev:$CIRCLE_BRANCH-${CIRCLE_SHA1:0:7}' (evaluates to the git branch plus
+          the first 7 characters of the job's commit hash)
+        type: string
+      checkout:
+        default: false
+        description: |
+          Boolean for whether or not to checkout as a first step. Default is false.
+        type: boolean
+      orb-name:
+        description: |
+          Semver-less name of an orb, e.g. circleci/orb-tools
+        type: string
+      orb-path:
+        default: workspace/orb.yml
+        description: Path of the orb file to publish.
+        type: string
+      publish-alpha-version:
+        default: true
+        description: >
+          Publish a dev:alpha version, intended to be used as part of an orb
+          integration testing workflow
+        type: boolean
+      publish-branch-sha-version:
+        default: false
+        description: >
+          Publish a third dev version of the orb, by-default tagged with the
+          CircleCI job's git branch and commit hash
+        type: boolean
+      publish-sha-version:
+        default: true
+        description: >
+          Publish a second dev version of the orb, with a job's $CIRCLE_SHA,
+          intended to be used for promotion to a semantic release at the conclusion
+          of an integration testing and deployment workflow
+        type: boolean
+      publish-token-variable:
+        default: CIRCLE_TOKEN
+        description: |
+          Name of environment variable containing your CircleCI API token
+        type: env_var_name
+      sha-version-ref:
+        default: 'dev:${CIRCLE_SHA1:0:7}'
+        description: >
+          Dev:reference to use for second dev version of the orb, defaults to
+          'dev:${CIRCLE_SHA1:0:7}' (evaluates to the first 7 characters of the job's
+          commit hash)
+        type: string
+      store-artifact:
+        default: true
+        description: |
+          Store the orb's orb.yml file as a job artifact?
+        type: boolean
+      validate:
+        default: false
+        description: >
+          Validate the orb? Defaults to false, as this job is intended to fit into
+          an automated orb development flow wherein it would have previously been
+          packed and validated
+        type: boolean
+      workspace-root:
+        default: workspace
+        description: >
+          Workspace root path that is either an absolute path or a path relative to
+          the working directory.
+        type: string
+    steps:
+      - when:
+          condition: <<parameters.checkout>>
+          steps:
+            - checkout
+      - when:
+          condition: <<parameters.attach-workspace>>
+          steps:
+            - attach_workspace:
+                at: <<parameters.workspace-root>>
+      - run: ls .
+      - run: ls src
+      - run: ls src/code-climate
+      - when:
+          condition: <<parameters.validate>>
+          steps:
+            - orb-tools/validate:
+                orb-path: <<parameters.orb-path>>
+      - when:
+          condition: <<parameters.publish-alpha-version>>
+          steps:
+            - orb-tools/publish:
+                orb-path: <<parameters.orb-path>>
+                orb-ref: <<parameters.orb-name>>@<<parameters.alpha-version-ref>>
+                token-variable: <<parameters.publish-token-variable>>
+      - when:
+          condition: <<parameters.publish-sha-version>>
+          steps:
+            - orb-tools/publish:
+                orb-path: <<parameters.orb-path>>
+                orb-ref: <<parameters.orb-name>>@<<parameters.sha-version-ref>>
+                token-variable: <<parameters.publish-token-variable>>
+      - when:
+          condition: <<parameters.publish-branch-sha-version>>
+          steps:
+            - orb-tools/publish:
+                orb-path: <<parameters.orb-path>>
+                orb-ref: <<parameters.orb-name>>@<<parameters.branch-sha-version-ref>>
+                token-variable: <<parameters.publish-token-variable>>
+      - when:
+          condition: <<parameters.store-artifact>>
+          steps:
+            - store_artifacts:
+                path: <<parameters.orb-path>>
+
+
+
 
 workflows:
   version: 2
@@ -44,7 +174,7 @@ workflows:
           workspace-path: orb.yaml
           workspace-root: src/code-climate
 
-      - orb-tools/publish-dev:
+      - publish-dev:
           context: orb-publishing
           orb-name: travelaudience/code-climate
           orb-path: src/code-climate/orb.yaml
