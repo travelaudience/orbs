@@ -1,0 +1,22 @@
+description: |
+  The docker container to used to test & build Go projects.
+  For test & code-climate reporting, using a specific executor with the CC_TEST_REPORTER_ID env variable set is required.
+parameters:
+  version:
+    description: golang version to use (docker tag)
+    type: string
+    default: "1.13"
+  working_directory:
+    description: directory path for this job
+    type: string
+    default: "."
+  go_mod:
+    description: set GO111MODULE env var
+    type: enum
+    enum: ["on", "off"]
+    default: "on"
+docker:
+  - image: circleci/golang:<<parameters.version>>
+working_directory: <<parameters.working_directory>>
+environment:
+  GO111MODULE: <<parameters.go_mod>>

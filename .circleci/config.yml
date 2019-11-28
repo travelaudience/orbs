@@ -73,6 +73,25 @@ workflows:
             - docker-lint
             - docker-pack
 
+      # Go
+      - orb-tools/lint:
+          lint-dir: src/go
+          name: go-lint
+      - orb-tools/pack:
+          source-dir: src/go
+          destination-orb-path: go.yaml
+          name: go-pack
+          workspace-path: go.yaml
+      - orb-tools/publish-dev:
+          context: orb-publishing
+          orb-name: travelaudience/go
+          orb-path: workspace/go.yaml
+          alpha-version-ref: "dev:$CIRCLE_BRANCH"
+          publish-token-variable: CIRCLE_ORB_TOKEN
+          requires:
+            - go-lint
+            - go-pack
+
   orb-promotion:
     jobs:
       - pre-orb-promotion-check:

@@ -1,0 +1,12 @@
+version: 2.1
+
+description: |
+  CircleCI Orb for golang CI. Provides static analysis, go test, go build, amongst other things...
+  see github page for more info: https://github.com/travelaudience/orbs
+
+orbs:
+  go: circleci/go@0.2.0
+  protobuf: izumin5210/protobuf@0.1.0
+  # the code-climate install with sudo is broken, we should migrate to using our own code-climate orb
+  #   but this is first waiting for such an orb to be available, because inline orb referencing is not possible
+  code-climate: afrase/code-climate@0.0.5

@@ -1,0 +1,22 @@
+description: "Go build package"
+parameters:
+  package_name:
+    description: the name to package the build as (used with -o ./bin/__)
+    type: string
+  import_path:
+    description: path to the code to build (generic would be ./...)
+    type: string
+  cgo_value:
+    default: "0"
+    type: string
+steps:
+  - run:
+      command: |
+        ver=$(git describe --tags --always --dirty)
+        ld_flags="-X 'main.version=$ver'"
+        CGO_ENABLED=<<parameters.cgo_value>> GOOS=linux go build -ldflags "$ld_flags" -a -o ./bin/<<parameters.package_name>> <<parameters.import_path>>
+      name: '[go] Build'
+  - persist_to_workspace:
+      root: ./
+      paths:
+        - bin/<<parameters.package_name>>

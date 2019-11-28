@@ -1,0 +1,14 @@
+description: Vet, staticcheck, and lint of go code
+parameters:
+  exec:
+    description: Executor to use for this job
+    type: executor
+    default: go_executor
+executor: << parameters.exec >>
+steps:
+  - checkout
+  - go/load-cache
+  - vet
+  - staticcheck
+  # - lint
+  - go/save-cache

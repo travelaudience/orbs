@@ -1,0 +1,4 @@
+description: Git diff to determine if there are any local changes that haven't been pushe to this branch
+steps:
+  - run: git diff --exit-code -- .
+

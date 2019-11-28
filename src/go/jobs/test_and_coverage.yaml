@@ -1,0 +1,19 @@
+description: Go test and upload of coverage to Code Climate
+parameters:
+  additional_flags:
+    description: Option to set code climate prefix (or other params) (use "--prefix=v3")
+    type: string
+    default: ""
+  exec:
+    description: Executor to use for this job (as described in the executor of this orb, this requires CC_TEST_REPORTER_ID env var)
+    type: executor
+executor: << parameters.exec >>
+steps:
+  - checkout
+  - go/load-cache
+  - code-climate-install
+  - run: cc-test-reporter before-build
+  - test
+  - submit_coverage:
+      additional_flags: <<parameters.additional_flags>>
+  - go/save-cache

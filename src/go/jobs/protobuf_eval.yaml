@@ -1,0 +1,15 @@
+description: Regenerate protobuf files to compare with auto-generated files pushed
+parameters:
+  exec:
+    description: Executor to use for this job
+    type: executor
+    default: go_executor
+executor: <<parameters.exec>>
+steps:
+  - protobuf/install:
+      version: 3.6.1 # 3.7.1 is available...
+  - checkout
+  - go/load-cache
+  - make-gen
+  - compare
+  - go/save-cache
