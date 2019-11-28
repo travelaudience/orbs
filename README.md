@@ -17,6 +17,13 @@ Learn more about Orbs from the official docs: https://circleci.com/docs/2.0/usin
 * Using the cli tool locally, create the orb:
 	* `circleci orb create travelaudience/<<ORB NAME>> --token $YOUR_API_TOKEN`
 
+### Releasing a new version
+
+When the PR is merged to master. Create a tag with the syntax of orb name, and the appropriate semantic version. Like:
+```
+docker-v0.1.0
+```
+
 ## Contributing
 
 Contributions are welcomed. However, these Orbs are used for out CI process, and have been made in an opionated way. Read the [Contributing Guide](CONTRIBUTING.md) for more information.
