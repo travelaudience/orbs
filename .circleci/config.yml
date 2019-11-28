@@ -168,15 +168,14 @@ workflows:
           name: code-climate-lint
       - orb-tools/pack:
           source-dir: src/code-climate
-          destination-orb-path: src/code-climate/orb.yaml
+          destination-orb-path: code-climate.yaml
           name: code-climate-pack
-          workspace-path: orb.yaml
-          workspace-root: src/code-climate
+          workspace-path: code-climate.yaml
 
       - publish-dev:
           context: orb-publishing
           orb-name: travelaudience/code-climate
-          orb-path: workspace/orb.yaml
+          orb-path: workspace/code-climate.yaml
           alpha-version-ref: "dev:$CIRCLE_BRANCH"
           publish-token-variable: CIRCLE_ORB_TOKEN
           requires:
