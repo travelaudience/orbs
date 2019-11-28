@@ -1,0 +1,15 @@
+description: |
+  Checkout, lint, and install charts into local k8s cluster (install is currently disabled).
+parameters:
+  chart_test_config: *chart_test_config
+  exec:
+    description: The name of custom executor to use
+    type: executor
+    default: helm-tester
+executor: << parameters.exec >>
+steps:
+  - checkout
+  - lint:
+      chart_test_config: <<parameters.chart_test_config>>
+  # - install:
+  #     chart_test_config: <<parameters.chart_test_config>>

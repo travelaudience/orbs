@@ -1,0 +1,36 @@
+description: "Package the helm chart(s)"
+parameters:
+  chart_test_config:
+    description: |
+      Path to local config file with settings to be used by Chart Tester
+      For example:
+        helm-extra-args: --timeout 600
+        validate-maintainers: false
+    type: string
+    default: ".circleci/helmTest.yaml"
+  chart_package_path:
+    description: The path where packaged charts will be saved (defaults to a local, relative path)
+    type: string
+    default: ".cr-release-packages"
+steps:
+  - run:
+      command: |
+        rm -rf <<parameters.chart_package_path>>; mkdir <<parameters.chart_package_path>>
+        ct list-changed --config <<parameters.chart_test_config>> | while IFS= read -r chart ; do
+            echo "Packaging chart: '$chart'..."
+            helm dependency build "$chart"
+
+            # set the version different for incubator
+            if [ "$CIRCLE_BRANCH" == "master" ]; then
+              helm package "$chart" --destination <<parameters.chart_package_path>>
+            else
+              ver=$(helm inspect chart "$chart" | grep version | cut -d' ' -f2)
+              [[ -z $CIRCLE_TAG ]] && BRANCH="$CIRCLE_BRANCH" || BRANCH="$CIRCLE_TAG"
+              echo "packaging $chart with version: ${ver}-${BRANCH}"
+              helm package "$chart" -u --version "${ver}-${BRANCH}" --destination .cr-release-packages
+            fi
+
+            echo "'$chart' packaged"
+            echo "-----"
+        done
+      name: '[helm] Package'

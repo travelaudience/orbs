@@ -92,6 +92,25 @@ workflows:
             - go-lint
             - go-pack
 
+      # Helm
+      - orb-tools/lint:
+          lint-dir: src/helm
+          name: helm-lint
+      - orb-tools/pack:
+          source-dir: src/helm
+          destination-orb-path: helm.yaml
+          name: helm-pack
+          workspace-path: helm.yaml
+      - orb-tools/publish-dev:
+          context: orb-publishing
+          orb-name: travelaudience/helm
+          orb-path: workspace/helm.yaml
+          alpha-version-ref: "dev:$CIRCLE_BRANCH"
+          publish-token-variable: CIRCLE_ORB_TOKEN
+          requires:
+            - helm-lint
+            - helm-pack
+
   orb-promotion:
     jobs:
       - pre-orb-promotion-check:

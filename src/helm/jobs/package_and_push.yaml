@@ -1,0 +1,14 @@
+description: |
+  Package and push charts that have changed. Pushed to github chart repository.
+parameters:
+  chart_git_repo: *chart_git_repo
+  exec:
+    description: The name of custom executor to use
+    type: executor
+    default: helm-tester
+executor: << parameters.exec >>
+steps:
+  - checkout
+  - package
+  - push:
+      chart_git_repo: <<parameters.chart_git_repo>>

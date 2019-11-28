@@ -1,0 +1,46 @@
+description: |
+  If files changed, run a helm install in kind to test that the chart can be installed
+  !!NOTE: this is not functional at this time!! docker within docker is not enabled at this time
+parameters:
+  chart_test_config:
+    description: |
+      Path to local config file with settings to be used by Chart Tester
+      For example:
+        helm-extra-args: --timeout 600
+        validate-maintainers: false
+    type: string
+    default: ".circleci/helmTest.yaml"
+  kind_version:
+    description: Version of Kind to be used
+    type: string
+    default: "v0.5.1"
+  k8s_version:
+    description: K8s version to be run with kind
+    type: string
+    default: "v1.15.0"
+steps:
+  - run:
+      command: |
+        if [ "$(ct list-changed --config <<parameters.chart_test_config>>)" ];
+        then
+          echo "Installing kind..."
+          curl -sSLo kind "https://github.com/kubernetes-sigs/kind/releases/download/<<parameters.kind_version>>/kind-linux-amd64"
+          chmod +x kind
+          mv kind /usr/local/bin/kind
+          echo "Creating cluster..."
+          // TODO: docker executable is required for this to run. IE, needs a different executor type
+          kind create cluster --name "chart-testing" --config .circleci/kind-config.yaml --image "kindest/node:<<parameters.k8s_version>>" --wait 60s
+
+          echo $(kubectl get nodes)
+          kubectl delete storageclass standard
+          kubectl apply -f https://raw.githubusercontent.com/rancher/local-path-provisioner/master/deploy/local-path-storage.yaml
+          kubectl --namespace kube-system create sa tiller
+          kubectl create clusterrolebinding tiller-cluster-rule --clusterrole=cluster-admin --serviceaccount=kube-system:tiller
+          helm init --service-account tiller --upgrade --wait
+          echo $(helm version)
+
+          ct install
+        else
+          echo "no helm changes to test"
+        fi
+      name: '[helm] Install'

@@ -1,0 +1,65 @@
+description: "Push helm chart(s) to gitub repository. Includes a retry to handle synchronous pushes."
+parameters:
+  chart_package_path:
+    description: The path where packaged charts were saved (defaults to a local, relative path)
+    type: string
+    default: ".cr-release-packages"
+  chart_git_repo: &chart_git_repo
+    description: The github repo that keeps packaged charts
+    type: string
+  clone_depth:
+    type: integer
+    default: 25
+  retry_count:
+    type: integer
+    default: 8
+steps:
+  - run: git clone --depth <<parameters.clone_depth>> <<parameters.chart_git_repo>> .helmPath
+  - run:
+      command: |
+        # Push update helm chart to github repo.
+        #
+        #  $ update_repo
+        #
+        function update_repo {
+            cd .helmPath
+            git config user.email "$GIT_EMAIL"
+            git config user.name "$GIT_USERNAME"
+
+            git fetch
+            git reset --hard origin/master
+            if ["$CIRCLE_BRANCH" == "master" ]; then
+              cp ../<<parameters.chart_package_path>>/* stable/
+            else
+              cp ../<<parameters.chart_package_path>>/* incubator/
+            fi
+            git add .
+            git commit -m "updating helm charts: $(ls ../<<parameters.chart_package_path>>)"
+            git push --set-upstream origin master
+        }
+
+        # Retry a updating repo a specific numer of times until it exits successfully, with exponential back off.
+        #
+        #  $ retry 5 update_repo
+        #
+        function retry {
+          local retries=$1
+          shift
+
+          local count=0
+          until "$@"; do
+            exit=$?
+            wait=$((2 ** $count))
+            count=$(($count + 1))
+            if [ $count -lt $retries ]; then
+              echo "Retry $count/$retries exited $exit, retrying in $wait seconds..."
+              sleep $wait
+            else
+              echo "Retry $count/$retries exited $exit, no more retries left."
+              return $exit
+            fi
+          done
+          return 0
+        }
+
+        retry <<parameters.retry_count>> update_repo
