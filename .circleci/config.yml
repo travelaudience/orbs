@@ -1,5 +1,12 @@
 version: 2.1
 
+deploy_tag_filter: &deploy_tag_filter
+  branches:
+    ignore: /.*/
+  tags:
+    only: /^[a-z,-]+-[0-9]+(\.[0-9]+){2}([0-9A-Za-z-+.]?)+/
+
+
 orbs:
   cli: circleci/circleci-cli@0.1.2
   orb-tools: circleci/orb-tools@8.27.5
@@ -113,17 +120,9 @@ workflows:
   orb-promotion:
     jobs:
       - pre-orb-promotion-check:
-          filters:
-            branches:
-              ignore: /.*/
-            tags:
-              only: /^[a-z,-]+-v[0-9]+(\.[0-9]+)*$/
+          filters: *deploy_tag_filter
       - publish-orb-into-production:
           context: orb-publishing
           requires:
             - pre-orb-promotion-check
-          filters:
-            branches:
-              ignore: /.*/
-            tags:
-              only: /^[a-z,-]+-v[0-9]+(\.[0-9]+)*$/
+          filters: *deploy_tag_filter
