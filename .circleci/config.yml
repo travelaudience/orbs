@@ -24,107 +24,91 @@ jobs:
           name: >
             Publish orb at to production, based on $CIRCLE_TAG
           command: |
-            ORB_NAME="$(echo $CIRCLE_TAG | sed 's/-v[0-9].*/\1/')"
-            VERSION="$(echo $CIRCLE_TAG | sed 's/.*\-/\1/')"
+            ORB_NAME="$(echo $CIRCLE_TAG | sed 's/-v[0-9].*//')"
+            VERSION="$(echo $CIRCLE_TAG | sed 's/.*\-//')"
             circleci config pack src/$ORB_NAME > ${ORB_NAME}.yaml
             circleci orb publish "$ORB_NAME.yaml" "travelaudience/${ORB_NAME}@${VERSION}" --token ${CIRCLE_ORB_TOKEN}
-
-  test:
-    executor: cli/default
-    steps:
-      - checkout
-      - run:
-          name: >
-            Test the tag parsinge
-          command: |
-            echo "$CIRCLE_BRANCH"
-            ORB_NAME=$(echo $CIRCLE_BRANCH | sed "s/-v[0-9].*//")
-            echo "without the quotes: $ORB_NAME"
-            VERSION="$(echo $CIRCLE_TAG | sed 's/.*\-//')"
-            echo "original problem still: $VERSION"
-
 
 
 workflows:
   version: 2
   orb-validate-dev-push:
     jobs:
-      - test
-      # # Code Climate
-      # - orb-tools/lint:
-      #     lint-dir: src/code-climate
-      #     name: code-climate-lint
-      # - orb-tools/pack:
-      #     source-dir: src/code-climate
-      #     destination-orb-path: code-climate.yaml
-      #     name: code-climate-pack
-      #     workspace-path: code-climate.yaml
-      # - orb-tools/publish-dev:
-      #     context: orb-publishing
-      #     orb-name: travelaudience/code-climate
-      #     orb-path: workspace/code-climate.yaml
-      #     alpha-version-ref: "dev:$CIRCLE_BRANCH"
-      #     publish-token-variable: CIRCLE_ORB_TOKEN
-      #     requires:
-      #       - code-climate-lint
-      #       - code-climate-pack
+      # Code Climate
+      - orb-tools/lint:
+          lint-dir: src/code-climate
+          name: code-climate-lint
+      - orb-tools/pack:
+          source-dir: src/code-climate
+          destination-orb-path: code-climate.yaml
+          name: code-climate-pack
+          workspace-path: code-climate.yaml
+      - orb-tools/publish-dev:
+          context: orb-publishing
+          orb-name: travelaudience/code-climate
+          orb-path: workspace/code-climate.yaml
+          alpha-version-ref: "dev:$CIRCLE_BRANCH"
+          publish-token-variable: CIRCLE_ORB_TOKEN
+          requires:
+            - code-climate-lint
+            - code-climate-pack
 
-      # # Docker
-      # - orb-tools/lint:
-      #     lint-dir: src/docker
-      #     name: docker-lint
-      # - orb-tools/pack:
-      #     source-dir: src/docker
-      #     destination-orb-path: docker.yaml
-      #     name: docker-pack
-      #     workspace-path: docker.yaml
-      # - orb-tools/publish-dev:
-      #     context: orb-publishing
-      #     orb-name: travelaudience/docker
-      #     orb-path: workspace/docker.yaml
-      #     alpha-version-ref: "dev:$CIRCLE_BRANCH"
-      #     publish-token-variable: CIRCLE_ORB_TOKEN
-      #     requires:
-      #       - docker-lint
-      #       - docker-pack
+      # Docker
+      - orb-tools/lint:
+          lint-dir: src/docker
+          name: docker-lint
+      - orb-tools/pack:
+          source-dir: src/docker
+          destination-orb-path: docker.yaml
+          name: docker-pack
+          workspace-path: docker.yaml
+      - orb-tools/publish-dev:
+          context: orb-publishing
+          orb-name: travelaudience/docker
+          orb-path: workspace/docker.yaml
+          alpha-version-ref: "dev:$CIRCLE_BRANCH"
+          publish-token-variable: CIRCLE_ORB_TOKEN
+          requires:
+            - docker-lint
+            - docker-pack
 
-      # # Go
-      # - orb-tools/lint:
-      #     lint-dir: src/go
-      #     name: go-lint
-      # - orb-tools/pack:
-      #     source-dir: src/go
-      #     destination-orb-path: go.yaml
-      #     name: go-pack
-      #     workspace-path: go.yaml
-      # - orb-tools/publish-dev:
-      #     context: orb-publishing
-      #     orb-name: travelaudience/go
-      #     orb-path: workspace/go.yaml
-      #     alpha-version-ref: "dev:$CIRCLE_BRANCH"
-      #     publish-token-variable: CIRCLE_ORB_TOKEN
-      #     requires:
-      #       - go-lint
-      #       - go-pack
+      # Go
+      - orb-tools/lint:
+          lint-dir: src/go
+          name: go-lint
+      - orb-tools/pack:
+          source-dir: src/go
+          destination-orb-path: go.yaml
+          name: go-pack
+          workspace-path: go.yaml
+      - orb-tools/publish-dev:
+          context: orb-publishing
+          orb-name: travelaudience/go
+          orb-path: workspace/go.yaml
+          alpha-version-ref: "dev:$CIRCLE_BRANCH"
+          publish-token-variable: CIRCLE_ORB_TOKEN
+          requires:
+            - go-lint
+            - go-pack
 
-      # # Helm
-      # - orb-tools/lint:
-      #     lint-dir: src/helm
-      #     name: helm-lint
-      # - orb-tools/pack:
-      #     source-dir: src/helm
-      #     destination-orb-path: helm.yaml
-      #     name: helm-pack
-      #     workspace-path: helm.yaml
-      # - orb-tools/publish-dev:
-      #     context: orb-publishing
-      #     orb-name: travelaudience/helm
-      #     orb-path: workspace/helm.yaml
-      #     alpha-version-ref: "dev:$CIRCLE_BRANCH"
-      #     publish-token-variable: CIRCLE_ORB_TOKEN
-      #     requires:
-      #       - helm-lint
-      #       - helm-pack
+      # Helm
+      - orb-tools/lint:
+          lint-dir: src/helm
+          name: helm-lint
+      - orb-tools/pack:
+          source-dir: src/helm
+          destination-orb-path: helm.yaml
+          name: helm-pack
+          workspace-path: helm.yaml
+      - orb-tools/publish-dev:
+          context: orb-publishing
+          orb-name: travelaudience/helm
+          orb-path: workspace/helm.yaml
+          alpha-version-ref: "dev:$CIRCLE_BRANCH"
+          publish-token-variable: CIRCLE_ORB_TOKEN
+          requires:
+            - helm-lint
+            - helm-pack
 
   orb-promotion:
     jobs:
