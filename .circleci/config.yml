@@ -38,9 +38,9 @@ jobs:
             Test the tag parsinge
           command: |
             echo "$CIRCLE_BRANCH"
-            ORB_NAME=$(echo $CIRCLE_BRANCH | sed "s/-v[0-9].*/\1/")
+            ORB_NAME=$(echo $CIRCLE_BRANCH | sed "s/-v[0-9].*//")
             echo "without the quotes: $ORB_NAME"
-            VERSION="$(echo $CIRCLE_TAG | sed 's/.*\-/\1/')"
+            VERSION="$(echo $CIRCLE_TAG | sed 's/.*\-//')"
             echo "original problem still: $VERSION"
 
 
