@@ -24,8 +24,8 @@ jobs:
           name: >
             Publish orb at to production, based on $CIRCLE_TAG
           command: |
-            ORB_NAME="$(echo $CIRCLE_TAG | sed 's/-v[0-9].*//')"
-            VERSION="$(echo $CIRCLE_TAG | sed 's/.*\-//')"
+            ORB_NAME="$(echo $CIRCLE_TAG | sed 's/-[0-9].*//')"
+            VERSION="$(echo $CIRCLE_TAG | sed 's/.*\-\([0-9]\)/\1/')"
             circleci config pack src/$ORB_NAME > ${ORB_NAME}.yaml
             circleci orb publish "$ORB_NAME.yaml" "travelaudience/${ORB_NAME}@${VERSION}" --token ${CIRCLE_ORB_TOKEN}
 

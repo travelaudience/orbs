@@ -21,7 +21,7 @@ Learn more about Orbs from the official docs: https://circleci.com/docs/2.0/usin
 
 When the PR is merged to master. Create a tag with the syntax of orb name, and the appropriate semantic version. Like:
 ```
-docker-v0.1.0
+docker-0.1.0
 ```
 
 ## Contributing
