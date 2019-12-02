@@ -1,0 +1,8 @@
+description: run golint against code base (not yet implemented in a way that only checks changed files)
+steps:
+  # TODO: golangci-lint seems to be quite common
+  - run: GO111MODULE=off go get -u golang.org/x/lint/golint
+  # TODO: DISABLED:
+  #       only changed files should be linted - check how helm version check does it
+  #       else, look into bash cmds in https://circleci.com/orbs/registry/orb/qventus/terraform-lint
+  - run: golint ./...

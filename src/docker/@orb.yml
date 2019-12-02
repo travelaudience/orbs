@@ -1,0 +1,10 @@
+version: 2.1
+
+description: |
+  CircleCI Orb for docker. Provides similar functionality to orb: circleci/docker (supporting persistent workspace & multiple tags)
+  But also includes image scanning with: ovotech/clair-scanner
+  see github page for more info: https://github.com/travelaudience/orbs
+
+orbs:
+  docker-orb: circleci/docker@0.5.13
+  clair-scanner: ovotech/clair-scanner@1.6.0

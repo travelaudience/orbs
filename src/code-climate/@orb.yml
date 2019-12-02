@@ -1,0 +1,9 @@
+version: 2.1
+
+description: |
+  Commands for Code Climate.
+  Originally from afrase/code-climate orb, but with the needed improvements to be usable.
+  see github page for more info: https://github.com/travelaudience/orbs
+
+display:
+  home_url: https://github.com/travelaudience/orbs

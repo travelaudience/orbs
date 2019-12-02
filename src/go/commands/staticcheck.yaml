@@ -1,0 +1,10 @@
+description: run staticcheck against code base
+parameters:
+  version:
+    description: Version of staticcheck to install
+    default: "2019.2.1"
+    type: string
+steps:
+  # directory change required due to https://github.com/dominikh/go-tools/issues/528
+  - run: cd ../ && go get -u honnef.co/go/tools/cmd/staticcheck@<<parameters.version>>
+  - run: staticcheck -unused.whole-program ./...
