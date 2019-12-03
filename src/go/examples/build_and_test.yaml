@@ -1,0 +1,50 @@
+description: |
+  If you have a standard go project, you can use this orb to run through
+  a common go workflow. (using code-climate for code coverage analysis)
+usage:
+  version: 2.1
+
+  orbs:
+    ta-go: travelaudience/go@x.y.z
+
+  executors:
+    golang-executor:
+      docker:
+        - image: circleci/golang:1.13
+      working_directory: /go/src/github.com/your-org/repo-name
+      environment:
+        GO111MODULE: "on"
+        # This environment variable is needed from go 1.13 for private repos.
+        GOPRIVATE: "github.com/your-org/*"
+        CC_TEST_REPORTER_ID: 123ABC # the Code Climate token for this repo
+
+  jobs:
+    # for compiling multiple binaries within one repo
+    compile_code:
+      executor: golang-executor
+      steps:
+        - checkout
+        - ta-go/load-cache
+        - ta-go/build:
+            package_name: package
+            import_path: github.com/your-org/repo-name/path-to/package
+        - ta-go/build:
+            package_name: alternate
+            import_path: github.com/your-org/repo-name/path-to/alternate
+        - ta-go/save-cache
+
+  workflows:
+    build_and_test:
+      jobs:
+        - ta-go/checks:
+            exec: golang-executor
+        - ta-go/protobuf_eval:
+            exec: golang-executor
+        - ta-go/test_and_coverage:
+            exec: golang-executor
+            additional_flags: "--prefix=v3"
+        - compile_code:
+            requires:
+              - ta-go/checks
+              - ta-go/protobuf_eval
+              - ta-go/test_and_coverage

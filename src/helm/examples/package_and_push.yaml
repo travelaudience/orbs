@@ -1,0 +1,19 @@
+description: |
+  If you have a standard project with helm configuration, you can use this orb to run through
+  a common helm workflow of packaging and pushing to external (github) helm repository.
+
+usage:
+  version: 2.1
+
+  orbs:
+    ta-helm: travelaudience/helm@0.1.0
+
+  workflows:
+    build_and_test:
+      jobs:
+        - ta-helm/validate
+        - ta-helm/package_and_push:
+            requires:
+              - ta-helm/validate
+            context: git-push-config
+            chart_git_repo: git@github.com:your-org/helmrepo.git
