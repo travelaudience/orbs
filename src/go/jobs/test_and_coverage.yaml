@@ -11,9 +11,17 @@ executor: << parameters.exec >>
 steps:
   - checkout
   - go/load-cache
-  - code-climate-install
+  - code-climate/install
   - run: cc-test-reporter before-build
   - test
-  - submit_coverage:
+  - run:
+      command: |
+        cat cover-source.out | grep -v '.pb.go' | grep -v '.pqt.go' | grep -v '.mock.go' > cover-final.out
+        go tool cover -func=cover-final.out
+      name: "remove .pb.go .pqt.go & .mock.go from coverage report"
+  - code-climate/format_coverage:
       additional_flags: <<parameters.additional_flags>>
+      coverage_file: cover-final.out
+      input_type: gocov
+  - code-climate/upload_coverage
   - go/save-cache
