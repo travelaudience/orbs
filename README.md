@@ -1,4 +1,9 @@
-# travel audience Orbs
+# travel audience Orbs [![CircleCI](https://circleci.com/gh/travelaudience/orbs/tree/master.svg?style=svg&circle-token=51e6640500da23f9c6796effa1a7c53bb6e411a6)](https://circleci.com/gh/travelaudience/orbs/tree/master) [![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](https://raw.githubusercontent.com/travelaudience/orbs/master/LICENSE)
+
+- `travelaudience/code-climate`: [![CircleCI Orb Version](https://img.shields.io/badge/endpoint.svg?url=https://badges.circleci.io/orb/travelaudience/code-climate)](https://circleci.com/orbs/registry/orb/travelaudience/code-climate)
+- `travelaudience/docker`: [![CircleCI Orb Version](https://img.shields.io/badge/endpoint.svg?url=https://badges.circleci.io/orb/travelaudience/docker)](https://circleci.com/orbs/registry/orb/travelaudience/docker)
+- `travelaudience/go`: [![CircleCI Orb Version](https://img.shields.io/badge/endpoint.svg?url=https://badges.circleci.io/orb/travelaudience/go)](https://circleci.com/orbs/registry/orb/travelaudience/go)
+- `travelaudience/helm`: [![CircleCI Orb Version](https://img.shields.io/badge/endpoint.svg?url=https://badges.circleci.io/orb/travelaudience/helm)](https://circleci.com/orbs/registry/orb/travelaudience/helm)
 
 The source code for travel audience orbs used on CircleCI
 
