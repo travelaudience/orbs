@@ -24,7 +24,7 @@ usage:
     build_and_test:
       jobs:
         - ta-helm/validate:
-          chart_test_config: .circleci/extraConfigFile.yamls
+          chart_test_config: ".circleci/extraConfigFile.yaml"
         - ta-helm/package_and_push:
             requires:
               - ta-helm/validate
