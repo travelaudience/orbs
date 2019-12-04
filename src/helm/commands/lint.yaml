@@ -7,6 +7,6 @@ parameters:
         helm-extra-args: --timeout 600
         validate-maintainers: false
     type: string
-    default: ".circleci/helmTest.yaml"
+    default: ".circleci/helmTestConfig.yaml"
 steps:
   - run: "ct lint --config <<parameters.chart_test_config>>"
