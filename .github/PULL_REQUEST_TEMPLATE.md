@@ -6,6 +6,6 @@ If this PR closes another issue, add 'closes #<issue number>' somewhere in the P
 **Special notes for your reviewer**:
 
 **If applicable**:
-- [ ] this PR contains documentation
-- [ ] this PR contains unit tests
-- [ ] this PR has been tested for backwards compatibility
+- [ ] All new Jobs, Commands, Executors, Parameters have descriptions
+- [ ] If PR adds a new feature, Examples have been added
+- [ ] README has been updated, if necessary
