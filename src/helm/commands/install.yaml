@@ -9,7 +9,7 @@ parameters:
         helm-extra-args: --timeout 600
         validate-maintainers: false
     type: string
-    default: ".circleci/helmTest.yaml"
+    default: ".circleci/helmTestConfig.yaml"
   kind_version:
     description: Version of Kind to be used
     type: string
@@ -43,4 +43,4 @@ steps:
         else
           echo "no helm changes to test"
         fi
-      name: '[helm] Install'
+      name: "[helm] Install"

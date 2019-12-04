@@ -8,7 +8,7 @@ parameters:
         helm-extra-args: --timeout 600
         validate-maintainers: false
     type: string
-    default: ".circleci/helmTest.yaml"
+    default: ".circleci/helmTestConfig.yaml"
   exec:
     description: The name of custom executor to use
     type: executor
