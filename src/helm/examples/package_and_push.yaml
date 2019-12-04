@@ -2,7 +2,7 @@ description: |
   If you have a standard project with helm configuration, you can use this orb to run through
   a common helm workflow of packaging and pushing to external (github) helm repository.
 
-  Extra configuration can be put in a local config file. See more information about the config options 
+  Extra configuration can be put in a local config file. See more information about the config options
   [https://github.com/helm/chart-testing](https://github.com/helm/chart-testing#configuration)
 
   An example config file will look like: [helmTestConfig.yaml]
