@@ -5,14 +5,14 @@ description: |
   Extra configuration can be put in a local config file. See more information about the config options
   [https://github.com/helm/chart-testing](https://github.com/helm/chart-testing#configuration)
 
-  An example config file will look like:
-
-  helm-extra-args: --timeout 600
-  validate-chart-schema: false
-  validate-maintainers: false
-  chart-dirs: helm
-  excluded-charts: example
-
+  An example config file will look like: helmTestConfig.yaml
+    ```
+    helm-extra-args: --timeout 600
+    validate-chart-schema: false
+    validate-maintainers: false
+    chart-dirs: helm
+    excluded-charts: example
+    ```
 usage:
   version: 2.1
 
@@ -23,7 +23,7 @@ usage:
     build_and_test:
       jobs:
         - ta-helm/validate:
-          chart_test_config: ".circleci/extraConfigFile.yaml"
+            chart_test_config: .circleci/extraConfigFile.yaml
         - ta-helm/package_and_push:
             requires:
               - ta-helm/validate
