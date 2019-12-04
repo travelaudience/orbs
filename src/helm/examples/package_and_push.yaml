@@ -5,7 +5,7 @@ description: |
   Extra configuration can be put in a local config file. See more information about the config options
   [https://github.com/helm/chart-testing](https://github.com/helm/chart-testing#configuration)
 
-  An example config file will look like: [helmTestConfig.yaml]
+  An example config file will look like: helmTestConfig.yaml
     ```
     helm-extra-args: --timeout 600
     validate-chart-schema: false
