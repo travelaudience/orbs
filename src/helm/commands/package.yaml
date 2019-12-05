@@ -20,6 +20,10 @@ steps:
         rm -rf <<parameters.chart_package_path>>; mkdir <<parameters.chart_package_path>>
         ct list-changed --config <<parameters.chart_test_config>> | while IFS= read -r chart ; do
             chart=$(echo $chart | sed 's/.*Skipping...//g')
+            if [ "$chart" == "" ]; then
+              continue
+            fi
+
             echo "Packaging chart: '$chart'..."
             helm dependency build "$chart"
 
