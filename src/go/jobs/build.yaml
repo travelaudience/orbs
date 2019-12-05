@@ -13,6 +13,6 @@ executor: << parameters.exec >>
 
 steps:
   - checkout
-  - load-cache
+  - go/load-cache
   - build
-  - save-cache
+  - go/save-cache
