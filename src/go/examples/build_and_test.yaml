@@ -18,21 +18,6 @@ usage:
         GOPRIVATE: "github.com/your-org/*"
         CC_TEST_REPORTER_ID: 123ABC # the Code Climate token for this repo
 
-  jobs:
-    # for compiling multiple binaries within one repo
-    compile_code:
-      executor: golang-executor
-      steps:
-        - checkout
-        - ta-go/load-cache
-        - ta-go/build:
-            package_name: package
-            import_path: github.com/your-org/repo-name/path-to/package
-        - ta-go/build:
-            package_name: alternate
-            import_path: github.com/your-org/repo-name/path-to/alternate
-        - ta-go/save-cache
-
   workflows:
     build_and_test:
       jobs:
@@ -43,7 +28,8 @@ usage:
         - ta-go/test_and_coverage:
             exec: golang-executor
             additional_flags: "--prefix=v3"
-        - compile_code:
+        - ta-go/build:
+            exec: golang-executor
             requires:
               - ta-go/checks
               - ta-go/protobuf_eval

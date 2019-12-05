@@ -1,22 +1,36 @@
-description: "Go build package"
+description: "Parse go code structure for packages to build."
 parameters:
-  package_name:
-    description: the name to package the build as (used with -o ./bin/__)
-    type: string
-  import_path:
-    description: path to the code to build (generic would be ./...)
-    type: string
   cgo_value:
     default: "0"
     type: string
+  os_value:
+    default: "linux"
+    type: string
 steps:
   - run:
+      name: '[go] Build'
       command: |
         ver=$(git describe --tags --always --dirty)
         ld_flags="-X 'main.version=$ver'"
-        CGO_ENABLED=<<parameters.cgo_value>> GOOS=linux go build -ldflags "$ld_flags" -a -o ./bin/<<parameters.package_name>> <<parameters.import_path>>
-      name: '[go] Build'
+
+        go list -f {{.ImportPath}}%{{.Name}} ./... | while IFS= read -r import_string ; do
+          if [[ $import_string != *"/cmd/"* ]]; then
+            continue
+          fi
+
+          arr_parts=(${import_string//%/ })
+          if [[ ${arr_parts[1],,} != "main" ]]; then
+            echo "The expected package is 'main'. Not building: $import_string"
+            continue
+          fi
+          importPath=${arr_parts[0]}
+          name="${importPath##*/}"
+
+          echo "Building: $name..."
+          CGO_ENABLED=<<parameters.cgo_value>> GOOS=<<parameters.os_value>> go build -ldflags "$ld_flags" -a -o "./bin/$name" "$importPath"
+        done
+  - run: ls -alh ./bin
   - persist_to_workspace:
       root: ./
       paths:
-        - bin/<<parameters.package_name>>
+        - bin/*

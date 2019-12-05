@@ -1,0 +1,18 @@
+description: |
+  Parse go code structure for packages to build.
+  Looks for /cmd subdirectory, and builds the main packages within that subdirectory.
+  For example, the expected import path should be:
+    github.com/my-org/repo-name/v1/cmd/packageName
+
+parameters:
+  exec:
+    description: Executor to use for this job
+    type: executor
+    default: go_executor
+executor: << parameters.exec >>
+
+steps:
+  - checkout
+  - load-cache
+  - build
+  - save-cache
