@@ -1,5 +1,6 @@
 description: Execute make gen in order to rebuild the generated protobuf files locally
 steps:
   - run: GO111MODULE=off go get -u github.com/vektra/mockery/cmd/mockery
+  - run: GO111MODULE=off go get -u github.com/golang/protobuf/protoc-gen-go
   - run: GO111MODULE=off go get -u golang.org/x/tools/cmd/goimports
   - run: make gen
