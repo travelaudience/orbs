@@ -7,4 +7,4 @@ description: |
 orbs:
   go: circleci/go@0.2.0
   protobuf: izumin5210/protobuf@0.1.0
-  code-climate: travelaudience/code-climate@0.1.0
+  code-climate: travelaudience/code-climate@0.1.1
