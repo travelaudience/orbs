@@ -3,12 +3,10 @@ steps:
   - run: |
           if [ ! -z "$CIRCLE_TAG" ];
           then
-            CIRCLE_NAME=$CIRCLE_TAG
+            echo 'export CHANGE_NAME="$(echo "$CIRCLE_TAG" | sed -r 's/[\/=_#]+/-/g')"' >> $BASH_ENV
           elif [ ! -z "$CIRCLE_BRANCH" ];
           then
-            CIRCLE_NAME=$CIRCLE_BRANCH
+            echo 'export CHANGE_NAME="$(echo "$CIRCLE_BRANCH" | sed -r 's/[\/=_#]+/-/g')"' >> $BASH_ENV
           fi
-          CIRCLE_NAME=$(echo "$CIRCLE_NAME" | sed -r 's/[\/=_#]+/-/g')
-          echo 'export CHANGE_NAME=$CIRCLE_NAME' >> $BASH_ENV
           source $BASH_ENV
           echo $CHANGE_NAME
