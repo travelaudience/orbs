@@ -1,0 +1,25 @@
+description: |
+  To trigger a job in Jenkins that manages a deploy.
+
+  Expectations: (ie, to make this orb useful)
+    * create a context with env vars: JENKINS_SERVER_URL, JENKINS_USER, JENKINS_TOKEN
+    * have jobs defined in Jenkins with the structure of: team-name/job/deploys/job/repo
+
+usage:
+  version: 2.1
+
+  orbs:
+    ta-deploy: travelaudience/deploy@x.y.z
+
+  workflows:
+    deploy_tag:
+      jobs:
+        - ta-deploy/jenkins_build_with_parameters:
+            context: jenkins-deploy
+            team_folder: "team-name"
+            job_name: "repo-name"
+            filters:
+              tags:
+                only: /.*/
+              branches:
+                ignore: /.*/
