@@ -121,6 +121,26 @@ workflows:
             - helm-lint
             - helm-pack
 
+      # Deploy
+      - orb-tools/lint:
+          lint-dir: src/deploy
+          name: deploy-lint
+      - orb-tools/pack:
+          source-dir: src/deploy
+          destination-orb-path: deploy.yaml
+          name: deploy-pack
+          workspace-path: deploy.yaml
+      - orb-tools/publish-dev:
+          name: deploy-dev-publish
+          context: orb-publishing
+          orb-name: travelaudience/deploy
+          orb-path: workspace/deploy.yaml
+          alpha-version-ref: "dev:$CIRCLE_BRANCH"
+          publish-token-variable: CIRCLE_ORB_TOKEN
+          requires:
+            - deploy-lint
+            - deploy-pack
+
   orb-promotion:
     jobs:
       - pre-orb-promotion-check:
