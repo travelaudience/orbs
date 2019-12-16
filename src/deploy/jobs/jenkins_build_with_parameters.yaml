@@ -16,7 +16,7 @@ parameters:
   server_url:
     description: "Jenkins endpoint"
     type: env_var_name
-    default:
+    default: JENKINS_SERVER_URL
   team_folder:
     type: string
     description: Team name where the deploy jobs in Jenkins sit
