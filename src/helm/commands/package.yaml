@@ -14,6 +14,7 @@ parameters:
     default: ".cr-release-packages"
 steps:
   - run:
+      shell: /bin/sh
       command: |
         helm init --client-only  || true  # this step is required for helm v2
         helm version -c
