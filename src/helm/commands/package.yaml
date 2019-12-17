@@ -25,7 +25,7 @@ steps:
                 repo_url=$(echo "$i" | cut -d'=' -f2)
                 helm repo add $repo_name $repo_url
             done
-        fi
+        fi;
         rm -rf <<parameters.chart_package_path>>; mkdir <<parameters.chart_package_path>>
         ct list-changed --config <<parameters.chart_test_config>> | while IFS= read -r chart ; do
             chart=$(echo $chart | sed 's/.*Skipping...//g')
