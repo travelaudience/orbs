@@ -1,4 +1,7 @@
-description: "Package the helm chart(s)"
+description: |
+  Package the helm chart(s).
+  You can add multiple chart repos by defining the following environment variable in your context
+  CT_CHART_REPOS=repo_name1=repo_url1,repo_name2=repo_url2
 parameters:
   chart_test_config:
     description: |
@@ -14,9 +17,18 @@ parameters:
     default: ".cr-release-packages"
 steps:
   - run:
+      shell: /bin/sh
       command: |
         helm init --client-only  || true  # this step is required for helm v2
         helm version -c
+        if [ "$CT_CHART_REPOS" ]; then
+            for i in $(echo $CT_CHART_REPOS | tr "," " ");
+            do
+                repo_name=$(echo "$i" | cut -d'=' -f1)
+                repo_url=$(echo "$i" | cut -d'=' -f2)
+                helm repo add $repo_name $repo_url
+            done
+        fi
         rm -rf <<parameters.chart_package_path>>; mkdir <<parameters.chart_package_path>>
         ct list-changed --config <<parameters.chart_test_config>> | while IFS= read -r chart ; do
             chart=$(echo $chart | sed 's/.*Skipping...//g')
