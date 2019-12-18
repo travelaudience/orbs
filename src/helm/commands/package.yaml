@@ -1,4 +1,7 @@
-description: "Package the helm chart(s)"
+description: | 
+  Package the helm chart(s). 
+  You can add multiple private chart repos by defining the following environment variable in your context
+  CT_CHART_REPOS=[repo_name1]=[repo_url1],[repo_name2]=[repo_url2]
 parameters:
   chart_test_config:
     description: |
