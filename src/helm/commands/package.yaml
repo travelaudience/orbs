@@ -23,7 +23,7 @@ steps:
             do
                 repo_name=$(echo "$i" | cut -d'=' -f1)
                 repo_url=$(echo "$i" | cut -d'=' -f2)
-                helm repo add $repo_name $repo_url        
+                helm repo add $repo_name $repo_url
             done
         fi
         rm -rf <<parameters.chart_package_path>>; mkdir <<parameters.chart_package_path>>
