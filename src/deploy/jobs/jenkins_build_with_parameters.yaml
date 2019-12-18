@@ -33,4 +33,4 @@ steps:
   - run:
       name: Trigger build via curl
       command: |
-        curl  -X POST --user <<parameters.user_id>>:<<parameters.access_token>> -d "<<parameters.job_params>>" <<parameters.server_url>>/job/<<parameters.team_folder>>/job/deploys/job/<<parameters.job_name>>/buildWithParameters
+        curl  -X POST --user ${<<parameters.user_id>>}:${<<parameters.access_token>>} -d "<<parameters.job_params>>" ${<<parameters.server_url>>}/job/<<parameters.team_folder>>/job/deploys/job/<<parameters.job_name>>/buildWithParameters
