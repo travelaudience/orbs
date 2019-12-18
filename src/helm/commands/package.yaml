@@ -18,13 +18,12 @@ steps:
       command: |
         helm init --client-only  || true  # this step is required for helm v2
         helm version -c
-        if [ $CT_CHART_REPOS ] ; then
-            IFS=', ' read -r -a array \<<<  $CT_CHART_REPOS
-            for i in "${array[@]}"; do
-                # echo "$i"
+        if [ "$CT_CHART_REPOS" ]; then
+            for i in $(echo $CT_CHART_REPOS | tr "," " ");
+            do
                 repo_name=$(echo "$i" | cut -d'=' -f1)
                 repo_url=$(echo "$i" | cut -d'=' -f2)
-                helm repo add $repo_name $repo_url
+                helm repo add $repo_name $repo_url        
             done
         fi
         rm -rf <<parameters.chart_package_path>>; mkdir <<parameters.chart_package_path>>
