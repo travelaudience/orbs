@@ -5,11 +5,11 @@ parameters:
   retry_count:
     description: Amount of attempts to make while waiting for the image to exist in the registry
     type: integer
-    default: 5
+    default: 8
   wait_period:
     description: Seconds to wait between retries
     type: integer
-    default: 60
+    default: 90
   image-name:
     description: Name of image to re-tag
     type: string
