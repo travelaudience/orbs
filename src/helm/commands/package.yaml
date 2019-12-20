@@ -40,16 +40,21 @@ steps:
             helm dependency build "$chart"
 
             # set the version different for incubator
-            if [ "$CIRCLE_BRANCH" == "master" ]; then
-              helm package "$chart" --destination <<parameters.chart_package_path>>
-            else
-              ver=$(helm inspect chart "$chart" | grep version | cut -d' ' -f2)
-              [[ -z $CIRCLE_TAG ]] && BRANCH="$CIRCLE_BRANCH" || BRANCH="$CIRCLE_TAG"
-              echo "packaging $chart with version: ${ver}-${BRANCH}"
-              helm package "$chart" -u --version "${ver}-${BRANCH}" --destination .cr-release-packages
-            fi
+            ver=$(helm inspect chart "$chart" | grep version | cut -d' ' -f2)
+            [[ -z $CIRCLE_TAG ]] && BRANCH="$CIRCLE_BRANCH" || BRANCH="$CIRCLE_TAG"
+            echo "packaging $chart with version: ${ver}-${BRANCH}"
+            helm package "$chart" -u --version "${ver}-${BRANCH}" --destination .cr-release-packages
 
             echo "'$chart' packaged"
             echo "-----"
         done
+        
+        if [ "$CIRCLE_BRANCH" == "master" ]; then
+          git diff HEAD^ HEAD | grep "helm/.*/Chart.yaml$" | sed -n '3p;6p;9p' | awk '{print $2}' | sed 's/\/Chart.yaml$//' | sed 's/\// /g'
+          echo "Packaging chart: '$chart'..."
+          helm dependency build "$chart"
+          helm package "$chart" --destination <<parameters.chart_package_path>>
+          echo "'$chart' packaged"
+          echo "-----"
+        fi
       name: "[helm] Package"
