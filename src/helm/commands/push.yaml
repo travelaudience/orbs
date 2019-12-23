@@ -25,20 +25,20 @@ steps:
             cd .helmPath
             git config user.email "$GIT_EMAIL"
             git config user.name "$GIT_USERNAME"
+            files_changed=$(ls ../<<parameters.chart_package_path>>)
 
             git fetch
             git reset --hard origin/master
             if [ "$CIRCLE_BRANCH" == "master" ]; then
               cp ../<<parameters.chart_package_path>>/* stable/
-              cd stable;helm repo index .
+              cd stable
+              helm repo index .
             else
               cp ../<<parameters.chart_package_path>>/* incubator/
-              cd incubator;helm repo index .
+              cd incubator
+              helm repo index .
             fi
-            files_changed=$(ls ../<<parameters.chart_package_path>>)
-            pwd
             echo "---$files_changed--"
-            ls -al ../
             git add .
             git commit -m "updating helm charts: $files_changed"
             git push --set-upstream origin master
