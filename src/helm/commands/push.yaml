@@ -28,7 +28,7 @@ steps:
 
             git fetch
             git reset --hard origin/master
-            if ["$CIRCLE_BRANCH" == "master" ]; then
+            if [ "$CIRCLE_BRANCH" == "master" ]; then
               cp ../<<parameters.chart_package_path>>/* stable/
               cd stable;helm repo index .
             else
