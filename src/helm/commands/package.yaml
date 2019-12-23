@@ -11,6 +11,13 @@ parameters:
         validate-maintainers: false
     type: string
     default: ".circleci/helmTestConfig.yaml"
+  chart_dir_override:
+    description: |
+      Due to 'ct list-changed' not working on master (see https://github.com/helm/chart-testing/pull/159)
+      Need get changed charts through git command.
+      Defaulting to searching in 'helm' dir to look for changes.
+    type: string
+    default: "helm"
   chart_package_path:
     description: The path where packaged charts will be saved (defaults to a local, relative path)
     type: string
@@ -19,23 +26,12 @@ steps:
   - run:
       shell: /bin/sh
       command: |
-        helm init --client-only  || true  # this step is required for helm v2
-        helm version -c
-        if [ "$CT_CHART_REPOS" ]; then
-            for i in $(echo $CT_CHART_REPOS | tr "," " ");
-            do
-                repo_name=$(echo "$i" | cut -d'=' -f1)
-                repo_url=$(echo "$i" | cut -d'=' -f2)
-                helm repo add $repo_name $repo_url
-            done
-        fi
-        rm -rf <<parameters.chart_package_path>>; mkdir <<parameters.chart_package_path>>
-        ct list-changed --config <<parameters.chart_test_config>> | while IFS= read -r chart ; do
-            chart=$(echo $chart | sed 's/.*Skipping...//g')
-            if [ "$chart" == "" ]; then
-              continue
-            fi
-
+        # Package up the chart to <<parameters.chart_package_path>>.
+        #
+        #  $ package_chart chart/path
+        #
+        function package_chart {
+            chart=$1
             echo "Packaging chart: '$chart'..."
             helm dependency build "$chart"
 
@@ -47,14 +43,36 @@ steps:
 
             echo "'$chart' packaged"
             echo "-----"
-        done
-        
+        }
+
+        helm init --client-only  || true  # this step is required for helm v2
+        helm version -c
+        if [ "$CT_CHART_REPOS" ]; then
+            for i in $(echo $CT_CHART_REPOS | tr "," " ");
+            do
+                repo_name=$(echo "$i" | cut -d'=' -f1)
+                repo_url=$(echo "$i" | cut -d'=' -f2)
+                helm repo add $repo_name $repo_url
+            done
+        fi
+        rm -rf <<parameters.chart_package_path>>; mkdir <<parameters.chart_package_path>>
+
+        # 'ct list-changed' doesn't work on master branch
+        #   see https://github.com/helm/chart-testing/pull/159
         if [ "$CIRCLE_BRANCH" == "master" ]; then
-          git diff HEAD^ HEAD | grep "helm/.*/Chart.yaml$" | sed -n '3p;6p;9p' | awk '{print $2}' | sed 's/\/Chart.yaml$//' | sed 's/\// /g'
-          echo "Packaging chart: '$chart'..."
-          helm dependency build "$chart"
-          helm package "$chart" --destination <<parameters.chart_package_path>>
-          echo "'$chart' packaged"
-          echo "-----"
+            git diff --name-only $(git merge-base HEAD^ HEAD) -- <<parameters.chart_dir_override>>  | while IFS= read -r file ; do
+                if echo "$file" | grep -q "/Chart.yaml"; then
+                    chart=$(echo "$file" | sed 's/\/Chart.yaml$//')
+                    package_chart $chart
+                fi
+            done
+        else
+            ct list-changed --config <<parameters.chart_test_config>> | while IFS= read -r chart ; do
+                chart=$(echo $chart | sed 's/.*Skipping...//g')
+                if [ "$chart" == "" ]; then
+                  continue
+                fi
+                package_chart $chart
+            done
         fi
       name: "[helm] Package"
