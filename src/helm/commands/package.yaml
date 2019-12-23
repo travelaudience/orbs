@@ -36,10 +36,14 @@ steps:
             helm dependency build "$chart"
 
             # set the version different for incubator
-            ver=$(helm inspect chart "$chart" | grep version | cut -d' ' -f2)
-            [[ -z $CIRCLE_TAG ]] && BRANCH="$CIRCLE_BRANCH" || BRANCH="$CIRCLE_TAG"
-            echo "packaging $chart with version: ${ver}-${BRANCH}"
-            helm package "$chart" -u --version "${ver}-${BRANCH}" --destination .cr-release-packages
+            if [ "$CIRCLE_BRANCH" == "master" ]; then
+              helm package "$chart" --destination <<parameters.chart_package_path>>
+            else
+              ver=$(helm inspect chart "$chart" | grep version | cut -d' ' -f2)
+              [[ -z $CIRCLE_TAG ]] && BRANCH="$CIRCLE_BRANCH" || BRANCH="$CIRCLE_TAG"
+              echo "packaging $chart with version: ${ver}-${BRANCH}"
+              helm package "$chart" -u --version "${ver}-${BRANCH}" --destination .cr-release-packages
+            fi
 
             echo "'$chart' packaged"
             echo "-----"
