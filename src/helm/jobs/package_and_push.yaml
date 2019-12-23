@@ -4,6 +4,21 @@ parameters:
   chart_git_repo:
     description: The github repo that keeps packaged charts
     type: string
+  chart_test_config:
+    description: |
+      Path to local config file with settings to be used by Chart Tester
+      For example:
+        helm-extra-args: --timeout 600
+        validate-maintainers: false
+    type: string
+    default: ".circleci/helmTestConfig.yaml"
+  chart_dir_override:
+    description: |
+      Due to 'ct list-changed' not working on master (see https://github.com/helm/chart-testing/pull/159)
+      Need get changed charts through git command.
+      Defaulting to searching in 'helm' dir to look for changes.
+    type: string
+    default: "helm"
   exec:
     description: The name of custom executor to use
     type: executor
@@ -11,6 +26,8 @@ parameters:
 executor: << parameters.exec >>
 steps:
   - checkout
-  - package
+  - package:
+      chart_test_config: <<parameters.chart_test_config>>
+      chart_dir_override: <<parameters.chart_dir_override>>
   - push:
       chart_git_repo: <<parameters.chart_git_repo>>
