@@ -4,10 +4,17 @@ parameters:
     description: Executor to use for this job
     type: executor
     default: go_executor
+  protobuf_version:
+    description: The version of protobuf tool to install
+    type: string
+    default: "3.6.1" # 3.11.2 is available...
 executor: <<parameters.exec>>
 steps:
   - protobuf/install:
-      version: 3.6.1 # 3.7.1 is available...
+      version: <<parameters.protobuf_version>>
+  # as a work around to the permissions being broken in v3.6.1
+  #   neeed to run a chmod on these files
+  - run: sudo chmod -R +r /usr/local/include/google
   - checkout
   - go/load-cache
   - make-gen
