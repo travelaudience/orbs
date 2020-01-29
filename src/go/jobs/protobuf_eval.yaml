@@ -8,6 +8,10 @@ parameters:
     description: The version of protobuf tool to install
     type: string
     default: "3.6.1" # 3.11.2 is available...
+  protoc_version:
+    description: Version of protoc-gen-go to install
+    default: "v1.3.2"
+    type: string
 executor: <<parameters.exec>>
 steps:
   - protobuf/install:
@@ -17,6 +21,7 @@ steps:
   - run: sudo chmod -R +r /usr/local/include/google
   - checkout
   - go/load-cache
-  - make-gen
+  - make-gen:
+      protoc_version: <<parameters.protoc_version>>
   - compare
   - go/save-cache
