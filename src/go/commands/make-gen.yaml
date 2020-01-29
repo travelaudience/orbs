@@ -5,5 +5,11 @@ parameters:
     default: "v1.3.2"
     type: string
 steps:
-  - run: cd ../ && go get -u github.com/vektra/mockery/cmd/mockery golang.org/x/tools/cmd/goimports github.com/golang/protobuf/protoc-gen-go@<<parameters.protoc_version>>
+  - run:
+      name: '[go] install deps'
+      command: |
+        cd ../
+        go get -u github.com/vektra/mockery/cmd/mockery
+        golang.org/x/tools/cmd/goimports
+        github.com/golang/protobuf/protoc-gen-go@<<parameters.protoc_version>>
   - run: make gen
