@@ -9,7 +9,7 @@ steps:
       name: '[go] install deps'
       command: |
         cd ../
-        go get -u github.com/vektra/mockery/cmd/mockery
-        golang.org/x/tools/cmd/goimports
+        go get -u github.com/vektra/mockery/cmd/mockery \
+        golang.org/x/tools/cmd/goimports \
         github.com/golang/protobuf/protoc-gen-go@<<parameters.protoc_version>>
   - run: make gen
