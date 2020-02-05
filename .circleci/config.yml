@@ -141,6 +141,26 @@ workflows:
             - deploy-lint
             - deploy-pack
 
+      # GCloud
+      - orb-tools/lint:
+          lint-dir: src/gcloud
+          name: gcloud-lint
+      - orb-tools/pack:
+          source-dir: src/gcloud
+          destination-orb-path: gcloud.yaml
+          name: gcloud-pack
+          workspace-path: gcloud.yaml
+      - orb-tools/publish-dev:
+          name: gcloud-dev-publish
+          context: orb-publishing
+          orb-name: travelaudience/gcloud
+          orb-path: workspace/gcloud.yaml
+          alpha-version-ref: "dev:$CIRCLE_BRANCH"
+          publish-token-variable: CIRCLE_ORB_TOKEN
+          requires:
+            - gcloud-lint
+            - gcloud-pack
+
   orb-promotion:
     jobs:
       - pre-orb-promotion-check:

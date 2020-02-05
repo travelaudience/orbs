@@ -1,0 +1,43 @@
+description: |
+  Copy single file to Google Cloud bucket.
+  Only copies if the file has changed since the last build.
+
+parameters:
+  exec:
+    description: Executor to use for this job
+    type: executor
+    default: gcloud
+  source:
+    description: The file in repo to be copied
+    type: string
+  destination_path:
+    description: |
+      The bucket/path to copy the file to. In the format:
+      gs://<BUCKET>/<PATH>/<FILE>
+    type: string
+  previous_revision:
+    description: |
+      The sha from the last commit. Available with CircleCI Pipeline Variable:
+      https://circleci.com/docs/2.0/pipeline-variables/
+    type: string
+  current_revision:
+    description: |
+      The sha from current commit. Available with CircleCI Pipeline Variable:
+      https://circleci.com/docs/2.0/pipeline-variables/
+    type: string
+  only_file_change:
+    description: Only cp things if the has been a change in the source from previous revision
+    type: boolean
+    default: false
+
+executor: << parameters.exec >>
+
+steps:
+  - checkout
+  - authenticate
+  - cp:
+      source: << parameters.source >>
+      destination_path: << parameters.destination_path >>
+      previous_revision: << parameters.previous_revision >>
+      current_revision: << parameters.current_revision >>
+      only_file_change: << parameters.only_file_change >>

@@ -1,0 +1,47 @@
+description: Copy single file (or full directory) to Google Cloud bucket
+
+parameters:
+  source:
+    description: The file/dir in repo to be copied
+    type: string
+  destination_path:
+    description: |
+      The bucket/path to copy the file/dir to. In the format:
+      gs://<BUCKET>/<PATH>/<FILE>
+    type: string
+  is_dir:
+    description: Is the source a directory
+    type: boolean
+    default: false
+  only_file_change:
+    description: |
+      Only cp things if the has been a change in the source from previous revision.
+      When copying a directory, it's advisable to keep this value false.
+    type: boolean
+    default: false
+  previous_revision:
+    description: |
+      The sha from the last commit. Available with CircleCI Pipeline Variable:
+      https://circleci.com/docs/2.0/pipeline-variables/
+    type: string
+    default: ""
+  current_revision:
+    description: |
+      The sha from current commit. Available with CircleCI Pipeline Variable:
+      https://circleci.com/docs/2.0/pipeline-variables/
+    type: string
+    default: ""
+
+steps:
+  - run:
+      name: "[gsutil] cp"
+      command: |
+        <<# parameters.only_file_change >>
+          changed=$(git diff --name-only $(git merge-base <<parameters.previous_revision>> <<parameters.current_revision>>) -- . | grep ^<<parameters.source>>$ || true )
+          if [[ -z "$changed" ]]; then
+            echo "The source: <<parameters.source>> has not changed. These are the files that were changed: "
+            git diff --name-only $(git merge-base <<parameters.previous_revision>> <<parameters.current_revision>>) -- .
+            exit 0
+          fi
+        <</ parameters.only_file_change >>
+        gsutil cp <<# parameters.is_dir>>-r<</ parameters.is_dir>> <<parameters.source>> <<parameters.destination_path>>

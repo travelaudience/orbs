@@ -1,0 +1,3 @@
+description: The latest cloud-sdk alpine image.
+docker:
+  - image: google/cloud-sdk:alpine

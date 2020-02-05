@@ -1,0 +1,32 @@
+description: |
+  This technique is useful when there is more than one file to be copied.
+
+usage:
+  version: 2.1
+
+  orbs:
+    ta-gcloud: travelaudience/gcloud@x.y.z
+
+  jobs:
+    copy_files:
+      description: Copy multiple files to bucket.
+      executor: ta-gcloud/gcloud
+      steps:
+        - checkout
+        - ta-gcloud/authenticate
+        - ta-gcloud/cp:
+            source: first-file.txt
+            destination_path: gs://my-bucket/where-file-is
+        - ta-gcloud/cp:
+            source: second-file.txt
+            destination_path: gs://my-bucket/different_path
+        # different bucket and renaming of the destination file
+        - ta-gcloud/cp:
+            source: third-file.txt
+            destination_path: gs://differnt-bucket/unique-file.txt
+
+  workflows:
+    multiple_copy:
+      jobs:
+        - copy_files:
+            context: gcloud-env-vars

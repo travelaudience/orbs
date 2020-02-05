@@ -1,0 +1,36 @@
+description: |
+  Copy a directory to Google Cloud Bucket.
+
+usage:
+  version: 2.1
+
+  orbs:
+    ta-gcloud: travelaudience/gcloud@x.y.z
+
+  jobs:
+    copy_dir:
+      description: Copy a directory to Google Cloud Bucket.
+      executor: ta-gcloud/gcloud
+      parameters:
+        dir:
+          description: The directory to copy.
+          type: string
+        dest:
+          description: The bucket to copy to.
+          type: string
+      steps:
+        - checkout
+        - ta-gcloud/authenticate
+        - ta-gcloud/cp:
+            source: << parameters.dir >>
+            destination_path: << parameters.dest >>
+            is_dir: true
+            only_file_change: false
+
+  workflows:
+    copy:
+      jobs:
+        - copy_dir:
+            context: gcloud-env-vars
+            dir: code-path
+            dest: gs://my-bucket/where-to-add-new-dir/

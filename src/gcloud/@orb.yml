@@ -1,0 +1,5 @@
+version: 2.1
+
+description: |
+  CircleCI Orb for Google Cloud commands.
+  With the inclusion of 'gsutil cp'.
