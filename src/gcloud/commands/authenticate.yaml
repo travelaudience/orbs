@@ -1,0 +1,17 @@
+description: |
+  Authenticate against Google Cloud.
+  Expects GCLOUD_SERVICE_KEY, GOOGLE_PROJECT_ID, GOOGLE_COMPUTE_ZONE to be set as Env Vars (in context)
+
+parameters:
+  zone:
+    description: Option to overwrite GCloud zone from the context.
+    type: env_var_name
+    default: GOOGLE_COMPUTE_ZONE
+
+steps:
+  - run:
+      name: "[gsutil] Auth"
+      command: |
+        echo $GCLOUD_SERVICE_KEY | gcloud auth activate-service-account --key-file=-
+        gcloud --quiet config set project ${GOOGLE_PROJECT_ID}
+        gcloud --quiet config set compute/zone ${GOOGLE_COMPUTE_ZONE}

@@ -1,0 +1,25 @@
+description: |
+  To copy a file from the repo to the bucket, when the file changes.
+  Advisable to add filters to the job, so that the copy only happens when change is merged to master (for example).
+
+  WARNING: The `pipeline.git.base_revision` values is only from the last CircleCI build.
+           If the previous build failed to update the file, and the current build didn't change the file again,
+           the file won't be updated...
+           If that is a risk, the set `only_file_change` to `false`.
+
+usage:
+  version: 2.1
+
+  orbs:
+    ta-gcloud: travelaudience/gcloud@x.y.z
+
+  workflows:
+    copy:
+      jobs:
+        - ta-gcloud/copy_file:
+            context: gcloud-env-vars
+            source: single_file.txt
+            destination_path: gs://my-bucket/where-file-is/single_file.txt
+            previous_revision: << pipeline.git.base_revision >>
+            current_revision: << pipeline.git.revision >>
+            only_file_change: true
