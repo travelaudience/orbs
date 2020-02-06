@@ -20,11 +20,13 @@ parameters:
       The sha from the last commit. Available with CircleCI Pipeline Variable:
       https://circleci.com/docs/2.0/pipeline-variables/
     type: string
+    default: ""
   current_revision:
     description: |
       The sha from current commit. Available with CircleCI Pipeline Variable:
       https://circleci.com/docs/2.0/pipeline-variables/
     type: string
+    default: ""
   only_file_change:
     description: Only cp things if the has been a change in the source from previous revision
     type: boolean
