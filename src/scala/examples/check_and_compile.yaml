@@ -1,0 +1,14 @@
+description: |
+  If you are building a jar file that will then be added to a docker image, you can use this orb to run through
+  a common scala workflow. (using scalafmt and scoverage for code coverage analysis)
+usage:
+  version: 2.1
+
+  orbs:
+    ta-scala: travelaudience/scala@x.y.z
+
+  workflows:
+    build_and_test:
+      jobs:
+        - ta-scala/static_check
+        - ta-scala/test_and_compile

@@ -1,0 +1,15 @@
+description: |
+  Compile a "fat" jar for adding to a docker image.
+
+steps:
+  - run:
+      name: '[scala] Assembly'
+      command: |
+        version=$(git describe --tags --always)
+        sbt 'set streaming / assembly / target := new File("target/fat-jar")' 'set ThisBuild / version := "'${version}'"' 'streaming / assembly'
+  - store_artifacts:
+      path: target/fat-jar
+  - persist_to_workspace:
+      root: ./
+      paths:
+        - target/fat-jar/*

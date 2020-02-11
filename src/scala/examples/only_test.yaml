@@ -1,0 +1,32 @@
+description: |
+  If you don't need to compile a jar file, and you only want to test the code, and you won't be saving the coverage report.
+
+usage:
+  version: 2.1
+
+  orbs:
+    ta-scala: travelaudience/scala@x.y.z
+
+  jobs:
+    test:
+      description: Only test, without coverage
+      executor: ta-scala/scala
+      steps:
+        - checkout
+        - restore_cache:
+            keys:
+              - dependencies-{{ checksum "build.sbt" }}
+        - ta-scala/test:
+            with_coverage: false
+        - save_cache:
+            paths:
+              - ~/.ivy2
+              - ~/.sbt
+              - ~/.m2
+            key: dependencies-{{ checksum "build.sbt" }}
+
+  workflows:
+    only_test:
+      jobs:
+        - ta-scala/static_check
+        - test
