@@ -1,12 +1,18 @@
 description: |
   Compile a "fat" jar for adding to a docker image.
+parameters:
+  submodule:
+    description: sbt submodule to build. Leave empty for main module.
+    type: string
+    default: ''
 
 steps:
   - run:
       name: '[scala] Assembly'
       command: |
+        submodule=$(expr length "<< parameters.submodule >>" && "<< parameters.submodule >>")
         version=$(git describe --tags --always)
-        sbt 'set streaming / assembly / target := new File("target/fat-jar")' 'set ThisBuild / version := "'${version}'"' 'streaming / assembly'
+        sbt 'set '${submodule}' assembly / target := new File("target/fat-jar")' 'set ThisBuild / version := "'${version}'"' ${submodule}' assembly'
   - store_artifacts:
       path: target/fat-jar
   - persist_to_workspace:
