@@ -8,7 +8,7 @@ parameters:
   memory:
     description: value to set the Xmx
     type: string
-    default: "2G"
+    default: "4G"
   working_directory:
     description: directory path for this job
     type: string
