@@ -5,10 +5,10 @@ parameters:
     description: jdk/sbt/scala version to use (docker tag)
     type: string
     default: 8u222_1.3.3_2.12.10
-  memory:
-    description: value to set the Xmx
+  resource_class:
+    description: which circleci resource_class to use
     type: string
-    default: "4G"
+    default: "large"
   working_directory:
     description: directory path for this job
     type: string
@@ -16,5 +16,4 @@ parameters:
 docker:
   - image: hseeberger/scala-sbt:<< parameters.version >>
 working_directory: <<parameters.working_directory>>
-environment:
-  SBT_OPTS: -Xmx<<parameters.memory>>
+resource_class: <<parameters.resource_class>>
