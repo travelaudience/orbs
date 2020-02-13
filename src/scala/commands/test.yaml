@@ -5,7 +5,7 @@ parameters:
   project_base:
     description: Where test output gets placed
     type: string
-    default: common/target
+    default: target
   with_coverage:
     description: |
       Enable the use of code-climate for test coverage analysis
