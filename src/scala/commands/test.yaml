@@ -29,6 +29,7 @@ steps:
       condition: << parameters.with_coverage >>
       steps:
         - run: sbt coverage test:test coverageReport
+        - run: sbt -v
         - run: sbt coverageAggregate
   - unless:
       condition: << parameters.with_coverage >>
