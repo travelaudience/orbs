@@ -1,0 +1,44 @@
+description: |
+  Run `sbt test:test` against the repo. Provides an option to upload coverage report to code climate.
+  If using coverage, it's advisable to add `scoverage` to plugins.sbt
+parameters:
+  project_base:
+    description: Where test output gets placed
+    type: string
+    default: common/target
+  with_coverage:
+    description: |
+      Enable the use of code-climate for test coverage analysis
+        requires code-climate CC_TEST_REPORTER_ID env variable to be added to the job
+        the best place for this is in the project in CircleCI UI
+        the code-climate ID is specific to each repo
+    type: boolean
+    default: true
+  path_to_coverage_file:
+    description: Where the test coverage report gets created.
+    type: string
+    default: scala-2.12/coverage-report/cobertura.xml
+steps:
+  - when:
+      condition: << parameters.with_coverage >>
+      steps:
+        - code-climate/install
+        - run: cc-test-reporter before-build
+  - run: sbt test:compile
+  - when:
+      condition: << parameters.with_coverage >>
+      steps:
+        - run: sbt coverage test:test coverageReport
+  - unless:
+      condition: << parameters.with_coverage >>
+      steps:
+        - run: sbt test:test
+  - when:
+      condition: << parameters.with_coverage >>
+      steps:
+        - code-climate/format_coverage:
+            coverage_file: << parameters.project_base >>/<< parameters.path_to_coverage_file >>
+            input_type: cobertura
+        - code-climate/upload_coverage
+  - store_test_results:
+      path: << parameters.project_base >>

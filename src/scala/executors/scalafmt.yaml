@@ -1,0 +1,14 @@
+description: |
+  The docker container to used to run static checks on Scala projects.
+parameters:
+  version:
+    description: scalafmt version to use (docker tag)
+    type: string
+    default: 2.2.1
+  working_directory:
+    description: directory path for this job
+    type: string
+    default: "~/repo"
+docker:
+  - image: mrothy/scalafmt:<< parameters.version >>
+working_directory: <<parameters.working_directory>>

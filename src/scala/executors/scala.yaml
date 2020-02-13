@@ -1,0 +1,14 @@
+description: |
+  The docker container to used to test & build Scala projects.
+parameters:
+  version:
+    description: jdk/sbt/scala version to use (docker tag)
+    type: string
+    default: 8u222_1.3.3_2.12.10
+  working_directory:
+    description: directory path for this job
+    type: string
+    default: "~/repo"
+docker:
+  - image: hseeberger/scala-sbt:<< parameters.version >>
+working_directory: <<parameters.working_directory>>
