@@ -8,7 +8,7 @@ parameters:
     default: target
   with_coverage:
     description: |
-      Enable the use of code-climate for test coverage analysis
+      Enable the use of code-climate for aggreated test coverage analysis
         requires code-climate CC_TEST_REPORTER_ID env variable to be added to the job
         the best place for this is in the project in CircleCI UI
         the code-climate ID is specific to each repo
@@ -29,6 +29,7 @@ steps:
       condition: << parameters.with_coverage >>
       steps:
         - run: sbt coverage test:test coverageReport
+        - run: sbt coverageAggregate
   - unless:
       condition: << parameters.with_coverage >>
       steps:
