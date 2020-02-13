@@ -21,6 +21,10 @@ parameters:
     description: Where the test coverage report gets created.
     type: string
     default: scala-2.12/coverage-report/cobertura.xml
+  submodule:
+    description: sbt submodule to assembly. Leave empty for main module.
+    type: string
+    default: ''
 
 executor: << parameters.executor >>
 
@@ -33,7 +37,8 @@ steps:
       project_base: << parameters.project_base >>
       with_coverage: << parameters.with_coverage >>
       path_to_coverage_file: << parameters.path_to_coverage_file >>
-  - compile
+  - compile:
+      submodule: << parameters.submodule >>
   - save_cache:
       paths:
         - ~/.ivy2

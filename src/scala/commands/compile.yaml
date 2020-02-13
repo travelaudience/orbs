@@ -2,7 +2,7 @@ description: |
   Compile a "fat" jar for adding to a docker image.
 parameters:
   submodule:
-    description: sbt submodule to build. Leave empty for main module.
+    description: sbt submodule to assembly. Leave empty for main module.
     type: string
     default: ''
 
