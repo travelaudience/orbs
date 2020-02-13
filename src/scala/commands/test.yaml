@@ -29,8 +29,7 @@ steps:
       condition: << parameters.with_coverage >>
       steps:
         - run: sbt coverage test:test coverageReport
-        - run: sbt -v
-        - run: sbt coverageAggregate
+        - run: SBT_OPTS="-Xmx1024m -Xss256m"  sbt coverageAggregate
   - unless:
       condition: << parameters.with_coverage >>
       steps:
