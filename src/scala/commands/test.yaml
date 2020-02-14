@@ -1,6 +1,7 @@
 description: |
   Run `sbt test:test` against the repo. Provides an option to upload coverage report to code climate.
   If using coverage, it's advisable to add `scoverage` to plugins.sbt
+
 parameters:
   project_base:
     description: Where test output gets placed
@@ -18,6 +19,11 @@ parameters:
     description: Where the test coverage report gets created.
     type: string
     default: scala-2.12/coverage-report/cobertura.xml
+  memory_limit_for_heap:
+    description: aggregating the test coverage requires more memory to be defined
+    type: string
+    default: 1524M
+
 steps:
   - when:
       condition: << parameters.with_coverage >>
@@ -29,7 +35,7 @@ steps:
       condition: << parameters.with_coverage >>
       steps:
         - run: sbt coverage test:test coverageReport
-        - run: SBT_OPTS="-Xmx1024m -Xss256m"  sbt coverageAggregate
+        - run: SBT_OPTS="-Xmx<<parameters.memory_limit_for_heap>>" sbt coverageAggregate
   - unless:
       condition: << parameters.with_coverage >>
       steps:

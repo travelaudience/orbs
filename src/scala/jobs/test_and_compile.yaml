@@ -1,5 +1,6 @@
 description: |
   Compile a fat-jar for adding to a docker image.
+
 parameters:
   executor:
     description: Executor to use for this job
@@ -24,7 +25,10 @@ parameters:
   submodule:
     description: sbt submodule to assembly. Leave empty for main module.
     type: string
-    default: ''
+  memory_limit_for_heap:
+    description: aggregating the test coverage requires more memory to be defined
+    type: string
+    default: 1524M
 
 executor: << parameters.executor >>
 
@@ -39,6 +43,7 @@ steps:
       path_to_coverage_file: << parameters.path_to_coverage_file >>
   - compile:
       submodule: << parameters.submodule >>
+      memory_limit_for_heap: << parameters.memory_limit_for_heap >>
   - save_cache:
       paths:
         - ~/.ivy2

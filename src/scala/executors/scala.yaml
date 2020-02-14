@@ -8,7 +8,7 @@ parameters:
   resource_class:
     description: which circleci resource_class to use
     type: string
-    default: "large"
+    default: "medium"
   working_directory:
     description: directory path for this job
     type: string
