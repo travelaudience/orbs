@@ -41,9 +41,9 @@ steps:
       project_base: << parameters.project_base >>
       with_coverage: << parameters.with_coverage >>
       path_to_coverage_file: << parameters.path_to_coverage_file >>
+      memory_limit_for_heap: << parameters.memory_limit_for_heap >>
   - compile:
       submodule: << parameters.submodule >>
-      memory_limit_for_heap: << parameters.memory_limit_for_heap >>
   - save_cache:
       paths:
         - ~/.ivy2
