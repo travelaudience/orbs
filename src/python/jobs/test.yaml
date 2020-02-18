@@ -1,0 +1,73 @@
+description: |
+  Run `pytest` against the repo.
+  Provides an option to upload coverage report to code climate.
+  By default it requires `requirements-ci.txt` with test dependencies.
+  By default it requires `requirements.txt` with code dependencies.
+  If desabling `with_pytest_dependencies` variable it requires both
+  `pytest` and `pytest-cov` in file `requirements-ci.txt`.
+parameters:
+  source:
+    default: src
+    description: Define location for the code source to test
+    type: string
+  test_source:
+    default: tests
+    description: |
+      Define location for the test source containing all the tests to execute
+    type: string
+  ci_requirements:
+    description: |
+      Enable the definition of a requirements file for tests in addition to the regular `requirements.txt`.
+      This file must include both `pytest` and `pytest-cov`.
+      If this file is empty the installation of test requirements is skipped and `pytest` and `pytest-cov` will be installed.
+    type: string
+    default: "requirements-ci.txt"
+  install_pytest:
+    description: |
+      Install pip dependencies for this flow to run.
+      Both  `pytest` and `pytest-cov` are required.
+    type: boolean
+    default: false
+  with_coverage:
+    description: |
+      Enable the use of code-climate for test coverage analysis
+      requires code-climate CC_TEST_REPORTER_ID env variable to be added to the job
+      the best place for this is in the project in CircleCI UI
+      the code-climate ID is specific to each repo
+    type: boolean
+    default: true
+  executor:
+    description: Python executor to use for this job
+    type: executor
+    default: python/default
+executor: << parameters.executor >>
+steps:
+  - checkout
+  - when:
+      condition: << parameters.with_coverage >>
+      steps:
+        - code-climate/install
+        - run: cc-test-reporter before-build
+  - python/load-cache
+  - python/install-deps
+  - when:
+      condition: << parameters.install_pytest >>
+      steps:
+        - run: pip install --user pytest pytest-cov
+  - when:
+      condition: << parameters.ci_requirements >>
+      steps:
+        - run: pip install --user -r << parameters.ci_requirements >>
+  - python/save-cache
+  - run:
+      command: |
+        # pytest would be a dep in requirements.txt
+        PYTHONPATH=<< parameters.source >> pytest << parameters.test_source >> --cov=<< parameters.source >> --cov-report=xml
+      name: Test
+  - when:
+      condition: << parameters.with_coverage >>
+      steps:
+        - code-climate/format_coverage:
+            coverage_file: coverage.xml
+            input_type: coverage.py
+        - code-climate/upload_coverage

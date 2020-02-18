@@ -1,0 +1,14 @@
+description: |
+  If you want to publish a python package to a repository.
+
+usage:
+  orbs:
+    ta-python: travelaudience/python@x.y.z
+
+  version: 2.1
+
+  workflows:
+    main:
+      jobs:
+        - ta-python/publish:
+            context: nexus-access

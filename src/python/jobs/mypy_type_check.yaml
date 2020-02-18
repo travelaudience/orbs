@@ -1,0 +1,17 @@
+description: |
+    Run `mypy` type checking against the repo. Outputs the issues with change suggestions.
+    To run locally, try install mypy and run against your source code.
+parameters:
+  source:
+    default: src/
+    description: Define location for the source code to apply the type checking
+    type: string
+  executor:
+    description: Python executor to use for this job
+    type: executor
+    default: python/default
+executor: << parameters.executor >>
+steps:
+  - checkout
+  - run: pip install --user mypy
+  - run: mypy << parameters.source >>

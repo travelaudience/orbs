@@ -1,0 +1,34 @@
+description: |
+  Publish the code in the specified repository.
+parameters:
+  source:
+    default: src/
+    description: Define location of the source code to be published
+    type: string
+  repository_username:
+    description: Name of environment variable storing your python repository username
+    type: env_var_name
+    default: PY_NEXUS_USERNAME
+  repository_password:
+    description: Name of environment variable storing your python repository password
+    type: env_var_name
+    default: PY_NEXUS_PASSWORD
+  repository_url:
+    description: Name of environment variable storing your python repository url
+    type: env_var_name
+    default: PY_NEXUS_URL
+  executor:
+    description: Python executor to use for this job
+    type: executor
+    default: python/default
+executor: << parameters.executor >>
+steps:
+  - orb-tools/check-env-var-param:
+      param: <<parameters.repository_username>>
+  - orb-tools/check-env-var-param:
+      param: <<parameters.repository_password>>
+  - orb-tools/check-env-var-param:
+      param: <<parameters.repository_url>>
+  - checkout
+  - run: pip install --user --upgrade twine
+  - run: python3 -m twine upload --repository-url $<<parameters.repository_url>> -u $<<parameters.repository_username>> -p $<<parameters.repository_password>> << parameters.source >>
