@@ -1,0 +1,9 @@
+description: |
+  The docker container to used perform linting with flake8 for Python projects.
+docker:
+  - image: 'alpine/flake8:<< parameters.tag >>'
+parameters:
+  tag:
+    default: 3.7.9
+    description: Flake 8 version to use (docker tag)
+    type: string

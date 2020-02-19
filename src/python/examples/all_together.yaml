@@ -1,0 +1,27 @@
+description: |
+  If you only want to:
+  - test the code and upload coverage report
+  - perform linting using flake8 and pylint
+  - perform type checking
+  - publish your package
+
+usage:
+  orbs:
+    ta-python: travelaudience/python@x.y.z
+
+  version: 2.1
+
+  workflows:
+    main:
+      jobs:
+        - ta-python/test
+        - ta-python/pylint
+        - ta-python/flake8
+        - ta-python/mypy_type_check
+        - ta-python/publish:
+            context: some-secret
+            requires:
+              - ta-python/test
+              - ta-python/pylint
+              - ta-python/flake8
+              - ta-python/mypy_type_check

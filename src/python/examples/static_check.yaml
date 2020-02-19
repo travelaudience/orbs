@@ -1,0 +1,15 @@
+description: |
+  Perform linting use pylint and flake8 and type check using mypy
+
+usage:
+  orbs:
+    ta-python: travelaudience/python@x.y.z
+
+  version: 2.1
+
+  workflows:
+    main:
+      jobs:
+        - ta-python/pylint
+        - ta-python/flake8
+        - ta-python/mypy_type_check

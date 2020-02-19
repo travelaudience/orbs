@@ -7,6 +7,7 @@
 - `travelaudience/helm`: [![CircleCI Orb Version](https://img.shields.io/badge/endpoint.svg?url=https://badges.circleci.io/orb/travelaudience/helm)](https://circleci.com/orbs/registry/orb/travelaudience/helm)
 - `travelaudience/gcloud`: [![CircleCI Orb Version](https://img.shields.io/badge/endpoint.svg?url=https://badges.circleci.io/orb/travelaudience/gcloud)](https://circleci.com/orbs/registry/orb/travelaudience/gcloud)
 - `travelaudience/scala`: [![CircleCI Orb Version](https://img.shields.io/badge/endpoint.svg?url=https://badges.circleci.io/orb/travelaudience/scala)](https://circleci.com/orbs/registry/orb/travelaudience/scala)
+- `travelaudience/python`: [![CircleCI Orb Version](https://img.shields.io/badge/endpoint.svg?url=https://badges.circleci.io/orb/travelaudience/python)](https://circleci.com/orbs/registry/orb/travelaudience/python)
 
 Orbs are added to the [registry](https://circleci.com/orbs/registry) through the CircleCI API.
 The build in this repository (`.circleci/config.yml`) uses that API via the CircleCI CLI to take the source of orbs located in the `src` folder, and register them as orbs with CircleCI.

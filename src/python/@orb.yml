@@ -1,0 +1,11 @@
+version: 2.1
+
+description: |
+  CircleCI Orb for Python CI. Provides static analysis, python test,
+  python type check, publish, amongst other things...
+  see github page for more info: https://github.com/travelaudience/orbs
+
+orbs:
+  python: circleci/python@0.1
+  code-climate: travelaudience/code-climate@0.1
+  orb-tools: circleci/orb-tools@8.8.0

@@ -1,0 +1,17 @@
+description: |
+  Run `flake8` against the repo. Outputs the issues with change suggestions.
+  To run locally, try:
+    `docker run --rm -v $(pwd):/data alpine/flake8 src/`
+parameters:
+  source:
+    default: src/
+    description: Define location for the source code to perform linting with flake8
+    type: string
+  executor:
+    description: Flake8 executor to use for this job
+    type: executor
+    default: flake8
+executor: << parameters.executor >>
+steps:
+  - checkout
+  - run: flake8 << parameters.source >>

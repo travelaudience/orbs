@@ -1,0 +1,17 @@
+description: |
+  If you only want to test the code, and you won't be saving the coverage report.
+  And you dont want to include a `requirements-ci.txt`.
+
+usage:
+  orbs:
+    ta-python: travelaudience/python@x.y.z
+
+  version: 2.1
+
+  workflows:
+    main:
+      jobs:
+        - ta-python/test:
+            with_coverage: false
+            ci_requirements: ""
+            install_pytest: true

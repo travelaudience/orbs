@@ -1,0 +1,18 @@
+description: |
+  Run `pylint` against the repo. Outputs the issues with change suggestions.
+  To run locally, try:
+    `docker run --rm -v $(pwd):/data cytopia/pylint src/`
+parameters:
+  source:
+    default: src/
+    description: |
+      Define location for the source code to perform linting with pylint
+    type: string
+  executor:
+    description: Pylint executor to use for this job
+    type: executor
+    default: pylint
+executor: << parameters.executor >>
+steps:
+  - checkout
+  - run: pylint << parameters.source >>
