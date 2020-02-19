@@ -3,7 +3,7 @@ description: |
   Provides an option to upload coverage report to code climate.
   By default it requires `requirements-ci.txt` with test dependencies.
   By default it requires `requirements.txt` with code dependencies.
-  If desabling `with_pytest_dependencies` variable it requires both
+  If disabling `install_pytest` variable it requires both
   `pytest` and `pytest-cov` in file `requirements-ci.txt`.
 parameters:
   source:
