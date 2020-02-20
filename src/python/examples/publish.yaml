@@ -11,4 +11,4 @@ usage:
     main:
       jobs:
         - ta-python/publish:
-            context: nexus-access
+            context: repo-context
