@@ -65,12 +65,12 @@ steps:
       condition: << parameters.with_custom_repository >>
       steps:
         - orb-tools/check-env-var-param:
-            param: <<parameters.repository_url>>
-        - run: pip install --user -r requirements.txt --index-url $<<parameters.repository_url>>
+            param: << parameters.repository_url >>
+        - run: pip install --user -r requirements.txt --index-url $<< parameters.repository_url >>
         - when:
             condition: << parameters.ci_requirements >>
             steps:
-              - run: pip install --user -r << parameters.ci_requirements >> --index-url $<<parameters.repository_url>>
+              - run: pip install --user -r << parameters.ci_requirements >> --index-url $<< parameters.repository_url >>
   - unless:
       condition: << parameters.with_custom_repository >>
       steps:
@@ -87,7 +87,7 @@ steps:
   - run:
       command: |
         # pytest would be a dep in requirements.txt
-        PYTHONPATH=<< parameters.source >> pytest << parameters.test_source >> --cov=<< parameters.source >> --cov-report=xml
+        PYTHONPATH=<< parameters.source >> python -m pytest << parameters.test_source >> --cov=<< parameters.source >> --cov-report=xml
       name: Test
   - when:
       condition: << parameters.with_coverage >>
