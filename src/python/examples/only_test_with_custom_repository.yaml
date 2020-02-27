@@ -1,0 +1,18 @@
+description: |
+  If you only want to test the code, and you won't be saving the coverage report.
+  And you want to use custom python repository for requirements
+
+usage:
+  orbs:
+    ta-python: travelaudience/python@x.y.z
+
+  version: 2.1
+
+  workflows:
+    main:
+      jobs:
+        - ta-python/test:
+            context: repo-context
+            with_coverage: false
+            with_custom_repository: true
+

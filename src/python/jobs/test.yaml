@@ -40,6 +40,18 @@ parameters:
     description: Python executor to use for this job
     type: executor
     default: python/default
+  with_custom_repository:
+    description: |
+      Enable the use a custom repository to install `requirements-ci.txt` and `requirements.txt`.
+      The repository url must be set via context
+    type: boolean
+    default: false
+  repository_url:
+    description: |
+      Name of environment variable storing your python repository url.
+      This url should include credentials if applicable.
+    type: env_var_name
+    default: PY_NEXUS_URL_WITH_SECRETS
 executor: << parameters.executor >>
 steps:
   - checkout
@@ -49,20 +61,33 @@ steps:
         - code-climate/install
         - run: cc-test-reporter before-build
   - python/load-cache
-  - python/install-deps
+  - when:
+      condition: << parameters.with_custom_repository >>
+      steps:
+        - orb-tools/check-env-var-param:
+            param: << parameters.repository_url >>
+        - run: pip install --user -r requirements.txt --index-url $<< parameters.repository_url >>
+        - when:
+            condition: << parameters.ci_requirements >>
+            steps:
+              - run: pip install --user -r << parameters.ci_requirements >> --index-url $<< parameters.repository_url >>
+  - unless:
+      condition: << parameters.with_custom_repository >>
+      steps:
+        - run: pip install --user -r requirements.txt
+        - when:
+            condition: << parameters.ci_requirements >>
+            steps:
+              - run: pip install --user -r << parameters.ci_requirements >>
   - when:
       condition: << parameters.install_pytest >>
       steps:
         - run: pip install --user pytest pytest-cov
-  - when:
-      condition: << parameters.ci_requirements >>
-      steps:
-        - run: pip install --user -r << parameters.ci_requirements >>
   - python/save-cache
   - run:
       command: |
         # pytest would be a dep in requirements.txt
-        PYTHONPATH=<< parameters.source >> pytest << parameters.test_source >> --cov=<< parameters.source >> --cov-report=xml
+        PYTHONPATH=<< parameters.source >> python -m pytest << parameters.test_source >> --cov=<< parameters.source >> --cov-report=xml
       name: Test
   - when:
       condition: << parameters.with_coverage >>
