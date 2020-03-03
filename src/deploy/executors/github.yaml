@@ -1,0 +1,9 @@
+description: |
+  The docker container to interact with github API
+docker:
+  - image: 'abergmeier/hub:<< parameters.tag >>'
+parameters:
+  tag:
+    default: 2.12.8
+    description: abergmeier/hub version (docker tag)
+    type: string

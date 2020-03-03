@@ -1,0 +1,50 @@
+description: |
+  Starts a dag deploy flow using gitops approach.
+parameters:
+  github_token:
+    description: |
+      Name of environment variable storing your secret githun token.
+    type: env_var_name
+    default: GIT_PUSH_TOKEN
+  github_email:
+    description: |
+      Name of environment variable storing your github email
+    type: env_var_name
+    default: GIT_EMAIL
+  dag_name:
+    description: |
+      Name of the dag to be used to change .ini files.
+      This dag name will be used to define dag folder name on composer bucket.
+      Dag name must be same as your repo name.
+    type: string
+  version:
+    description: |
+      Version of the dag to deploy
+    type: string
+    default: $CIRCLE_TAG
+  gitops_repo:
+    description: |
+      Name of environment variable storing repo to apply CD using gitops
+    type: env_var_name
+    default: GIT_DAG_GITOPS
+  executor:
+    description: Github executor to use for this job
+    type: executor
+    default: github
+executor: << parameters.executor >>
+steps:
+  - run: git clone https://$<<parameters.github_token>>@$<<parameters.gitops_repo>>
+  - run: git config --global user.email '$<<parameters.github_email>>'
+  - run:
+      name: "Change config files"
+      command: |
+        cd dag-cd
+        git checkout -b <<parameters.dag_name>>-<<parameters.version>>
+        cd <<parameters.dag_name>>;sed -i -e 's/docker_tag=.*/docker_tag=<<parameters.version>>/g' *.ini
+  - run:
+      name: "Create Pull Request"
+      command: |
+        cd dag-cd
+        git add .
+        git commit -m "project:<<parameters.dag_name>> version:<<parameters.version>>"
+        GITHUB_TOKEN=$<<parameters.github_token>> hub pull-request -m "project:<<parameters.dag_name>> version:<<parameters.version>>" -p

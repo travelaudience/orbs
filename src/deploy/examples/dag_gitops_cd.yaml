@@ -1,0 +1,19 @@
+description: |
+  Trigger dag gitops CD process by creating a PR in our deploy repo
+usage:
+  version: 2.1
+
+  orbs:
+    ta-deploy: travelaudience/deploy@x.y.z
+
+  workflows:
+    deploy:
+      jobs:
+        - ta-deploy/dag_gitops_deploy:
+            context: git-context
+            dag_name: some-dag-name
+            filters:
+              tags:
+                only: /.*/
+              branches:
+                ignore: /.*/
