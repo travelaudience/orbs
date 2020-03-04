@@ -46,5 +46,5 @@ steps:
       command: |
         cd dag-cd
         git add .
-        git commit -m "project:<<parameters.dag_name>> version:<<parameters.version>>"
+        git commit --allow-empty -m "project:<<parameters.dag_name>> version:<<parameters.version>>"
         GITHUB_TOKEN=$<<parameters.github_token>> hub pull-request -m "project:<<parameters.dag_name>> version:<<parameters.version>>" -p
