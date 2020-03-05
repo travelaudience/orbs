@@ -8,6 +8,12 @@ parameters:
     description: |
       Define location for the source code to perform linting with pylint
     type: string
+  with_custom_repository:
+    description: |
+      Enable the use a custom repository to install `requirements-ci.txt` and `requirements.txt`.
+      The repository url must be set via context
+    type: boolean
+    default: false
   repository_url:
     description: |
       Name of environment variable storing your python repository url.
@@ -17,9 +23,17 @@ parameters:
   executor:
     description: Pylint executor to use for this job
     type: executor
-    default: pylint
+    default: python/default
 executor: << parameters.executor >>
 steps:
   - checkout
-  - run: pip install --user -r requirements.txt --index-url $<< parameters.repository_url >>
+  - run: pip install --user pylint
+  - when:
+      condition: << parameters.with_custom_repository >>
+      steps:
+        - run: pip install --user -r requirements.txt --index-url $<< parameters.repository_url >>
+  - unless:
+      condition: << parameters.with_custom_repository >>
+      steps:
+        - run: pip install --user -r requirements.txt
   - run: pylint << parameters.source >>

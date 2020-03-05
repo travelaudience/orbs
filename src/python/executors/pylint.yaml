@@ -1,9 +1,0 @@
-description: |
-  The docker container to perform linting with pylint for Python projects.
-docker:
-  - image: 'cytopia/pylint:<< parameters.tag >>'
-parameters:
-  tag:
-    default: latest
-    description: The lastest version of pylint
-    type: string
