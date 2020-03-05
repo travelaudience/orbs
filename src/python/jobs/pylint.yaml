@@ -8,6 +8,12 @@ parameters:
     description: |
       Define location for the source code to perform linting with pylint
     type: string
+  repository_url:
+    description: |
+      Name of environment variable storing your python repository url.
+      This url should include credentials if applicable.
+    type: env_var_name
+    default: PY_NEXUS_URL_WITH_SECRETS
   executor:
     description: Pylint executor to use for this job
     type: executor
@@ -15,4 +21,5 @@ parameters:
 executor: << parameters.executor >>
 steps:
   - checkout
+  - run: pip install --user -r requirements.txt --index-url $<< parameters.repository_url >>
   - run: pylint << parameters.source >>
