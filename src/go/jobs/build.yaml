@@ -19,5 +19,5 @@ steps:
   - checkout
   - go/load-cache
   - build:
-    cgo_value: << parameters.cgo_value >>
+      cgo_value: << parameters.cgo_value >>
   - go/save-cache
