@@ -9,10 +9,15 @@ parameters:
     description: Executor to use for this job
     type: executor
     default: go_executor
+  cgo_value:
+    description: Cgo enables the creation of Go packages that call C code
+    type: string
+    default: "0"
 executor: << parameters.exec >>
 
 steps:
   - checkout
   - go/load-cache
-  - build
+  - build:
+      cgo_value: << parameters.cgo_value >>
   - go/save-cache
