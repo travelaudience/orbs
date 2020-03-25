@@ -4,7 +4,18 @@ parameters:
     description: Version of staticcheck to install
     default: "2019.2.1"
     type: string
+  run-static-analysis:
+    description: If false static analysis is not executed
+    default: true
+    type: bool
 steps:
-  # directory change required due to https://github.com/dominikh/go-tools/issues/528
-  - run: cd ../ && go get -u honnef.co/go/tools/cmd/staticcheck@<<parameters.version>>
-  - run: staticcheck -unused.whole-program ./...
+  - when:
+    condition: run-static-analysis
+    steps:
+      # directory change required due to https://github.com/dominikh/go-tools/issues/528
+      - run: cd ../ && go get -u honnef.co/go/tools/cmd/staticcheck@<<parameters.version>>
+      - run: staticcheck -unused.whole-program ./...
+  - unless:
+    condition: run-static-analysis
+    steps:
+      - run: echo "skipped static-analysis"
