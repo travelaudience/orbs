@@ -7,15 +7,16 @@ parameters:
   run-static-analysis:
     description: If false static analysis is not executed
     default: true
-    type: bool
+    type: boolean
 steps:
+  - run: echo "test"
   - when:
-    condition: run-static-analysis
-    steps:
-      # directory change required due to https://github.com/dominikh/go-tools/issues/528
-      - run: cd ../ && go get -u honnef.co/go/tools/cmd/staticcheck@<<parameters.version>>
-      - run: staticcheck -unused.whole-program ./...
+      condition: run-static-analysis
+      steps:
+        # directory change required due to https://github.com/dominikh/go-tools/issues/528
+        - run: cd ../ && go get -u honnef.co/go/tools/cmd/staticcheck@<<parameters.version>>
+        - run: staticcheck -unused.whole-program ./...
   - unless:
-    condition: run-static-analysis
-    steps:
-      - run: echo "skipped static-analysis"
+      condition: run-static-analysis
+      steps:
+        - run: echo "skipped static-analysis"
