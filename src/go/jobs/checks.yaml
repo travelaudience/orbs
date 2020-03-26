@@ -7,7 +7,7 @@ parameters:
   run-static-analysis:
     description: If false static analysis is not executed
     default: true
-    type: bool
+    type: boolean
 executor: << parameters.exec >>
 steps:
   - checkout
