@@ -4,11 +4,18 @@ parameters:
     description: Executor to use for this job
     type: executor
     default: go_executor
+  run-static-analysis:
+    description: If false static analysis is not executed
+    default: true
+    type: boolean
 executor: << parameters.exec >>
 steps:
   - checkout
   - go/load-cache
   - vet
-  - staticcheck
+  - when:
+      condition: << parameters.run-static-analysis >>
+      steps:
+        - staticcheck
   # - lint
   - go/save-cache
