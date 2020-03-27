@@ -13,7 +13,9 @@ steps:
   - checkout
   - go/load-cache
   - vet
-  - staticcheck:
-      run-static-analysis: << parameters.run-static-analysis >>
+  - when: 
+    condition:  << parameters.run-static-analysis >>
+    steps:
+      - staticcheck:
   # - lint
   - go/save-cache
