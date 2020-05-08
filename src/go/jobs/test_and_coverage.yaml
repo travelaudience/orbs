@@ -7,13 +7,60 @@ parameters:
   exec:
     description: Executor to use for this job (as described in the executor of this orb, this requires CC_TEST_REPORTER_ID env var)
     type: executor
+  packages:
+    description: Import tests to run, by path glob.
+    type: string
+    default: "./..."
+  race:
+    description: |
+      run tests with -race option
+      (if enabled, update covermode to be "atomic")
+    type: boolean
+    default: true
+  count:
+    description: run each test and benchmark n times
+    type: string
+    default: "1"
+  failfast:
+    description: do not start new tests after the first test failure
+    type: boolean
+    default: true
+  short:
+    description: tell long-running tests to shorten their run time
+    type: boolean
+    default: false
+  parallel:
+    description: |
+      Allow parallel execution of test functions that call t.Parallel.
+      The value of this flag is the maximum number of tests to run
+      simultaneously
+    type: string
+    default: "1"
+  coverprofile:
+    description: file to save coverage profile
+    type: string
+    default: "cover-source.out"
+  covermode:
+    description: |
+      flag to set the coverage mode
+      (the go default is: "set", unless -race is enabled, in which case the go default is "atomic")
+    type: enum
+    enum: ["set", "count", "atomic"]
+    default: "atomic"  # the go default is: "set", however unless -race is enabled, in which case it is "atomic"
 executor: << parameters.exec >>
 steps:
   - checkout
   - go/load-cache
   - code-climate/install
   - run: cc-test-reporter before-build
-  - test
+  - go/test:
+      packages: <<parameters.packages>>
+      race: <<parameters.race>>
+      count: <<parameters.count>>
+      failfast: <<parameters.failfast>>
+      parallel: <<parameters.parallel>>
+      coverprofile: <<parameters.coverprofile>>
+      covermode: <<parameters.covermode>>
   - run:
       command: |
         cat cover-source.out | grep -v '.pb.go' | grep -v '.pqt.go' | grep -v '.mock.go' > cover-final.out
