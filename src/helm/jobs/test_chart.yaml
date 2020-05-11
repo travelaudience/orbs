@@ -13,8 +13,7 @@ parameters:
     description: The name of custom executor to use
     type: executor
     default: chart-testing-exec
-executor:
-    machine: true
+executor: << parameters.exec >>
 steps:
   - checkout
   - install:
