@@ -1,8 +1,5 @@
 description: |
   Install charts into local k8s cluster (install is currently disabled).
-executor:
-  chart-testing-exec:
-    machine: true
 parameters:
   chart_test_config:
     description: |
@@ -16,7 +13,8 @@ parameters:
     description: The name of custom executor to use
     type: executor
     default: chart-testing-exec
-executor: << parameters.exec >>
+executor:
+    machine: true
 steps:
   - checkout
   - install:
