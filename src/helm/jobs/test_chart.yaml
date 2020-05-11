@@ -22,6 +22,7 @@ steps:
       sudo tar -C /usr/local/bin/chart-testing -zxvf chart-testing
       ls -al /usr/local/bin
       sudo chmod +x /usr/local/bin/chart-testing/ct
+      export PATH=$PATH:"/usr/local/bin/chart-testing"
       echo $PATH
       ct version
   - install:
