@@ -5,6 +5,6 @@ description: |
   see github page for more info: https://github.com/travelaudience/orbs
 
 orbs:
-  go: circleci/go@0.2.0
+  go: circleci/go@1.1.1
   protobuf: izumin5210/protobuf@0.1.0
   code-climate: travelaudience/code-climate@0.1.1
