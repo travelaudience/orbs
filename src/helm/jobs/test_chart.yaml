@@ -16,8 +16,7 @@ parameters:
 executor: << parameters.exec >>
 steps:
   - checkout
-  - run:
-    command: |
+  - run: |
       curl -sSLo chart-testing "https://github.com/helm/chart-testing/releases/download/v2.4.0/chart-testing_2.4.0_linux_amd64.tar.gz"
       tar -zxvf chart-testing_2.4.0_linux_amd64.tar.gz
       export PATH=$PATH:${pwd}
