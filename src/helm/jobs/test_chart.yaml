@@ -21,7 +21,7 @@ steps:
       sudo mkdir /usr/local/bin/chart-testing
       sudo tar -C /usr/local/bin/chart-testing -zxvf chart-testing
       ls -al /usr/local/bin
-      chmod +x /usr/local/bin/chart-testing/ct
+      sudo chmod +x /usr/local/bin/chart-testing/ct
       echo $PATH
       ct version
   - install:
