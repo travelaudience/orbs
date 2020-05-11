@@ -1,6 +1,6 @@
 description: |
   Install charts into local k8s cluster (install is currently disabled).
-executors:
+executor:
   chart-testing-exec:
     machine: true
 parameters:
