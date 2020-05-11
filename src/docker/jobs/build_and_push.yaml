@@ -39,7 +39,7 @@ steps:
   - attach_workspace:
       at: ./
   - docker-orb/check:
-      registry: << parameters.registry >>
+      registry: "$<< parameters.registry >>"
       docker-username: << parameters.docker-username >>
       docker-password: << parameters.docker-password >>
   - get_change_name
@@ -50,16 +50,16 @@ steps:
             dockerfile: <<parameters.dockerfile>>
   - docker-orb/build:
       image: <<parameters.image-name>>
-      extra_build_args: '-t << parameters.registry >>/<< parameters.image-name >>:<< parameters.extra-tag >>'
-      registry: <<parameters.registry>>
+      extra_build_args: '-t "$<< parameters.registry >>"/<< parameters.image-name >>:<< parameters.extra-tag >>'
+      registry: "$<<parameters.registry>>"
       dockerfile: <<parameters.dockerfile>>
   - docker-orb/push:
       image: <<parameters.image-name>>
-      registry: <<parameters.registry>>
+      registry: "$<<parameters.registry>>"
   - docker-orb/push:
       image: <<parameters.image-name>>
       tag: <<parameters.extra-tag>>
-      registry: <<parameters.registry>>
+      registry: "$<<parameters.registry>>"
   - collect_image_names:
-      image: <<parameters.registry>>/<<parameters.image-name>>
+      image: "$<<parameters.registry>>/<<parameters.image-name>>"
       tag: <<parameters.extra-tag>>
