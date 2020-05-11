@@ -25,5 +25,8 @@ steps:
       export PATH=$PATH:"/usr/local/bin/chart-testing"
       echo $PATH
       ct version
+  - run: |
+      echo $PATH
+      ct version
   - install:
       chart_test_config: <<parameters.chart_test_config>>
