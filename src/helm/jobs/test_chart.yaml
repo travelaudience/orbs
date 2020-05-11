@@ -18,9 +18,9 @@ steps:
   - checkout
   - run: |
       curl -sSLo chart-testing "https://github.com/helm/chart-testing/releases/download/v2.4.0/chart-testing_2.4.0_linux_amd64.tar.gz"
-      ls -al .
-      tar -zxvf chart-testing
-      export PATH=$PATH:${pwd}
+      sudo tar -C /usr/local/bin -zxvf chart-testing
+      chmod +x /usr/local/bin/chart-testing/ct
+      ls -al /usr/local/bin/chart-testing/
       echo $PATH
       ct version
   - install:
