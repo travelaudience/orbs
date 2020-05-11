@@ -19,7 +19,7 @@ steps:
   - run: |
       curl -sSLo chart-testing "https://github.com/helm/chart-testing/releases/download/v2.4.0/chart-testing_2.4.0_linux_amd64.tar.gz"
       ls -al .
-      tar -zxvf chart-testing.tar.gz
+      tar -zxvf chart-testing
       export PATH=$PATH:${pwd}
       echo $PATH
       ct version
