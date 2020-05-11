@@ -14,9 +14,10 @@ parameters:
     type: executor
     default: helm-tester
 executor: << parameters.exec >>
+machine: true
 steps:
   - checkout
   - lint:
       chart_test_config: <<parameters.chart_test_config>>
-  # - install:
-  #     chart_test_config: <<parameters.chart_test_config>>
+  - install:
+      chart_test_config: <<parameters.chart_test_config>>
