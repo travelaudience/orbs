@@ -21,6 +21,7 @@ parameters:
 steps:
   - run:
       command: |
+        source $BASH_ENV
         if [ "$(ct list-changed --config <<parameters.chart_test_config>>)" ];
         then
           echo "Installing kind..."
