@@ -9,9 +9,9 @@ parameters:
     type: env_var_name
     default: DOCKER_PASSWORD
   registry:
-    description: Name of registry to use
-    type: string
-    default: 'docker.io'
+    description: Name of environment variable storing the registry host
+    type: env_var_name
+    default: DOCKER_REGISTRY
 steps:
   - attach_workspace:
       at: /tmp

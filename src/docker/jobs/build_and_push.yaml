@@ -13,9 +13,9 @@ parameters:
     type: boolean
     default: false
   registry:
-    description: Name of registry to use
-    type: string
-    default: 'docker.io'
+    description: Name of environment variable storing the registry host
+    type: env_var_name
+    default: DOCKER_REGISTRY
   docker-username:
     description: Name of environment variable storing your Docker username
     type: env_var_name
