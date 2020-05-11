@@ -23,6 +23,7 @@ steps:
       ls -al /usr/local/bin
       sudo chmod +x /usr/local/bin/chart-testing/ct
       echo "export PATH=/usr/local/bin/chart-testing:$PATH" >> $BASH_ENV
+      source $BASH_ENV
       ct version
   - install:
       chart_test_config: <<parameters.chart_test_config>>
