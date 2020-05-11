@@ -13,23 +13,35 @@ parameters:
   kind_version:
     description: Version of Kind to be used
     type: string
-    default: "v0.5.1"
+    default: "v0.7.0"
   k8s_version:
     description: K8s version to be run with kind
     type: string
     default: "v1.15.0"
+  helm_version:
+    description: helm version to be run with kind
+    type: string
+    default: "v2.16.1"
 steps:
   - run:
       command: |
         source $BASH_ENV
-        if [ "$(ct list-changed --config <<parameters.chart_test_config>>)" ];
+        if [ "$(ct list-changed --config ./circleci/helmTestConfig.yaml)" ];
         then
+          echo "Installing kubectl...""
+          curl -LO https://storage.googleapis.com/kubernetes-release/release/<<parameters.k8s_version>>/bin/linux/amd64/kubectl
+          chmod +x ./kubectl
+          sudo mv ./kubectl /usr/local/bin/kubectl
+          echo "Installing helm..."
+          curl -LO "https://get.helm.sh/helm-<<parameters.helm_version>>-linux-amd64.tar.gz"
+          sudo mkdir -p "/usr/local/helm-<<parameters.helm_version>>"
+          sudo tar -xzf "helm-<<parameters.helm_version>>-linux-amd64.tar.gz" -C "/usr/local/helm-<<parameters.helm_version>>"
+          sudo ln -s "/usr/local/helm-<<parameters.helm_version>>/linux-amd64/helm" /usr/local/bin/helm
           echo "Installing kind..."
           curl -sSLo kind "https://github.com/kubernetes-sigs/kind/releases/download/<<parameters.kind_version>>/kind-linux-amd64"
           chmod +x kind
           sudo mv kind /usr/local/bin/kind
           echo "Creating cluster..."
-          // TODO: docker executable is required for this to run. IE, needs a different executor type
           kind create cluster --name "chart-testing" --config .circleci/kind-config.yaml --image "kindest/node:<<parameters.k8s_version>>" --wait 60s
 
           echo $(kubectl get nodes)
@@ -39,7 +51,7 @@ steps:
           kubectl create clusterrolebinding tiller-cluster-rule --clusterrole=cluster-admin --serviceaccount=kube-system:tiller
           helm init --service-account tiller --upgrade --wait
           echo $(helm version)
-          ct install
+          ct install --config ./circleci/helmTestConfig.yaml
         else
           echo "no helm changes to test"
         fi
