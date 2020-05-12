@@ -28,6 +28,9 @@ parameters:
     description: Additional tag to apply to the image besides the default SHA tag. Defaults to the change name (git branch OR tag)
     type: string
     default: $CHANGE_NAME
+  extra-build-args:
+    description: Additional docker build flags
+    type: string
   executor:
     description: Executor to use for this job
     default: default
@@ -50,7 +53,7 @@ steps:
             dockerfile: <<parameters.dockerfile>>
   - docker-orb/build:
       image: <<parameters.image-name>>
-      extra_build_args: '-t "$<< parameters.registry >>"/<< parameters.image-name >>:<< parameters.extra-tag >>'
+      extra_build_args: '-t "$<< parameters.registry >>"/<< parameters.image-name >>:<< parameters.extra-tag >>  << parameters.extra-build-args >>'
       registry: "$<<parameters.registry>>"
       dockerfile: <<parameters.dockerfile>>
   - docker-orb/push:
