@@ -22,9 +22,9 @@ parameters:
     type: env_var_name
     default: DOCKER_PASSWORD
   registry:
-    description: Name of registry to use
-    type: string
-    default: 'docker.io'
+    description: Name of environment variable storing the registry host
+    type: env_var_name
+    default: DOCKER_REGISTRY
   executor:
     description: Executor to use for this job
     default: default
@@ -32,25 +32,25 @@ parameters:
 executor: <<parameters.executor>>
 steps:
   - setup_remote_docker
-  - run: docker login -u "$<<parameters.docker-username>>" -p "$<<parameters.docker-password>>"  <<parameters.registry>>
+  - run: docker login -u "$<<parameters.docker-username>>" -p "$<<parameters.docker-password>>"  "$<<parameters.registry>>"
   - run: |
       set +e
       count=0
       exit=1
       while [[ "$count" -lt <<parameters.retry_count>> ]] && [[ "$exit" -gt 0 ]]; do
-        docker pull -q <<parameters.registry>>/<< parameters.image-name >>:"$CIRCLE_SHA1"
+        docker pull -q "$<<parameters.registry>>"/<< parameters.image-name >>:"$CIRCLE_SHA1"
         exit=$?
         let count=count+1
         if [[ $exit -gt 0 ]] && [[ "$count" -eq <<parameters.retry_count>> ]]; then
-          echo "Failed to find the image <<parameters.registry>>/<< parameters.image-name >>:$CIRCLE_SHA1 in registry."
+          echo "Failed to find the image $<<parameters.registry>>/<< parameters.image-name >>:$CIRCLE_SHA1 in registry."
           exit 1
         elif [[ $exit -gt 0 ]]; then
           sleep <<parameters.wait_period>>
         fi
       done
   - run:
-      command: docker tag <<parameters.registry>>/<< parameters.image-name >>:"$CIRCLE_SHA1" <<parameters.registry>>/<< parameters.image-name >>:"$CIRCLE_TAG"
+      command: docker tag "$<<parameters.registry>>"/<< parameters.image-name >>:"$CIRCLE_SHA1" <<parameters.registry>>/<< parameters.image-name >>:"$CIRCLE_TAG"
       when: on_success
   - run:
-      command: docker push <<parameters.registry>>/<< parameters.image-name >>:"$CIRCLE_TAG"
+      command: docker push "$<<parameters.registry>>"/<< parameters.image-name >>:"$CIRCLE_TAG"
       when: on_success

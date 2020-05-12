@@ -9,13 +9,13 @@ parameters:
     type: env_var_name
     default: DOCKER_PASSWORD
   registry:
-    description: Name of registry to use
-    type: string
-    default: 'docker.io'
+    description: Name of environment variable storing the registry host
+    type: env_var_name
+    default: DOCKER_REGISTRY
 steps:
   - attach_workspace:
       at: /tmp
   - run: find /tmp/image-names -type f -name '*.txt' -exec cat {} + >> /images.file
-  - run: docker login -u "$<<parameters.docker-username>>" -p "$<<parameters.docker-password>>"  <<parameters.registry>>
+  - run: docker login -u "$<<parameters.docker-username>>" -p "$<<parameters.docker-password>>"  "$<<parameters.registry>>"
   - clair-scanner/scan:
       image_file: /images.file
