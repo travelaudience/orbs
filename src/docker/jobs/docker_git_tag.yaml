@@ -49,7 +49,7 @@ steps:
         fi
       done
   - run:
-      command: docker tag "$<<parameters.registry>>"/<< parameters.image-name >>:"$CIRCLE_SHA1" <<parameters.registry>>/<< parameters.image-name >>:"$CIRCLE_TAG"
+      command: docker tag "$<<parameters.registry>>"/<< parameters.image-name >>:"$CIRCLE_SHA1" "$<<parameters.registry>>"/<< parameters.image-name >>:"$CIRCLE_TAG"
       when: on_success
   - run:
       command: docker push "$<<parameters.registry>>"/<< parameters.image-name >>:"$CIRCLE_TAG"
