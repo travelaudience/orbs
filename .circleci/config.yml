@@ -9,7 +9,7 @@ deploy_tag_filter: &deploy_tag_filter
 
 orbs:
   cli: circleci/circleci-cli@0.1.2
-  orb-tools: circleci/orb-tools@8.27.5
+  orb-tools: circleci/orb-tools@9.1.0
 
 jobs:
   pre-orb-promotion-check:
