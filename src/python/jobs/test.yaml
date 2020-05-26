@@ -66,11 +66,11 @@ steps:
       steps:
         - orb-tools/check-env-var-param:
             param: << parameters.repository_url >>
-        - run: pip install --user -r requirements.txt --index-url $<< parameters.repository_url >>
+        - run: pip install --user -r requirements.txt --extra-index-url $<< parameters.repository_url >>
         - when:
             condition: << parameters.ci_requirements >>
             steps:
-              - run: pip install --user -r << parameters.ci_requirements >> --index-url $<< parameters.repository_url >>
+              - run: pip install --user -r << parameters.ci_requirements >> --extra-index-url $<< parameters.repository_url >>
   - unless:
       condition: << parameters.with_custom_repository >>
       steps:

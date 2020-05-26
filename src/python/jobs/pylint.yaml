@@ -31,7 +31,7 @@ steps:
   - when:
       condition: << parameters.with_custom_repository >>
       steps:
-        - run: pip install --user -r requirements.txt --index-url $<< parameters.repository_url >>
+        - run: pip install --user -r requirements.txt --extra-index-url $<< parameters.repository_url >>
   - unless:
       condition: << parameters.with_custom_repository >>
       steps:
