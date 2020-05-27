@@ -1,0 +1,13 @@
+description: |
+  Run `scalafmt` against the repo. Outputs the issues which change suggestions.
+  To run locally, try:
+    `docker run -v $(PWD)/src:/src --rm -it mrothy/scalafmt-native /src`
+  This is a smaller image, and version might not align with CI, but is a quick way to reproduce.
+parameters:
+  executor:
+    description: Executor to use for this job
+    type: executor
+    default: scalafmt
+executor: << parameters.executor >>
+steps:
+  - run: echo test
