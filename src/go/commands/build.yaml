@@ -8,7 +8,7 @@ parameters:
     type: string
 steps:
   - run:
-      name: '[go] Build'
+      name: "[go] Build"
       command: |
         ver=$(git describe --tags --always --dirty)
         ld_flags="-X 'main.version=$ver'"
@@ -29,6 +29,7 @@ steps:
           echo "Building: $name..."
           CGO_ENABLED=<<parameters.cgo_value>> GOOS=<<parameters.os_value>> go build -ldflags "$ld_flags" -a -o "./bin/$name" "$importPath"
         done
+  - run: mkdir -p ./bin
   - run: ls -alh ./bin
   - persist_to_workspace:
       root: ./
