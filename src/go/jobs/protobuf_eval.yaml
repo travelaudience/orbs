@@ -23,5 +23,6 @@ steps:
   - go/load-cache
   - make-gen:
       protoc_version: <<parameters.protoc_version>>
+      protoc_grpc_version: <<parameters.protoc_version>>
   - compare
   - go/save-cache

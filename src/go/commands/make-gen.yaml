@@ -2,7 +2,11 @@ description: Execute make gen in order to rebuild the generated protobuf files l
 parameters:
   protoc_version:
     description: Version of protoc-gen-go to install
-    default: "v1.3.2"
+    default: "v1.4.2"
+    type: string
+  protoc_grpc_version:
+    description: Version of protoc-gen-go to install
+    default: "v1.29.0"
     type: string
 steps:
   - run:
@@ -12,4 +16,5 @@ steps:
         go get -u github.com/vektra/mockery/cmd/mockery \
         golang.org/x/tools/cmd/goimports \
         github.com/golang/protobuf/protoc-gen-go@<<parameters.protoc_version>>
+        github.com/grpc/grpc-go/cmd/protoc-gen-go-grpc@<<parameters.protoc_grpc_version>>
   - run: make gen
