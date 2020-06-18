@@ -8,9 +8,9 @@ steps:
   - run:
       name: '[scala] Assembly'
       command: |
-        submodule=$([ "<< parameters.submodule >>" ] && echo "<< parameters.submodule >> /" || echo "")
+        submodule=$([ "<< parameters.submodule >>" ] && echo "<< parameters.submodule >>" || echo "")
         version=$(git describe --tags --always)
-        sbt 'set '"$submodule"' assembly / target := new File("target/fat-jar")' 'set ThisBuild / version := "'${version}'"' "$submodule"' assembly'
+        sbt "project $submodule" 'set assembly / target := new File("target/fat-jar")' 'set ThisBuild / version := "'${version}'"' assembly
   - store_artifacts:
       path: target/fat-jar
   - persist_to_workspace:

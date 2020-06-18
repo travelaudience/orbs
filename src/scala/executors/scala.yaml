@@ -4,7 +4,7 @@ parameters:
   version:
     description: jdk/sbt/scala version to use (docker tag)
     type: string
-    default: 8u222_1.3.3_2.12.10
+    default: 8u252_1.3.12_2.12.11
   resource_class:
     description: which circleci resource_class to use
     type: string
