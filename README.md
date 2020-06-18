@@ -34,6 +34,8 @@ When the PR is merged to master. Create a tag with the syntax of orb name, and t
 docker-0.1.0
 ```
 
+Then create a release on Github with the new tag.
+
 ## Contributing
 
 Contributions are welcomed. However, these Orbs are used for travel audience CI process, and have been made in an opionated way. More information on how to contribute is in our guide: [Contributing Guide](CONTRIBUTING.md).
