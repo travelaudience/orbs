@@ -6,7 +6,7 @@ filter_snapshot_tags: &filter_snapshot_tags
     # https://semver.org/#is-there-a-suggested-regular-expression-regex-to-check-a-semver-string
     only: /^v((([0-9]+)\.([0-9]+)\.([0-9]+)(?:-([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?)(?:\+([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?)$/
 
-filter_release_tag: &filter_release_tags
+filter_release_tags: &filter_release_tags
   tags:
     # 'v{major}.{minor}.{patch}'
     only: /^v\d+\.\d+\.\d+$/
