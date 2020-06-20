@@ -1,0 +1,471 @@
+commands:
+  clean_cache:
+    description: |
+      Deletes .ivy/.sbt process lock files.
+    steps:
+    - run:
+        command: |
+          rm -fv $HOME/.ivy2/.sbt.ivy.lock
+          find $HOME/.ivy2/cache -name "ivydata-*.properties" -print -delete
+          find $HOME/.sbt        -name "*.lock"               -print -delete
+        name: Clean unwanted files from cache
+  compile:
+    description: |
+      Compile a "fat" jar for adding to a docker image.
+    parameters:
+      submodule:
+        description: sbt submodule to assembly. Leave empty for main module.
+        type: string
+    steps:
+    - run:
+        command: |
+          submodule=$([ "<< parameters.submodule >>" ] && echo "<< parameters.submodule >> /" || echo "")
+          version=$(git describe --tags --always)
+          sbt 'set '"$submodule"' assembly / target := new File("target/fat-jar")' 'set ThisBuild / version := "'${version}'"' "$submodule"' assembly'
+        name: '[scala] Assembly'
+    - store_artifacts:
+        path: target/fat-jar
+    - persist_to_workspace:
+        paths:
+        - target/fat-jar/*
+        root: ./
+  read_cache:
+    description: |
+      Reads cached scala library dependencies
+    steps:
+    - restore_cache:
+        keys:
+        - v2-dependencies-{{ checksum "build.sbt" }}-{{ checksum "project/plugins.sbt"
+          }}-{{ checksum ".circleci/config.yml" }}
+        - v2-dependencies-
+  read_workspace:
+    description: |
+      Reads persisted workspace directory and attaches it to the current job
+    steps:
+    - attach_workspace:
+        at: ~/
+  test:
+    description: |
+      Run `sbt test:test` against the repo. Provides an option to upload coverage report to code climate.
+      If using coverage, it's advisable to add `scoverage` to plugins.sbt
+    parameters:
+      memory_limit_for_heap:
+        default: 1524M
+        description: aggregating the test coverage requires more memory to be defined
+        type: string
+      path_to_coverage_file:
+        default: scala-2.12/coverage-report/cobertura.xml
+        description: Where the test coverage report gets created.
+        type: string
+      project_base:
+        default: target
+        description: Where test output gets placed
+        type: string
+      with_coverage:
+        default: true
+        description: |
+          Enable the use of code-climate for aggreated test coverage analysis
+            requires code-climate CC_TEST_REPORTER_ID env variable to be added to the job
+            the best place for this is in the project in CircleCI UI
+            the code-climate ID is specific to each repo
+        type: boolean
+    steps:
+    - when:
+        condition: << parameters.with_coverage >>
+        steps:
+        - code-climate/install
+        - run: cc-test-reporter before-build
+    - run: sbt test:compile
+    - when:
+        condition: << parameters.with_coverage >>
+        steps:
+        - run: sbt coverage test:test coverageReport
+        - run: SBT_OPTS="-Xmx<<parameters.memory_limit_for_heap>>" sbt coverageAggregate
+    - unless:
+        condition: << parameters.with_coverage >>
+        steps:
+        - run: sbt test:test
+    - when:
+        condition: << parameters.with_coverage >>
+        steps:
+        - code-climate/format_coverage:
+            coverage_file: << parameters.project_base >>/<< parameters.path_to_coverage_file
+              >>
+            input_type: cobertura
+        - code-climate/upload_coverage
+    - store_test_results:
+        path: << parameters.project_base >>
+  write_cache:
+    description: |
+      Write sbt library dependencies to cache so it can be reuesed for multiple pipeline execution.
+    steps:
+    - save_cache:
+        key: v2-dependencies-{{ checksum "build.sbt" }}-{{ checksum "project/plugins.sbt"
+          }}-{{ checksum "project/Dependencies.scala" }}
+        paths:
+        - ~/.sbt
+        - ~/.m2
+        - ~/.ivy2/cache
+        - ~/.cache/coursier
+  write_workspace:
+    description: |
+      Writes project directory state to workspace so it could be reused in downstream jobs
+    steps:
+    - persist_to_workspace:
+        paths:
+        - app
+        root: ~/
+description: |
+  CircleCI Orb for scala CI. Provides static analysis, sbt test, sbt compile, amongst other things...
+  see github page for more info: https://github.com/travelaudience/orbs
+examples:
+  check_and_compile:
+    description: |
+      If you are building a jar file that will then be added to a docker image, you can use this orb to run through
+      a common scala workflow. (using scalafmt and scoverage for code coverage analysis)
+    usage:
+      orbs:
+        ta-scala: travelaudience/scala@x.y.z
+      version: 2.1
+      workflows:
+        build_and_test:
+          jobs:
+          - ta-scala/static_check
+          - ta-scala/test_and_compile
+  only_test:
+    description: |
+      If you don't need to compile a jar file, and you only want to test the code, and you won't be saving the coverage report.
+    usage:
+      jobs:
+        test:
+          description: Only test, without coverage
+          executor: ta-scala/scala
+          steps:
+          - checkout
+          - restore_cache:
+              keys:
+              - dependencies-{{ checksum "build.sbt" }}
+          - ta-scala/test:
+              with_coverage: false
+          - save_cache:
+              key: dependencies-{{ checksum "build.sbt" }}
+              paths:
+              - ~/.ivy2
+              - ~/.sbt
+              - ~/.m2
+      orbs:
+        ta-scala: travelaudience/scala@x.y.z
+      version: 2.1
+      workflows:
+        only_test:
+          jobs:
+          - ta-scala/static_check
+          - test
+  publish_library:
+    description: |
+      Publish scala snapshot/relaease library to nexus.
+    usage:
+      docker_defaults:
+        docker:
+        - image: hseeberger/scala-sbt:8u242_1.3.9_2.13.1
+        working_directory: ~/app
+      filter_release_tags:
+        tags:
+          only: /^v\d+\.\d+\.\d+$/
+      filter_snapshot_tags:
+        tags:
+          only: /^v((([0-9]+)\.([0-9]+)\.([0-9]+)(?:-([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?)(?:\+([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?)$/
+      orbs:
+        ta-scala: travelaudience/scala@x.y.z
+      version: 2.1
+      workflows:
+        scala_publish_release:
+          jobs:
+          - ta-scala/fetch_nexus_credentials:
+              filters:
+                branches:
+                  ignore: /.*/
+                tags:
+                  only: /^v\d+\.\d+\.\d+$/
+          - ta-scala/static_checks:
+              filters:
+                branches:
+                  ignore: /.*/
+                tags:
+                  only: /^v\d+\.\d+\.\d+$/
+              requires:
+              - fetch_nexus_credentials
+          - ta-scala/package:
+              filters:
+                branches:
+                  ignore: /.*/
+                tags:
+                  only: /^v\d+\.\d+\.\d+$/
+              requires:
+              - static_checks
+          - ta-scala/publish_release:
+              filters:
+                branches:
+                  ignore: /.*/
+                tags:
+                  only: /^v\d+\.\d+\.\d+$/
+              requires:
+              - package
+        scala_publish_snapshot:
+          jobs:
+          - ta-scala/fetch_nexus_credentials:
+              filters:
+                branches:
+                  ignore: master
+                tags:
+                  ignore: /.*/
+          - ta-scala/static_checks:
+              filters:
+                branches:
+                  ignore: master
+                tags:
+                  ignore: /.*/
+              requires:
+              - ta-scala/fetch_nexus_credentials
+          - ta-scala/package:
+              filters:
+                branches:
+                  ignore: master
+                tags:
+                  ignore: /.*/
+              requires:
+              - static_checks
+          - ta-scala/publish_snapshot:
+              filters:
+                branches:
+                  ignore: master
+                tags:
+                  ignore: /.*/
+              requires:
+              - package
+        version: 2
+executors:
+  scala:
+    description: |
+      The docker container to used to test & build Scala projects.
+    docker:
+    - image: hseeberger/scala-sbt:<< parameters.version >>
+    parameters:
+      resource_class:
+        default: medium
+        description: which circleci resource_class to use
+        type: string
+      version:
+        default: 8u222_1.3.3_2.12.10
+        description: jdk/sbt/scala version to use (docker tag)
+        type: string
+      working_directory:
+        default: ~/repo
+        description: directory path for this job
+        type: string
+    resource_class: <<parameters.resource_class>>
+    working_directory: <<parameters.working_directory>>
+  scalafmt:
+    description: |
+      The docker container to used to run static checks on Scala projects.
+    docker:
+    - image: mrothy/scalafmt:<< parameters.version >>
+    parameters:
+      version:
+        default: 2.2.1
+        description: scalafmt version to use (docker tag)
+        type: string
+      working_directory:
+        default: ~/repo
+        description: directory path for this job
+        type: string
+    working_directory: <<parameters.working_directory>>
+jobs:
+  fetch_nexus_credentials:
+    description: |
+      Fetch nexus credentials using project environment variables and write it to a sbt file
+    executor: << parameters.executor >>
+    parameters:
+      executor:
+        default: scala
+        description: Executor to use for this job
+        type: executor
+      nexus_host:
+        default: NEXUS_HOST
+        description: Project environment variable key containing nexus host
+        type: string
+      nexus_password:
+        default: NEXUS_PASSWORD
+        description: Project environment variable key containing nexus password
+        type: string
+      nexus_realm:
+        default: NEXUS_REALM
+        description: Project environment variable key containing nexus realm
+        type: string
+      nexus_username:
+        default: NEXUS_USERNAME
+        description: Project environment variable key containing nexus username
+        type: string
+    steps:
+    - checkout
+    - run:
+        command: rm -rf .git
+        name: Remove .git directory before persisting to workspace
+    - run:
+        command: echo 'credentials+=Credentials(realm="'$<< parameters.nexus_realm
+          >>'", host="'$<< parameters.nexus_host >>'", userName="'$<< parameters.nexus_username
+          >>'", passwd="'$<< parameters.nexus_password >>'")' > project/nexus-credentials.sbt
+        name: Fetch nexus credentials and prepare project/nexus-credentials.sbt file
+    - write_workspace
+  package:
+    description: |
+      TODO
+    executor: << parameters.executor >>
+    parameters:
+      executor:
+        default: scala
+        description: Executor to use for this job
+        type: executor
+    steps:
+    - read_workspace
+    - read_cache
+    - run:
+        command: sbt +package
+        name: Package .jar files
+    - clean_cache
+    - write_cache
+    - write_workspace
+  publish_release:
+    description: |
+      TODO
+    executor: << parameters.executor >>
+    parameters:
+      executor:
+        default: scala
+        description: Executor to use for this job
+        type: executor
+    steps:
+    - read_workspace
+    - read_cache
+    - run:
+        command: |
+          #!/usr/bin/env bash
+          VERSION_TAG=$(echo "$CIRCLE_TAG"   | grep -P -o '(?<=v).+')  # '1.0.0' without 'v' prefix
+          echo 'Publishing release '"$VERSION_TAG"'...'
+          sbt 'set ThisBuild / version := "'"$VERSION_TAG"'"' +publish
+        name: Publish release .jar
+  publish_snapshot:
+    description: |
+      TODO
+    executor: << parameters.executor >>
+    parameters:
+      executor:
+        default: scala
+        description: Executor to use for this job
+        type: executor
+    steps:
+    - read_workspace
+    - read_cache
+    - run:
+        command: sbt +publish
+        name: Publish snapshot .jar
+  run_static_checks:
+    description: |
+      TODO
+    executor: << parameters.executor >>
+    parameters:
+      executor:
+        default: scala
+        description: Executor to use for this job
+        type: executor
+    steps:
+    - read_workspace
+    - read_cache
+    - run:
+        command: sbt clean scalafmtCheckAll
+        name: Check formatting with Scalafmt
+    - run:
+        command: sbt +test:compile
+        name: Compile test code
+    - run:
+        command: sbt coverageOn +test coverageOff coverageAggregate
+        name: Check code coverage and run tests
+    - run:
+        command: |
+          mkdir -p test-reports
+          find . -type f -regex ".*/target/test-reports/.*xml" -exec cp {} test-reports/ \;
+        name: Save test results
+    - clean_cache
+    - write_cache
+    - write_workspace
+    - store_test_results:
+        path: test-reports
+  static_check:
+    description: |
+      Run `scalafmt` against the repo. Outputs the issues which change suggestions.
+      To run locally, try:
+        `docker run -v $(PWD)/src:/src --rm -it mrothy/scalafmt-native /src`
+      This is a smaller image, and version might not align with CI, but is a quick way to reproduce.
+    executor: << parameters.executor >>
+    parameters:
+      executor:
+        default: scalafmt
+        description: Executor to use for this job
+        type: executor
+    steps:
+    - checkout
+    - run: scalafmt --test
+  test_and_compile:
+    description: |
+      Compile a fat-jar for adding to a docker image.
+    executor: << parameters.executor >>
+    parameters:
+      executor:
+        default: scala
+        description: Executor to use for this job
+        type: executor
+      memory_limit_for_heap:
+        default: 1524M
+        description: aggregating the test coverage requires more memory to be defined
+        type: string
+      path_to_coverage_file:
+        default: scala-2.12/coverage-report/cobertura.xml
+        description: Where the test coverage report gets created.
+        type: string
+      project_base:
+        default: target
+        description: Where test output gets placed
+        type: string
+      submodule:
+        description: sbt submodule to assembly. Leave empty for main module.
+        type: string
+      with_coverage:
+        default: true
+        description: |
+          Enable the use of code-climate for test coverage analysis
+            requires code-climate CC_TEST_REPORTER_ID env variable to be added to the job
+            the best place for this is in the project in CircleCI UI
+            the code-climate ID is specific to each repo
+        type: boolean
+    steps:
+    - checkout
+    - restore_cache:
+        keys:
+        - dependencies-{{ checksum "build.sbt" }}
+    - test:
+        memory_limit_for_heap: << parameters.memory_limit_for_heap >>
+        path_to_coverage_file: << parameters.path_to_coverage_file >>
+        project_base: << parameters.project_base >>
+        with_coverage: << parameters.with_coverage >>
+    - compile:
+        submodule: << parameters.submodule >>
+    - save_cache:
+        key: dependencies-{{ checksum "build.sbt" }}
+        paths:
+        - ~/.ivy2
+        - ~/.sbt
+        - ~/.m2
+orbs:
+  code-climate: travelaudience/code-climate@0.1
+version: 2.1
+
