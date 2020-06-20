@@ -5,4 +5,4 @@ steps:
   - persist_to_workspace:
       root: ~/
       paths:
-        - app
+        - repo

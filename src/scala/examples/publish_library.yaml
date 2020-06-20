@@ -6,7 +6,7 @@ usage:
 
   orbs:
     ta-scala: travelaudience/scala@x.y.z
-#    ta-scala: travelaudience/scala@dev:improve_scala_orb
+    #ta-scala: travelaudience/scala@dev:improve_scala_orb
 
   filter_snapshot_tags: &filter_snapshot_tags
     tags:
@@ -17,11 +17,6 @@ usage:
     tags:
       # 'v{major}.{minor}.{patch}'
       only: /^v\d+\.\d+\.\d+$/
-
-  docker_defaults: &docker_defaults
-    docker: # more here https://circleci.com/docs/2.0/configuration-reference/#docker
-      - image: hseeberger/scala-sbt:8u242_1.3.9_2.13.1
-    working_directory: ~/app
 
   workflows:
     version: 2
