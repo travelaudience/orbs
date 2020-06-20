@@ -1,0 +1,17 @@
+description: |
+  TODO
+
+parameters:
+  executor:
+    description: Executor to use for this job
+    type: executor
+    default: scala
+
+executor: << parameters.executor >>
+
+steps:
+  - read_workspace
+  - read_cache
+  - run:
+      name: Publish snapshot .jar
+      command: sbt +publish

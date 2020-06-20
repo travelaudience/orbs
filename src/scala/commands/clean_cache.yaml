@@ -1,0 +1,10 @@
+description: |
+  Deletes .ivy/.sbt process lock files.
+
+steps:
+  - run:
+      name: Clean unwanted files from cache
+      command: |
+        rm -fv $HOME/.ivy2/.sbt.ivy.lock
+        find $HOME/.ivy2/cache -name "ivydata-*.properties" -print -delete
+        find $HOME/.sbt        -name "*.lock"               -print -delete

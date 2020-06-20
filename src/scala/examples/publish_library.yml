@@ -1,0 +1,90 @@
+description: |
+  Publish scala snapshot/relaease library to nexus.
+
+filter_snapshot_tags: &filter_snapshot_tags
+  tags:
+    # https://semver.org/#is-there-a-suggested-regular-expression-regex-to-check-a-semver-string
+    only: /^v((([0-9]+)\.([0-9]+)\.([0-9]+)(?:-([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?)(?:\+([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?)$/
+
+filter_release_tag: &filter_release_tags
+  tags:
+    # 'v{major}.{minor}.{patch}'
+    only: /^v\d+\.\d+\.\d+$/
+
+usage:
+  version: 2.1
+
+  orbs:
+    ta-scala: travelaudience/scala@x.y.z
+#    ta-scala: travelaudience/scala@dev:improve_scala_orb
+
+  docker_defaults: &docker_defaults
+    docker: # more here https://circleci.com/docs/2.0/configuration-reference/#docker
+      - image: hseeberger/scala-sbt:8u242_1.3.9_2.13.1
+    working_directory: ~/app
+
+  workflows:
+    version: 2
+    scala_publish_snapshot:
+      # publish snapshot on any non-master commit
+      jobs:
+        - ta-scala/fetch_nexus_credentials:
+            filters:
+              tags:
+                ignore: /.*/
+              branches:
+                ignore: master
+        - ta-scala/static_checks:
+            requires:
+              - ta-scala/fetch_nexus_credentials
+            filters:
+              tags:
+                ignore: /.*/
+              branches:
+                ignore: master
+        - ta-scala/package:
+            requires:
+              - static_checks
+            filters:
+              tags:
+                ignore: /.*/
+              branches:
+                ignore: master
+        - ta-scala/publish_snapshot:
+            requires:
+              - package
+            filters:
+              tags:
+                ignore: /.*/
+              branches:
+                ignore: master
+
+    scala_publish_release:
+      # publish release on tag only
+      jobs:
+        - ta-scala/fetch_nexus_credentials:
+            filters:
+              <<: *filter_release_tags
+              branches:
+                ignore: /.*/
+        - ta-scala/static_checks:
+            requires:
+              - fetch_nexus_credentials
+            filters:
+              <<: *filter_release_tags
+              branches:
+                ignore: /.*/
+        - ta-scala/package:
+            requires:
+              - static_checks
+            filters:
+              <<: *filter_release_tags
+              branches:
+                ignore: /.*/
+        - ta-scala/publish_release:
+            requires:
+              - package
+            filters:
+              <<: *filter_release_tags
+              branches:
+                ignore: /.*/

@@ -1,0 +1,33 @@
+description: |
+  TODO
+
+parameters:
+  executor:
+    description: Executor to use for this job
+    type: executor
+    default: scala
+
+executor: << parameters.executor >>
+
+steps:
+  - read_workspace
+  - read_cache
+  - run:
+      name: Check formatting with Scalafmt
+      command: sbt clean scalafmtCheckAll
+  - run:
+      name: Compile test code
+      command: sbt +test:compile
+  - run:
+      name: Check code coverage and run tests
+      command: sbt coverageOn +test coverageOff coverageAggregate
+  - run:
+      name: Save test results
+      command: |
+        mkdir -p test-reports
+        find . -type f -regex ".*/target/test-reports/.*xml" -exec cp {} test-reports/ \;
+  - clean_cache
+  - write_cache
+  - write_workspace
+  - store_test_results:
+      path: test-reports

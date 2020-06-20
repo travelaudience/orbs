@@ -1,0 +1,20 @@
+description: |
+  TODO
+
+parameters:
+  executor:
+    description: Executor to use for this job
+    type: executor
+    default: scala
+
+executor: << parameters.executor >>
+
+steps:
+  - read_workspace
+  - read_cache
+  - run:
+      name: Package .jar files
+      command: sbt +package
+  - clean_cache
+  - write_cache
+  - write_workspace

@@ -1,0 +1,8 @@
+description: |
+  Writes project directory state to workspace so it could be reused in downstream jobs
+
+steps:
+  - persist_to_workspace:
+      root: ~/
+      paths:
+        - app

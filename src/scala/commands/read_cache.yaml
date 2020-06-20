@@ -1,0 +1,8 @@
+description: |
+  Reads cached scala library dependencies
+
+steps:
+  - restore_cache:
+      keys:
+        - v2-dependencies-{{ checksum "build.sbt" }}-{{ checksum "project/plugins.sbt" }}-{{ checksum ".circleci/config.yml" }}
+        - v2-dependencies- # fallback to using the latest cache if no exact match is found

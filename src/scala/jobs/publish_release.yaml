@@ -1,0 +1,21 @@
+description: |
+  TODO
+
+parameters:
+  executor:
+    description: Executor to use for this job
+    type: executor
+    default: scala
+
+executor: << parameters.executor >>
+
+steps:
+  - read_workspace
+  - read_cache
+  - run:
+      name: Publish release .jar
+      command: |
+        #!/usr/bin/env bash
+        VERSION_TAG=$(echo "$CIRCLE_TAG"   | grep -P -o '(?<=v).+')  # '1.0.0' without 'v' prefix
+        echo 'Publishing release '"$VERSION_TAG"'...'
+        sbt 'set ThisBuild / version := "'"$VERSION_TAG"'"' +publish
