@@ -23,15 +23,15 @@ usage:
     scala_publish_snapshot:
       # publish snapshot on any non-master commit
       jobs:
-        - ta-scala/fetch_nexus_credentials:
+        - ta-scala/checkout_with_nexus_credentials:
             filters:
               tags:
                 ignore: /.*/
               branches:
                 ignore: master
-        - ta-scala/static_checks:
+        - ta-scala/run_static_checks:
             requires:
-              - ta-scala/fetch_nexus_credentials
+              - ta-scala/checkout_with_nexus_credentials
             filters:
               tags:
                 ignore: /.*/
@@ -39,7 +39,7 @@ usage:
                 ignore: master
         - ta-scala/package:
             requires:
-              - static_checks
+              - ta-scala/run_static_checks
             filters:
               tags:
                 ignore: /.*/
@@ -47,7 +47,7 @@ usage:
                 ignore: master
         - ta-scala/publish_snapshot:
             requires:
-              - package
+              - ta-scala/package
             filters:
               tags:
                 ignore: /.*/
@@ -57,28 +57,28 @@ usage:
     scala_publish_release:
       # publish release on tag only
       jobs:
-        - ta-scala/fetch_nexus_credentials:
+        - ta-scala/checkout_with_nexus_credentials:
             filters:
               <<: *filter_release_tags
               branches:
                 ignore: /.*/
-        - ta-scala/static_checks:
+        - ta-scala/run_static_checks:
             requires:
-              - fetch_nexus_credentials
+              - ta-scala/checkout_with_nexus_credentials
             filters:
               <<: *filter_release_tags
               branches:
                 ignore: /.*/
         - ta-scala/package:
             requires:
-              - static_checks
+              - ta-scala/run_static_checks
             filters:
               <<: *filter_release_tags
               branches:
                 ignore: /.*/
         - ta-scala/publish_release:
             requires:
-              - package
+              - ta-scala/package
             filters:
               <<: *filter_release_tags
               branches:
