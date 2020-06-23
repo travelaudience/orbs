@@ -29,10 +29,14 @@ Learn more about Orbs from the official docs: https://circleci.com/docs/2.0/usin
 
 ### Releasing a new version
 
-When the PR is merged to master. Create a tag with the syntax of orb name, and the appropriate semantic version. Like:
+When the PR is merged to master. Create and push a tag with the syntax of orb name, and the appropriate semantic version. Like:
 ```
 docker-0.1.0
 ```
+
+Then create a release on Github with the new tag.
+
+Or, if you prefer you can just create the release on Github and it will automatically create a tag.
 
 ## Contributing
 
