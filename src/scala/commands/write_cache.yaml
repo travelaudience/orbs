@@ -1,13 +1,32 @@
 description: |
-  Write sbt library dependencies to cache so it can be reuesed for multiple pipeline execution.
+  Write sbt library dependencies to cache so it can be reused for multiple pipeline execution.
 
-# TODO let user choose one of the keys (make cascade)
+parameters:
+  cache_key:
+    description: Checksum-based key used to identify cache
+    type: string
+    default: ''
 
 steps:
-  - save_cache:
-      key: v2-dependencies-{{ checksum "build.sbt" }}-{{ checksum "project/plugins.sbt" }}-{{ checksum "project/Dependencies.scala" }}
-      paths:
-        - ~/.sbt
-        - ~/.m2
-        - ~/.ivy2/cache
-        - ~/.cache/coursier
+  - when:
+      condition: << parameters.cache_key >>
+      steps:
+        - save_cache:
+            key: << parameters.cache_key >>
+            paths:
+              - ~/.sbt
+              - ~/.m2
+              - ~/.ivy2/cache
+              - ~/.cache/coursier
+  - unless:
+      condition: << parameters.cache_key >>
+      steps:
+        - run: cat build.sbt project/plugins.sbt project/Dependencies 2>/dev/null >> cache_file || true
+        - save_cache:
+            key:  v2-{{ checksum "cache_file" }}
+            paths:
+              - ~/.sbt
+              - ~/.m2
+              - ~/.ivy2/cache
+              - ~/.cache/coursier
+        - run: rm cache_file

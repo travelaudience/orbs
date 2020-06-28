@@ -1,8 +1,24 @@
 description: |
-  Reads cached scala library dependencies
+  Read sbt library dependencies from cache.
+
+parameters:
+  cache_key:
+    description: Checksum-based key used to identify cache
+    type: string
+    default: ''
 
 steps:
-  - restore_cache:
-      keys:
-        - v2-dependencies-{{ checksum "build.sbt" }}-{{ checksum "project/plugins.sbt" }}-{{ checksum ".circleci/config.yml" }}
-        - v2-dependencies- # fallback to using the latest cache if no exact match is found
+  - when:
+      condition: << parameters.cache_key  >>
+      steps:
+        - restore_cache:
+            keys:
+              - << parameters.cache_key >>
+  - unless:
+      condition: << parameters.cache_key  >>
+      steps:
+        - run: cat build.sbt project/plugins.sbt project/Dependencies 2>/dev/null >> cache_file || true
+        - restore_cache:
+            keys:
+              - v2-{{ checksum "cache_file" }}
+        - run: rm cache_file
