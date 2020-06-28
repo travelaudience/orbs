@@ -1,12 +1,10 @@
 description: |
   Write sbt library dependencies to cache so it can be reused for multiple pipeline execution.
-
 parameters:
   cache_key:
     description: Checksum-based key used to identify cache
     type: string
     default: ''
-
 steps:
   - when:
       condition: << parameters.cache_key >>
