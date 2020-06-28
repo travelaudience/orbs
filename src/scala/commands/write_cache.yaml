@@ -19,7 +19,7 @@ steps:
   - unless:
       condition: << parameters.cache_key >>
       steps:
-        - run: cat build.sbt project/plugins.sbt project/Dependencies 2>/dev/null >> cache_file || true
+        - run: cat build.sbt project/plugins.sbt project/Dependencies.scala 2>/dev/null >> cache_file || true
         - save_cache:
             key:  v2-{{ checksum "cache_file" }}
             paths:
