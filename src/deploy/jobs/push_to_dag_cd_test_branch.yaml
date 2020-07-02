@@ -58,7 +58,7 @@ steps:
           git config --global user.email "${<<parameters.github_email>>}"
           cd dag-cd
           git fetch --prune
-          if git ls-remote --heads --exit-code origin "testbranch_<<parameters.dag_name>>_'$<<parameters.version>>'"; then
+          if git ls-remote --heads --exit-code origin "testbranch_<<parameters.dag_name>>_$<<parameters.version>>"; then
             git push origin --delete "testbranch_<<parameters.dag_name>>_$<<parameters.version>>"
           fi
         fi
