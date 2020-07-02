@@ -47,7 +47,7 @@ steps:
           git ls-remote --heads --exit-code origin "testbranch|<<parameters.dag_name>>|$<<parameters.version>>"
           echo $?
           echo "git checkout"
-          git checkout $( git ls-remote --heads  --exit-code origin "testbranch|<<parameters.dag_name>>|$<<parameters.version>>" || echo '-b' ) "testbranch|<<parameters.dag_name>>|$<<parameters.version>>"
+          # git checkout $( git ls-remote --heads  --exit-code origin "testbranch|<<parameters.dag_name>>|$<<parameters.version>>" || echo '-b' ) "testbranch|<<parameters.dag_name>>|$<<parameters.version>>"
           if git ls-remote --heads  --exit-code origin "testbranch|<<parameters.dag_name>>|$<<parameters.version>>"; then
             echo "checkout exiting branch"
             git checkout "testbranch|<<parameters.dag_name>>|$<<parameters.version>>"
