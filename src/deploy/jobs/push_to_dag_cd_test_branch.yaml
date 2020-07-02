@@ -1,0 +1,64 @@
+description: |
+  Creates a test dag deploy flow on feature branches.
+parameters:
+  github_token:
+    description: |
+      Name of environment variable storing your secret githun token.
+    type: env_var_name
+    default: GIT_PUSH_TOKEN
+  github_email:
+    description: |
+      Name of environment variable storing your github email
+    type: env_var_name
+    default: GIT_EMAIL
+  dag_name:
+    description: |
+      Name of the dag to be used to change .ini files.
+      This dag name will be used to define dag folder name on composer bucket.
+      Dag name must be same as your repo name.
+    type: string
+  version:
+    description: |
+      Version of the dag to deploy
+    type: string
+    default: CIRCLE_BRANCH
+  gitops_repo:
+    description: |
+      Name of environment variable storing repo to apply CD using gitops
+    type: env_var_name
+    default: GIT_DAG_GITOPS
+  executor:
+    description: Github executor to use for this job
+    type: executor
+    default: github
+executor: << parameters.executor >>
+steps:
+  - run:
+      # if a PR wasn't opened yet , push to gitops repo's test branch ( deploy to staging ), if it became a PR , delete the test branch on gitops repo.
+      command: |
+        if [[ -z "$CIRCLE_PULL_REQUEST" ]]; then
+          git clone https://$<<parameters.github_token>>@$<<parameters.gitops_repo>>
+          git config --global user.email "${<<parameters.github_email>>}"
+          cd dag-cd
+          git fetch --prune
+          if git ls-remote --heads  --exit-code origin "testbranch_<<parameters.dag_name>>_$<<parameters.version>>"; then
+            echo "checkout exiting branch"
+            git checkout "testbranch_<<parameters.dag_name>>_$<<parameters.version>>"
+          else
+            echo " create a new branch"
+            git checkout -b "testbranch_<<parameters.dag_name>>_$<<parameters.version>>"
+          fi
+          find "<<parameters.dag_name>>/" -name "*.ini" -exec sed -i -e "s/docker_tag=.*/docker_tag=<<parameters.version>>/g" {} +
+          git add .
+          git commit --allow-empty -m "project:<<parameters.dag_name>> version:$<<parameters.version>>"
+          GITHUB_TOKEN=$<<parameters.github_token>> git push --set-upstream origin "testbranch_<<parameters.dag_name>>_$<<parameters.version>>"
+        else
+          echo "This is a PR and it will not be deployed to staging. Pull request link is $CIRCLE_PULL_REQUEST"
+          git clone https://$<<parameters.github_token>>@$<<parameters.gitops_repo>>
+          git config --global user.email "${<<parameters.github_email>>}"
+          cd dag-cd
+          git fetch --prune
+          if git ls-remote --heads --exit-code origin "testbranch_<<parameters.dag_name>>_$<<parameters.version>>"; then
+            git push origin --delete "testbranch_<<parameters.dag_name>>_$<<parameters.version>>"
+          fi
+        fi

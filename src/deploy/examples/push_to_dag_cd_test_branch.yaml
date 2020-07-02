@@ -1,0 +1,19 @@
+description: |
+  Creates a test dag deploy flow on feature branches.
+usage:
+  version: 2.1
+
+  orbs:
+    ta-deploy: travelaudience/deploy@x.y.z
+
+  workflows:
+    deploy:
+      jobs:
+        - ta-deploy/push_to_dag_cd_test_branch:
+            context: git-context
+            dag_name: some-dag-name
+            filters:
+              tags:
+                ignore: /.*/
+              branches:
+                ignore: master
