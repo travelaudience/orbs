@@ -47,8 +47,12 @@ steps:
           git ls-remote --heads --exit-code origin "testbranch|<<parameters.dag_name>>|$<<parameters.version>>"
           echo $?
           echo "git checkout"
-          # git checkout $( git ls-remote --heads  --exit-code origin "testbranch|<<parameters.dag_name>>|'$<<parameters.version>>'"; || echo "-b" )
-          git checkout $( git ls-remote --heads  --exit-code origin "testbranch|<<parameters.dag_name>>|'$<<parameters.version>>'" ; || echo '-b' ) "testbranch|<<parameters.dag_name>>|$<<parameters.version>>"
+          if git ls-remote --heads  --exit-code origin "testbranch|<<parameters.dag_name>>|'$<<parameters.version>>'"; then
+            git checkout "testbranch|<<parameters.dag_name>>|$<<parameters.version>>"
+          else
+            git checkout -b "testbranch|<<parameters.dag_name>>|$<<parameters.version>>"
+          fi
+          # git checkout $( git ls-remote --heads  --exit-code origin "testbranch|<<parameters.dag_name>>|'$<<parameters.version>>'" ; || echo '-b' ) "testbranch|<<parameters.dag_name>>|$<<parameters.version>>"
           find "<<parameters.dag_name>>/" -name "*.ini" -exec sed -i -e "s/docker_tag=.*/docker_tag=<<parameters.version>>/g" {} +
           git add .
           git commit --allow-empty -m "project:<<parameters.dag_name>> version:$<<parameters.version>>"
