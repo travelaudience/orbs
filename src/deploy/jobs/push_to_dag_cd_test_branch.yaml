@@ -40,14 +40,7 @@ steps:
           git clone https://$<<parameters.github_token>>@$<<parameters.gitops_repo>>
           git config --global user.email "${<<parameters.github_email>>}"
           cd dag-cd
-          # git fetch --prune
-          echo "git branch -r"
-          git branch -r | grep "testbranch|<<parameters.dag_name>>|$<<parameters.version>>"
-          echo " git ls-remote"
-          git ls-remote --heads --exit-code origin "testbranch|<<parameters.dag_name>>|$<<parameters.version>>"
-          echo $?
-          echo "git checkout"
-          # git checkout $( git ls-remote --heads  --exit-code origin "testbranch|<<parameters.dag_name>>|$<<parameters.version>>" || echo '-b' ) "testbranch|<<parameters.dag_name>>|$<<parameters.version>>"
+          git fetch --prune
           if git ls-remote --heads  --exit-code origin "testbranch|<<parameters.dag_name>>|$<<parameters.version>>"; then
             echo "checkout exiting branch"
             git checkout "testbranch|<<parameters.dag_name>>|$<<parameters.version>>"
