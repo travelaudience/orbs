@@ -36,7 +36,7 @@ steps:
   - run:
       # if a PR wasn't opened yet , push to gitops repo's test branch ( deploy to staging ), if it became a PR , delete the test branch on gitops repo.
       command: |
-        if [[ -z "$CIRCLE_PULL_REQUEST" ]]; then
+        if [[ -n "$CIRCLE_PULL_REQUEST" ]]; then
           git clone https://$<<parameters.github_token>>@$<<parameters.gitops_repo>>
           git config --global user.email "${<<parameters.github_email>>}"
           cd dag-cd
@@ -52,13 +52,14 @@ steps:
           git add .
           git commit --allow-empty -m "project:<<parameters.dag_name>> version:$<<parameters.version>>"
           GITHUB_TOKEN=$<<parameters.github_token>> git push --set-upstream origin "testbranch_<<parameters.dag_name>>_$<<parameters.version>>"
-        else
-          echo "This is a PR and it will not be deployed to staging. Pull request link is $CIRCLE_PULL_REQUEST"
-          git clone https://$<<parameters.github_token>>@$<<parameters.gitops_repo>>
-          git config --global user.email "${<<parameters.github_email>>}"
-          cd dag-cd
-          git fetch --prune
-          if git ls-remote --heads --exit-code origin "testbranch_<<parameters.dag_name>>_$<<parameters.version>>"; then
-            git push origin --delete "testbranch_<<parameters.dag_name>>_$<<parameters.version>>"
-          fi
         fi
+        # else
+        #   echo "This is a PR and it will not be deployed to staging. Pull request link is $CIRCLE_PULL_REQUEST"
+        #   git clone https://$<<parameters.github_token>>@$<<parameters.gitops_repo>>
+        #   git config --global user.email "${<<parameters.github_email>>}"
+        #   cd dag-cd
+        #   git fetch --prune
+        #   if git ls-remote --heads --exit-code origin "testbranch_<<parameters.dag_name>>_$<<parameters.version>>"; then
+        #     git push origin --delete "testbranch_<<parameters.dag_name>>_$<<parameters.version>>"
+        #   fi
+        # fi
