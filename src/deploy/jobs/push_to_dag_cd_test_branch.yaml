@@ -48,7 +48,7 @@ steps:
             echo " create a new branch"
             git checkout -b "testbranch_<<parameters.dag_name>>_$<<parameters.version>>"
           fi
-          find "<<parameters.dag_name>>/" -name "*.ini" -exec sed -i -e "s/docker_tag=.*/docker_tag=<<parameters.version>>/g" {} +
+          find "<<parameters.dag_name>>/" -name "*.ini" -exec sed -i -e "s/docker_tag=.*/docker_tag=$CIRCLE_SHA1/g" {} +
           git add .
           git commit --allow-empty -m "project:<<parameters.dag_name>> version:$<<parameters.version>>"
           GITHUB_TOKEN=$<<parameters.github_token>> git push --set-upstream origin "testbranch_<<parameters.dag_name>>_$<<parameters.version>>"
