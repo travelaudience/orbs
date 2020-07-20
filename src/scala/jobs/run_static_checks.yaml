@@ -1,33 +1,71 @@
 description: |
-  TODO
+  Run unit tests, check formatting and coverage optionally.
 
 parameters:
   executor:
     description: Executor to use for this job
     type: executor
     default: scala
+  cache_key:
+    description: Checksum-based key used to identify cache
+    type: string
+    default: ''
+  with_scalafmt:
+    description: Whether to check formatting with Scalafmt
+    type: boolean
+    default: true
+  with_sbtcoverage:
+    description: Whether to check code coverage with sbtcoverage
+    type: boolean
+    default: true
 
 executor: << parameters.executor >>
 
 steps:
   - read_workspace
-  - read_cache
+  - read_cache:
+      cache_key: << parameters.cache_key >>
+
   - run:
-      name: Check formatting with Scalafmt
-      command: sbt clean scalafmtCheckAll
+      name: Clean sbt project
+      command: sbt clean
+
+  - when:
+      condition: << parameters.with_scalafmt >>
+      steps:
+        - run:
+            name: Check formatting with Scalafmt
+            command: sbt scalafmtCheckAll
+
   - run:
       name: Compile test code
       command: sbt +test:compile
-  - run:
-      name: Check code coverage and run tests
-      command: sbt coverageOn +test coverageOff coverageAggregate
+
+  - when:
+      condition: << parameters.with_sbtcoverage >>
+      steps:
+        - run:
+            name: Check code coverage and run tests
+            command: sbt coverageOn +test coverageOff coverageAggregate
+  - unless:
+      condition: << parameters.with_sbtcoverage >>
+      steps:
+        - run:
+            name: Run tests
+            command: sbt coverageOn +test coverageOff coverageAggregate
+
   - run:
       name: Save test results
       command: |
         mkdir -p test-reports
         find . -type f -regex ".*/target/test-reports/.*xml" -exec cp {} test-reports/ \;
-  - clean_cache
-  - write_cache
-  - write_workspace
+
   - store_test_results:
       path: test-reports
+
+  # TODO add codeclimate (check how to make wildcard for any scala version)
+
+  - clean_cache
+  - write_cache:
+      cache_key: << parameters.cache_key >>
+  - write_workspace

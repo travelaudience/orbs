@@ -1,0 +1,212 @@
+description: This is an inline job
+
+orbs:
+  my_inline_orb:
+    executors:
+      scala:
+        parameters:
+          version:
+            description: jdk/sbt/scala version to use (docker tag)
+            type: string
+            default: 8u242_1.3.9_2.13.1
+          resource_class:
+            description: which circleci resource_class to use
+            type: string
+            default: "medium"
+          working_directory:
+            description: directory path for this job
+            type: string
+            default: "~/repo"
+        docker:
+          - image: hseeberger/scala-sbt:<< parameters.version >>
+        working_directory: <<parameters.working_directory>>
+        resource_class: <<parameters.resource_class>>
+
+    commands:
+      write_cache:
+        parameters:
+          cache_key:
+            description: Checksum-based key used to identify cache
+            type: string
+            default: ''
+        steps:
+          - when:
+              condition: << parameters.cache_key >>
+              steps:
+                - save_cache:
+                    key: << parameters.cache_key >>
+                    paths:
+                      - ~/.sbt
+                      - ~/.m2
+                      - ~/.ivy2/cache
+                      - ~/.cache/coursier
+          - unless:
+              condition: << parameters.cache_key >>
+              steps:
+                - run: cat build.sbt project/plugins.sbt project/Dependencies.scala 2>/dev/null >> cache_file || true
+                - save_cache:
+                    key:  v2-{{ checksum "cache_file" }}
+                    paths:
+                      - ~/.sbt
+                      - ~/.m2
+                      - ~/.ivy2/cache
+                      - ~/.cache/coursier
+                - run: rm cache_file
+
+      clean_cache:
+        description: |
+          Deletes .ivy/.sbt process lock files.
+
+        steps:
+          - run:
+              name: Clean unwanted files from cache
+              command: |
+                rm -fv $HOME/.ivy2/.sbt.ivy.lock
+                find $HOME/.ivy2/cache -name "ivydata-*.properties" -print -delete
+                find $HOME/.sbt        -name "*.lock"               -print -delete
+
+
+      read_cache:
+        parameters:
+          cache_key:
+            description: Checksum-based key used to identify cache
+            type: string
+            default: ''
+        steps:
+          - when:
+              condition: << parameters.cache_key >>
+              steps:
+                - restore_cache:
+                    keys:
+                      - << parameters.cache_key >>
+          - unless:
+              condition: << parameters.cache_key >>
+              steps:
+                - run: cat build.sbt project/plugins.sbt project/Dependencies.scala 2>/dev/null >> cache_file || true
+                - restore_cache:
+                    keys:
+                      - v2-{{ checksum "cache_file" }}
+                - run: rm cache_file
+
+      read_workspace:
+        description: |
+          Reads persisted workspace directory and attaches it to the current job
+
+        steps:
+          - attach_workspace:
+              at: ~/
+
+      write_workspace:
+        description: |
+          Writes project directory state to workspace so it could be reused in downstream jobs
+
+        parameters:
+          persist_directory_root:
+            description: directory root to persist
+            type: string
+            default: "~/"
+          persist_directory_path:
+            description: directory path to persist
+            type: string
+            default: "repo"
+
+        steps:
+          - persist_to_workspace:
+              root: << parameters.persist_directory_root >>
+              paths:
+                - << parameters.persist_directory_path >>
+
+    jobs:
+      my_inline_job:
+        #parameters:
+        executor: scala
+        steps:
+          - write_cache
+          - read_cache
+
+      run_static_checks:
+        description: |
+          Run unit tests, check formatting and coverage optionally.
+
+        parameters:
+          executor:
+            description: Executor to use for this job
+            type: executor
+            default: scala
+          cache_key:
+            description: Checksum-based key used to identify cache
+            type: string
+            default: ''
+          with_scalafmt:
+            description: Whether to check formatting with Scalafmt
+            type: boolean
+            default: true
+          with_sbtcoverage:
+            description: Whether to check code coverage with sbtcoverage
+            type: boolean
+            default: true
+
+        executor: << parameters.executor >>
+
+        steps:
+          - my_inline_orb/read_workspace
+          - my_inline_orb/read_cache:
+              cache_key: << parameters.cache_key >>
+
+          - run:
+              name: Clean sbt project
+              command: sbt clean
+
+          - when:
+              condition: << parameters.with_scalafmt >>
+              steps:
+                - run:
+                    name: Check formatting with Scalafmt
+                    command: sbt scalafmtCheckAll
+
+          - run:
+              name: Compile test code
+              command: sbt +test:compile
+
+          - when:
+              condition: << parameters.with_sbtcoverage >>
+              steps:
+                - run:
+                    name: Check code coverage and run tests
+                    command: sbt coverageOn +test coverageOff coverageAggregate
+          - unless:
+              condition: << parameters.with_sbtcoverage >>
+              steps:
+                - run:
+                    name: Run tests
+                    command: sbt coverageOn +test coverageOff coverageAggregate
+
+          - run:
+              name: Save test results
+              command: |
+                mkdir -p test-reports
+                find . -type f -regex ".*/target/test-reports/.*xml" -exec cp {} test-reports/ \;
+
+          - store_test_results:
+              path: test-reports
+
+          # TODO add codeclimate (check how to make wildcard for any scala version)
+
+          - my_inline_orb/clean_cache
+          - my_inline_orb/write_cache:
+              cache_key: << parameters.cache_key >>
+          - my_inline_orb/write_workspace
+
+
+
+
+version: 2.1
+workflows:
+  my_workflow:
+    jobs:
+      - my_inline_orb/my_inline_job:
+          # circleci local execute --config src/my_inline_orb_test.yaml --job blabla
+          name: blabla
+      - my_inline_orb/run_static_checks:
+          # circleci local execute --config src/my_inline_orb_test.yaml --job rsc
+          name: rsc

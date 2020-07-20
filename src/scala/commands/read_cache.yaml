@@ -9,13 +9,13 @@ parameters:
 
 steps:
   - when:
-      condition: << parameters.cache_key  >>
+      condition: << parameters.cache_key >>
       steps:
         - restore_cache:
             keys:
               - << parameters.cache_key >>
   - unless:
-      condition: << parameters.cache_key  >>
+      condition: << parameters.cache_key >>
       steps:
         - run: cat build.sbt project/plugins.sbt project/Dependencies.scala 2>/dev/null >> cache_file || true
         - restore_cache:
