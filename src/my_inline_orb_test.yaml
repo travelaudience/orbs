@@ -149,8 +149,8 @@ orbs:
         executor: << parameters.executor >>
 
         steps:
-          - my_inline_orb/read_workspace
-          - my_inline_orb/read_cache:
+          - read_workspace
+          - read_cache:
               cache_key: << parameters.cache_key >>
 
           - run:
@@ -192,10 +192,10 @@ orbs:
 
           # TODO add codeclimate (check how to make wildcard for any scala version)
 
-          - my_inline_orb/clean_cache
-          - my_inline_orb/write_cache:
+          - clean_cache
+          - write_cache:
               cache_key: << parameters.cache_key >>
-          - my_inline_orb/write_workspace
+          - write_workspace
 
 
 
