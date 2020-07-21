@@ -117,7 +117,7 @@ orbs:
                 - << parameters.persist_directory_path >>
 
     jobs:
-      my_inline_job:
+      test_commands:
         #parameters:
         executor: scala
         steps:
@@ -270,7 +270,9 @@ workflows:
     jobs:
       - my_inline_orb/checkout_with_nexus_credentials:
           name: cwnc
-      - my_inline_orb/my_inline_job:
-          name: mij
+      - my_inline_orb/test_commands:
+          name: tc
       - my_inline_orb/run_static_checks:
           name: rsc
+      - my_inline_orb/package:
+          name: p
