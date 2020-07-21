@@ -1,5 +1,5 @@
 description: |
-  TODO
+  Runs sbt package task.
 
 parameters:
   executor:
