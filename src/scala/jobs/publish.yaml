@@ -1,5 +1,5 @@
 description: |
-  TODO
+  Publish snapshot/release .jar depending on the version from git tag.
 
 parameters:
   executor:
@@ -13,7 +13,7 @@ steps:
   - read_workspace
   - read_cache
   - run:
-      name: Publish release .jar
+      name: Publish .jar
       command: |
         #!/usr/bin/env bash
         VERSION_TAG=$(echo "$CIRCLE_TAG"   | grep -P -o '(?<=v).+')  # '1.0.0' without 'v' prefix
