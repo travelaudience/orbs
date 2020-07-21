@@ -121,6 +121,7 @@ orbs:
         #parameters:
         executor: scala
         steps:
+          - checkout # TODO remove in destrcutred orb
           - write_cache
           - read_cache
 
@@ -187,6 +188,7 @@ orbs:
         executor: << parameters.executor >>
 
         steps:
+          - checkout # TODO remove in destrcutred orb
           - read_workspace
           - read_cache:
               cache_key: << parameters.cache_key >>
@@ -248,12 +250,3 @@ workflows:
           name: mij
       - my_inline_orb/run_static_checks:
           name: rsc
-
-# circleci local execute \
-#    --skip-checkout \
-#    --config src/my_inline_orb_test.yaml \
-#    --job cwnc \
-#    -e NEXUS_REALM=nexus-proxy \
-#    -e NEXUS_HOST=nexus.travelaudience.com \
-#    -e NEXUS_USERNAME=f.popic@travelaudience.com \
-#    -e NEXUS_PASSWORD="$(echo $NEXUS_PASSWORD)"
