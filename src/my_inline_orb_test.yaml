@@ -124,6 +124,44 @@ orbs:
           - write_cache
           - read_cache
 
+      checkout_with_nexus_credentials:
+        description: |
+          Fetch nexus credentials using project environment variables and write it to a sbt file
+
+        parameters:
+          executor:
+            description: Executor to use for this job
+            type: executor
+            default: scala
+          nexus_realm:
+            description: Project environment variable key containing nexus realm
+            type: string
+            default: NEXUS_REALM
+          nexus_host:
+            description: Project environment variable key containing nexus host
+            type: string
+            default: NEXUS_HOST
+          nexus_username:
+            description: Project environment variable key containing nexus username
+            type: string
+            default: NEXUS_USERNAME
+          nexus_password:
+            description: Project environment variable key containing nexus password
+            type: string
+            default: NEXUS_PASSWORD
+
+        executor: << parameters.executor >>
+
+        steps:
+          - checkout
+          - run:
+              name: Remove .git directory before persisting to workspace
+              command: rm -rf .git
+          - run:
+              name: Fetch nexus credentials and prepare project/nexus-credentials.sbt file
+              command: echo 'credentials+=Credentials(realm="'$<< parameters.nexus_realm >>'", host="'$<< parameters.nexus_host >>'", userName="'$<< parameters.nexus_username >>'", passwd="'$<< parameters.nexus_password >>'")' > project/nexus-credentials.sbt
+          - write_workspace
+
       run_static_checks:
         description: |
           Run unit tests, check formatting and coverage optionally.
@@ -204,9 +242,18 @@ version: 2.1
 workflows:
   my_workflow:
     jobs:
+      - my_inline_orb/checkout_with_nexus_credentials:
+          name: cwnc
       - my_inline_orb/my_inline_job:
-          # circleci local execute --config src/my_inline_orb_test.yaml --job blabla
-          name: blabla
+          name: mij
       - my_inline_orb/run_static_checks:
-          # circleci local execute --config src/my_inline_orb_test.yaml --job rsc
           name: rsc
+
+# circleci local execute \
+#    --skip-checkout \
+#    --config src/my_inline_orb_test.yaml \
+#    --job cwnc \
+#    -e NEXUS_REALM=nexus-proxy \
+#    -e NEXUS_HOST=nexus.travelaudience.com \
+#    -e NEXUS_USERNAME=f.popic@travelaudience.com \
+#    -e NEXUS_PASSWORD="$(echo $NEXUS_PASSWORD)"
