@@ -17,17 +17,29 @@ usage:
     version: 2
     scala_publish_library:
       jobs:
-        - ta-scala/checkout_with_nexus_credentials
+        - ta-scala/checkout_with_nexus_credentials:
+            filters:
+              tags:
+                only: /.*/
         - ta-scala/run_static_checks:
             requires:
               - ta-scala/checkout_with_nexus_credentials
+            filters:
+              tags:
+                only: /.*/
         - ta-scala/compile:
             requires:
               - ta-scala/run_static_checks
+            filters:
+              tags:
+                only: /.*/
         - ta-scala/publish:
             requires:
               - ta-scala/compile
             filters:
-              <<: *filter_tags
-            branches:
-              ignore: /.*/
+              tags:
+                # release:  'v{major}.{minor}.{patch}'
+                # snapshot: 'v{major}.{minor}.{patch}-SNAPSHOT'
+                only: /^v([0-9]+)\.([0-9]+)\.([0-9]+)(?:-SNAPSHOT)?$/
+              branches:
+                ignore: /.*/
