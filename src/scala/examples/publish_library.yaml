@@ -7,12 +7,6 @@ usage:
   orbs:
     ta-scala: travelaudience/scala@x.y.z
 
-  filter_tags: &filter_tags
-    tags:
-      # release:  'v{major}.{minor}.{patch}'
-      # snapshot: 'v{major}.{minor}.{patch}-SNAPSHOT'
-      only: /^v([0-9]+)\.([0-9]+)\.([0-9]+)(?:-SNAPSHOT)?$/
-
   workflows:
     version: 2
     scala_publish_library:
