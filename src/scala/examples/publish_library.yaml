@@ -29,3 +29,5 @@ usage:
               - ta-scala/compile
             filters:
               <<: *filter_tags
+            branches:
+              ignore: /.*/
