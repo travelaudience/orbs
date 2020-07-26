@@ -21,7 +21,7 @@ steps:
       steps:
         - run: cat build.sbt project/plugins.sbt project/Dependencies.scala 2>/dev/null >> cache_file || true
         - save_cache:
-            key:  v2-{{ checksum "cache_file" }}
+            key: v2-{{ checksum "cache_file" }}
             paths:
               - ~/.sbt
               - ~/.m2
