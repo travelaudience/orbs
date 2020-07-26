@@ -6,80 +6,26 @@ usage:
 
   orbs:
     ta-scala: travelaudience/scala@x.y.z
-    #ta-scala: travelaudience/scala@dev:improve_scala_orb
 
-  filter_snapshot_tags: &filter_snapshot_tags
+  filter_tags: &filter_tags
     tags:
-      # https://semver.org/#is-there-a-suggested-regular-expression-regex-to-check-a-semver-string
-      only: /^v((([0-9]+)\.([0-9]+)\.([0-9]+)(?:-([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?)(?:\+([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?)$/
-
-  filter_release_tags: &filter_release_tags
-    tags:
-      # 'v{major}.{minor}.{patch}'
-      only: /^v\d+\.\d+\.\d+$/
+      # release:  'v{major}.{minor}.{patch}'
+      # snapshot: 'v{major}.{minor}.{patch}-SNAPSHOT'
+      only: /^v([0-9]+)\.([0-9]+)\.([0-9]+)(?:-SNAPSHOT)?$/
 
   workflows:
     version: 2
-    scala_publish_snapshot:
-      # publish snapshot on any non-master commit
+    scala_publish_library:
       jobs:
-        - ta-scala/checkout_with_nexus_credentials:
-            filters:
-              tags:
-                ignore: /.*/
-              branches:
-                ignore: master
+        - ta-scala/checkout_with_nexus_credentials
         - ta-scala/run_static_checks:
             requires:
               - ta-scala/checkout_with_nexus_credentials
-            filters:
-              tags:
-                ignore: /.*/
-              branches:
-                ignore: master
-        - ta-scala/package:
+        - ta-scala/compile:
             requires:
               - ta-scala/run_static_checks
-            filters:
-              tags:
-                ignore: /.*/
-              branches:
-                ignore: master
-        - ta-scala/publish_snapshot:
+        - ta-scala/publish:
             requires:
-              - ta-scala/package
+              - ta-scala/compile
             filters:
-              tags:
-                ignore: /.*/
-              branches:
-                ignore: master
-
-    scala_publish_release:
-      # publish release on tag only
-      jobs:
-        - ta-scala/checkout_with_nexus_credentials:
-            filters:
-              <<: *filter_release_tags
-              branches:
-                ignore: /.*/
-        - ta-scala/run_static_checks:
-            requires:
-              - ta-scala/checkout_with_nexus_credentials
-            filters:
-              <<: *filter_release_tags
-              branches:
-                ignore: /.*/
-        - ta-scala/package:
-            requires:
-              - ta-scala/run_static_checks
-            filters:
-              <<: *filter_release_tags
-              branches:
-                ignore: /.*/
-        - ta-scala/publish_release:
-            requires:
-              - ta-scala/package
-            filters:
-              <<: *filter_release_tags
-              branches:
-                ignore: /.*/
+              <<: *filter_tags

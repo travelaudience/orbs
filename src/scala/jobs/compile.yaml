@@ -1,5 +1,5 @@
 description: |
-  Runs sbt package task.
+  Runs sbt compile task.
 
 parameters:
   executor:
@@ -13,8 +13,8 @@ steps:
   - read_workspace
   - read_cache
   - run:
-      name: Package .jar files
-      command: sbt +package
+      name: Compile sbt class files
+      command: sbt +compile
   - clean_cache
   - write_cache
   - write_workspace
