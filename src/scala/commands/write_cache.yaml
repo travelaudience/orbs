@@ -34,4 +34,6 @@ steps:
         rm -fv $HOME/.ivy2/.sbt.ivy.lock
         find $HOME/.ivy2/cache -name "ivydata-*.properties" -print -delete
         find $HOME/.sbt        -name "*.lock"               -print -delete
-
+        # Remove ~/.sbt/{1.0|0.13}/staging external `RootProject` dependencies.
+        # More here https://github.com/sbt/sbt/issues/1284.
+        find $HOME/.sbt -type d -regex "$HOME/.sbt/[0-9]+\.[0-9]+/staging" -print -exec rm -rfv {} +
