@@ -7,6 +7,9 @@ usage:
   orbs:
     ta-scala: travelaudience/scala@x.y.z
 
+  app_cache_key: &app_cache_key
+    cache_key: v1-dependencies-{{ checksum "build.sbt" }}-{{ checksum "project/plugins.sbt" }}
+
   workflows:
     version: 2
     scala_publish_library:
@@ -16,18 +19,21 @@ usage:
               tags:
                 only: /.*/
         - ta-scala/run_static_checks:
+            <<: *app_cache_key
             requires:
               - ta-scala/checkout_with_nexus_credentials
             filters:
               tags:
                 only: /.*/
         - ta-scala/compile:
+            <<: *app_cache_key
             requires:
               - ta-scala/run_static_checks
             filters:
               tags:
                 only: /.*/
         - ta-scala/publish:
+            <<: *app_cache_key
             requires:
               - ta-scala/compile
             filters:
