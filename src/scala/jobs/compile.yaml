@@ -20,7 +20,6 @@ steps:
   - run:
       name: Compile sbt class files
       command: sbt +compile
-  - clean_cache
   - write_cache:
       cache_key: << parameters.cache_key >>
   - write_workspace

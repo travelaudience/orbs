@@ -65,7 +65,6 @@ steps:
 
   # TODO add codeclimate (check how to make wildcard for any scala version)
 
-  - clean_cache
   - write_cache:
       cache_key: << parameters.cache_key >>
   - write_workspace
