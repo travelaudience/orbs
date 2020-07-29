@@ -6,15 +6,21 @@ parameters:
     description: Executor to use for this job
     type: executor
     default: scala
+  cache_key:
+    description: Checksum-based key used to identify cache
+    type: string
+    default: ''
 
 executor: << parameters.executor >>
 
 steps:
   - read_workspace
-  - read_cache
+  - read_cache:
+      cache_key: << parameters.cache_key >>
   - run:
       name: Compile sbt class files
       command: sbt +compile
   - clean_cache
-  - write_cache
+  - write_cache:
+      cache_key: << parameters.cache_key >>
   - write_workspace
