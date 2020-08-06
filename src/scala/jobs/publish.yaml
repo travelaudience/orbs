@@ -31,7 +31,7 @@ steps:
           VERSION_SBT_PATTERN="^version in ThisBuild := \"$VERSION_TAG\"$"
           if egrep "$VERSION_SBT_PATTERN" version.sbt; then
             echo "Publishing $VERSION_TAG ..."
-            echo sbt 'set ThisBuild / version := "'"$VERSION_TAG"'"' +publish
+            sbt 'set ThisBuild / version := "'"$VERSION_TAG"'"' +publish
           else
             echo "CIRCLE_TAG '$CIRCLE_TAG' does not match version.sbt, skipping publish!"
             exit -1
@@ -43,7 +43,7 @@ steps:
           VERSION_SBT_PATTERN="^version in ThisBuild := \".+-SNAPSHOT\"$"
           if egrep "$VERSION_SBT_PATTERN" version.sbt; then
             echo 'Publishing using version.sbt ...'
-            echo sbt +publish
+            sbt +publish
           else
             echo "With no CIRCLE_TAG given, version must end in -SNAPSHOT!"
             exit -3
