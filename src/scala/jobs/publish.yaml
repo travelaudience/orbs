@@ -24,6 +24,28 @@ steps:
       name: Publish .jar files
       command: |
         #!/usr/bin/env bash
-        VERSION_TAG=$(echo "$CIRCLE_TAG"   | grep -P -o '(?<=v).+')  # '1.0.0' without 'v' prefix
-        echo 'Publishing '"$VERSION_TAG"' ...'
-        sbt 'set ThisBuild / version := "'"$VERSION_TAG"'"' +publish
+        TAG_PATTERN='(?<=v).+'
+        VERSION_TAG=$(echo "$CIRCLE_TAG"   | grep -P -o $TAG_PATTERN)  # '1.0.0' without 'v' prefix
+
+        if [[ ! -z "$VERSION_TAG" ]]; then
+          VERSION_SBT_PATTERN="^version in ThisBuild := \"$VERSION_TAG\"$"
+          if egrep "$VERSION_SBT_PATTERN" version.sbt; then
+            echo "Publishing $VERSION_TAG ..."
+            echo sbt 'set ThisBuild / version := "'"$VERSION_TAG"'"' +publish
+          else
+            echo "CIRCLE_TAG '$CIRCLE_TAG' does not match version.sbt, skipping publish!"
+            exit -1
+          fi
+        elif [[ ! -z "$CIRCLE_TAG" ]]; then
+          echo "CIRCLE_TAG '$CIRCLE_TAG' does not match '$TAG_PATTERN', skipping publish!"
+          exit -2
+        else
+          VERSION_SBT_PATTERN="^version in ThisBuild := \".+-SNAPSHOT\"$"
+          if egrep "$VERSION_SBT_PATTERN" version.sbt; then
+            echo 'Publishing using version.sbt ...'
+            echo sbt +publish
+          else
+            echo "With no CIRCLE_TAG given, version must end in -SNAPSHOT!"
+            exit -3
+          fi
+        fi
