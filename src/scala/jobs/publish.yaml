@@ -25,7 +25,7 @@ steps:
       command: |
         #!/usr/bin/env bash
         TAG_PATTERN='(?<=v).+'
-        VERSION_TAG=$(echo "$CIRCLE_TAG"   | grep -P -o $TAG_PATTERN)  # '1.0.0' without 'v' prefix
+        VERSION_TAG=$(set +e; echo "$CIRCLE_TAG" | grep -P -o $TAG_PATTERN)  # '1.0.0' without 'v' prefix
 
         if [[ ! -z "$VERSION_TAG" ]]; then
           VERSION_SBT_PATTERN="^version in ThisBuild := \"$VERSION_TAG\"$"
