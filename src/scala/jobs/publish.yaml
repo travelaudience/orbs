@@ -34,7 +34,7 @@ steps:
             sbt 'set ThisBuild / version := "'"$VERSION_TAG"'"' +publish
           else
             echo "CIRCLE_TAG '$CIRCLE_TAG' does not match version.sbt (pattern $VERSION_SBT_PATTERN), skipping publish!"
-            exit -1
+            exit 0
           fi
         elif [[ ! -z "$CIRCLE_TAG" ]]; then
           echo "CIRCLE_TAG '$CIRCLE_TAG' does not match '$TAG_PATTERN', skipping publish!"
