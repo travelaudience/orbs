@@ -1,0 +1,18 @@
+description: |
+  Writes project directory state to workspace so it could be reused in downstream jobs
+
+parameters:
+  persist_directory_root:
+    description: directory root to persist
+    type: string
+    default: "~/"
+  persist_directory_path:
+    description: directory path to persist
+    type: string
+    default: "repo"
+
+steps:
+  - persist_to_workspace:
+      root: << parameters.persist_directory_root >>
+      paths:
+        - << parameters.persist_directory_path >>

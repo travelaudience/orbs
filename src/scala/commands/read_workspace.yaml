@@ -1,0 +1,6 @@
+description: |
+  Reads persisted workspace directory and attaches it to the current job
+
+steps:
+  - attach_workspace:
+      at: ~/

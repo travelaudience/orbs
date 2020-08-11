@@ -1,0 +1,45 @@
+description: |
+  Publish scala snapshot/relaease library to nexus.
+
+usage:
+  version: 2.1
+
+  orbs:
+    ta-scala: travelaudience/scala@x.y.z
+
+  app_cache_key: &app_cache_key
+    cache_key: v1-dependencies-{{ checksum "build.sbt" }}-{{ checksum "project/plugins.sbt" }}
+
+  workflows:
+    version: 2
+    scala_publish_library:
+      jobs:
+        - ta-scala/checkout_with_nexus_credentials:
+            filters:
+              tags:
+                only: /.*/
+        - ta-scala/run_static_checks:
+            <<: *app_cache_key
+            requires:
+              - ta-scala/checkout_with_nexus_credentials
+            filters:
+              tags:
+                only: /.*/
+        - ta-scala/compile:
+            <<: *app_cache_key
+            requires:
+              - ta-scala/run_static_checks
+            filters:
+              tags:
+                only: /.*/
+        - ta-scala/publish:
+            <<: *app_cache_key
+            requires:
+              - ta-scala/compile
+            filters:
+              tags:
+                # release:  'v{major}.{minor}.{patch}'
+                # snapshot: 'v{major}.{minor}.{patch}-SNAPSHOT'
+                only: /^v([0-9]+)\.([0-9]+)\.([0-9]+)(?:-SNAPSHOT)?$/
+              branches:
+                ignore: /.*/

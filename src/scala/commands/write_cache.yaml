@@ -1,0 +1,39 @@
+description: |
+  Write sbt library dependencies to cache so it can be reused for multiple pipeline execution.
+parameters:
+  cache_key:
+    description: Checksum-based key used to identify cache
+    type: string
+    default: ''
+steps:
+  - when:
+      condition: << parameters.cache_key >>
+      steps:
+        - save_cache:
+            key: << parameters.cache_key >>
+            paths:
+              - ~/.sbt
+              - ~/.m2
+              - ~/.ivy2/cache
+              - ~/.cache/coursier
+  - unless:
+      condition: << parameters.cache_key >>
+      steps:
+        - run: cat build.sbt project/plugins.sbt project/Dependencies.scala 2>/dev/null >> cache_file || true
+        - save_cache:
+            key: v2-{{ checksum "cache_file" }}
+            paths:
+              - ~/.sbt
+              - ~/.m2
+              - ~/.ivy2/cache
+              - ~/.cache/coursier
+        - run: rm cache_file
+  - run:
+      name: Clean unwanted .ivy/.sbt process lock files from the cache
+      command: |
+        rm -fv $HOME/.ivy2/.sbt.ivy.lock
+        find $HOME/.ivy2/cache -name "ivydata-*.properties" -print -delete
+        find $HOME/.sbt        -name "*.lock"               -print -delete
+        # Remove ~/.sbt/{1.0|0.13}/staging external `RootProject` dependencies.
+        # More here https://github.com/sbt/sbt/issues/1284.
+        find $HOME/.sbt -type d -regex "$HOME/.sbt/[0-9]+\.[0-9]+/staging" -print -exec rm -rfv {} +

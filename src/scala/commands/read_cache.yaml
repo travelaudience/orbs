@@ -1,0 +1,24 @@
+description: |
+  Read sbt library dependencies from cache.
+
+parameters:
+  cache_key:
+    description: Checksum-based key used to identify cache
+    type: string
+    default: ''
+
+steps:
+  - when:
+      condition: << parameters.cache_key >>
+      steps:
+        - restore_cache:
+            keys:
+              - << parameters.cache_key >>
+  - unless:
+      condition: << parameters.cache_key >>
+      steps:
+        - run: cat build.sbt project/plugins.sbt project/Dependencies.scala 2>/dev/null >> cache_file || true
+        - restore_cache:
+            keys:
+              - v2-{{ checksum "cache_file" }}
+        - run: rm cache_file
