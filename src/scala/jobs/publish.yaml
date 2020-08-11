@@ -35,7 +35,7 @@ steps:
             sbt 'set ThisBuild / version := "'"$VERSION_TAG"'"' +publish
           else
             echo "CIRCLE_TAG '$CIRCLE_TAG' does not match version.sbt (pattern $VERSION_SBT_PATTERN), skipping publish!"
-            exit 0
+            exit -1
           fi
         elif [[ ! -z "$CIRCLE_TAG" ]]; then
           echo "CIRCLE_TAG '$CIRCLE_TAG' does not match '$TAG_PATTERN', skipping publish!"
@@ -46,7 +46,7 @@ steps:
             echo 'Publishing using version.sbt ...'
             sbt +publish
           else
-            echo "With no CIRCLE_TAG given, version.sbt must contain a version with pattern $VERSION_SBT_PATTERN!"
+            echo "version.sbt must contain a version with pattern $VERSION_SBT_PATTERN!"
             exit -3
           fi
         fi
