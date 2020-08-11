@@ -28,7 +28,8 @@ steps:
         VERSION_TAG=$(set +e; echo "$CIRCLE_TAG" | grep -P -o $TAG_PATTERN || true)  # '1.0.0' without 'v' prefix
 
         if [[ ! -z "$VERSION_TAG" ]]; then
-          VERSION_SBT_PATTERN="^version in ThisBuild := \"$VERSION_TAG\"$"
+          SNAPSHOT_VERSION=$(echo $VERSION_TAG|sed 's/-SNAPSHOT$//')-SNAPSHOT
+          VERSION_SBT_PATTERN="^version in ThisBuild := \"$SNAPSHOT_VERSION\"$"
           if egrep "$VERSION_SBT_PATTERN" version.sbt; then
             echo "Publishing $VERSION_TAG ..."
             sbt 'set ThisBuild / version := "'"$VERSION_TAG"'"' +publish
