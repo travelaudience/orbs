@@ -36,7 +36,6 @@ usage:
             <<: *app_cache_key
             requires:
               - ta-scala/compile
-
             filters:
               tags:
                 # release:  'v{major}.{minor}.{patch}..'
