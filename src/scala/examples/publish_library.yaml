@@ -36,10 +36,10 @@ usage:
             <<: *app_cache_key
             requires:
               - ta-scala/compile
+
             filters:
               tags:
-                # release:  'v{major}.{minor}.{patch}'
-                # snapshot: 'v{major}.{minor}.{patch}-SNAPSHOT'
-                only: /^v([0-9]+)\.([0-9]+)\.([0-9]+)(?:-SNAPSHOT)?$/
-              branches:
-                ignore: /.*/
+                # release:  'v{major}.{minor}.{patch}..'
+                # Leading 'v' + proper semver regex
+                # https://semver.org/#is-there-a-suggested-regular-expression-regex-to-check-a-semver-string
+                only: /^v(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-((?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?$/
