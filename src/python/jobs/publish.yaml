@@ -8,11 +8,11 @@ parameters:
   repository_username:
     description: Name of environment variable storing your python repository username
     type: env_var_name
-    default: PY_NEXUS_USERNAME
+    default: NEXUS_USERNAME
   repository_password:
     description: Name of environment variable storing your python repository password
     type: env_var_name
-    default: PY_NEXUS_PASSWORD
+    default: NEXUS_PASSWORD
   repository_url:
     description: Name of environment variable storing your python repository url
     type: env_var_name

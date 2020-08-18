@@ -19,11 +19,11 @@ parameters:
   docker-username:
     description: Name of environment variable storing your Docker username
     type: env_var_name
-    default: DOCKER_LOGIN
+    default: NEXUS_USERNAME
   docker-password:
     description: Name of environment variable storing your Docker password
     type: env_var_name
-    default: DOCKER_PASSWORD
+    default: NEXUS_PASSWORD
   extra-tag:
     description: Additional tag to apply to the image besides the default SHA tag. Defaults to the change name (git branch OR tag)
     type: string

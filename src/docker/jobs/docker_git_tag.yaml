@@ -16,11 +16,11 @@ parameters:
   docker-username:
     description: Name of environment variable storing your Docker username
     type: env_var_name
-    default: DOCKER_LOGIN
+    default: NEXUS_USERNAME
   docker-password:
     description: Name of environment variable storing your Docker password
     type: env_var_name
-    default: DOCKER_PASSWORD
+    default: NEXUS_PASSWORD
   registry:
     description: Name of environment variable storing the registry host
     type: env_var_name
