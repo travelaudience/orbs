@@ -1,0 +1,3 @@
+description: The latest cloudsql goose image
+docker:
+  - image: quay.io/travelaudience/docker-cloudsql-goose
