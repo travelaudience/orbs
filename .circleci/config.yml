@@ -41,6 +41,26 @@ workflows:
   version: 2
   orb-validate-dev-push:
     jobs:
+      # Cloudsql
+      - orb-tools/lint:
+        lint-dir: src/cloudsql
+        name: cloudsql-lint
+    - orb-tools/pack:
+        source-dir: src/cloudsql
+        destination-orb-path: cloudsql.yaml
+        name: cloudsql-pack
+        workspace-path: cloudsql.yaml
+    - orb-tools/publish-dev:
+        name: cloudsql-dev-publish
+        context: orb-publishing
+        orb-name: travelaudience/cloudsql
+        orb-path: workspace/cloudsql.yaml
+        alpha-version-ref: "dev:$CIRCLE_BRANCH"
+        publish-token-variable: CIRCLE_ORB_TOKEN
+        requires:
+          - cloudsql-lint
+          - cloudsql-pack
+
       # Code Climate
       - orb-tools/lint:
           lint-dir: src/code-climate
