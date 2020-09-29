@@ -34,7 +34,7 @@ goose_command:
             description: 'Which goose driver to use'
             type: string
             default: 'postgres'
-    executor: goose_executor
+    executor: << parameters.exec >>
     steps:
         - checkout
         - goose:
