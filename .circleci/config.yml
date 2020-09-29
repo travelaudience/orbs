@@ -43,8 +43,8 @@ workflows:
     jobs:
       # Cloudsql
       - orb-tools/lint:
-        lint-dir: src/cloudsql
-        name: cloudsql-lint
+          lint-dir: src/cloudsql
+          name: cloudsql-lint
       - orb-tools/pack:
           source-dir: src/cloudsql
           destination-orb-path: cloudsql.yaml
