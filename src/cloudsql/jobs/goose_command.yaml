@@ -1,39 +1,39 @@
 goose_command:
     parameters:
         cloudsql_proxy_sa:
-        type: env_var_name
-        description: 'The SA used to setup the cloudsql connection'
-        default: CLOUDSQL_PROXY_SA
+            type: env_var_name
+            description: 'The SA used to setup the cloudsql connection'
+            default: CLOUDSQL_PROXY_SA
         postgres_password:
-        type: env_var_name
-        description: 'The password used to connect to the postgres database'
-        default: POSTGRES_PASSWORD
+            type: env_var_name
+            description: 'The password used to connect to the postgres database'
+            default: POSTGRES_PASSWORD
         migrations_dir:
-        description: 'The directory containing goose migrations'
-        type: string
-        default: 'cloudsql'
+            description: 'The directory containing goose migrations'
+            type: string
+            default: 'cloudsql'
         goose_commands:
-        description: 'The goose commands to execute'
-        type: string
-        default: 'goose status'
+            description: 'The goose commands to execute'
+            type: string
+            default: 'goose status'
         gcloud_sql_instance:
-        description: 'Cloudsql instance to connect the proxy to. format: "PROJECT:REGION:CLOUDSQL_INSTANCE"'
-        type: string
+            description: 'Cloudsql instance to connect the proxy to. format: "PROJECT:REGION:CLOUDSQL_INSTANCE"'
+            type: string
         postgres_database:
-        description: 'Database to apply the migrations on'
-        type: string
+            description: 'Database to apply the migrations on'
+            type: string
         postgres_user:
-        description: 'User to connect to the postgres database. Usually "postgres"'
-        type: string
-        default: 'postgres'
+            description: 'User to connect to the postgres database. Usually "postgres"'
+            type: string
+            default: 'postgres'
         postgres_port:
-        description: 'Port to expose the cloudsql connection'
-        type: string
-        default: '5536'
+            description: 'Port to expose the cloudsql connection'
+            type: string
+            default: '5536'
         goose_driver:
-        description: 'Which goose driver to use'
-        type: string
-        default: 'postgres'
+            description: 'Which goose driver to use'
+            type: string
+            default: 'postgres'
     executor: goose_executor
     steps:
         - checkout
