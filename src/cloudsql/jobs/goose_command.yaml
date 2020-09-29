@@ -33,7 +33,11 @@ parameters:
         description: 'Which goose driver to use'
         type: string
         default: 'postgres'
-executor: << parameters.exec >>
+    executor:
+        description: Executor to use for this job
+        type: executor
+        default: goose_executor
+executor: << parameters.executor >>
 steps:
     - checkout
     - goose:
