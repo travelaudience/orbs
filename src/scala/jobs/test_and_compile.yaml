@@ -29,8 +29,13 @@ parameters:
     description: aggregating the test coverage requires more memory to be defined
     type: string
     default: 1524M
+  working_directory:
+    description: Working directory for this job
+    type: String
+    default: .
 
 executor: << parameters.executor >>
+working_directory: << parameters.working_directory >>
 
 steps:
   - checkout
