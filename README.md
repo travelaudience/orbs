@@ -1,5 +1,6 @@
 # travel audience Orbs [![CircleCI](https://circleci.com/gh/travelaudience/orbs/tree/master.svg?style=svg&circle-token=51e6640500da23f9c6796effa1a7c53bb6e411a6)](https://circleci.com/gh/travelaudience/orbs/tree/master) [![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](https://raw.githubusercontent.com/travelaudience/orbs/master/LICENSE)
 
+- `travelaudience/cloudsql`: [![CircleCI Orb Version](https://img.shields.io/badge/endpoint.svg?url=https://badges.circleci.io/orb/travelaudience/cloudsql)](https://circleci.com/orbs/registry/orb/travelaudience/cloudsql)
 - `travelaudience/code-climate`: [![CircleCI Orb Version](https://img.shields.io/badge/endpoint.svg?url=https://badges.circleci.io/orb/travelaudience/code-climate)](https://circleci.com/orbs/registry/orb/travelaudience/code-climate)
 - `travelaudience/deploy`: [![CircleCI Orb Version](https://img.shields.io/badge/endpoint.svg?url=https://badges.circleci.io/orb/travelaudience/deploy)](https://circleci.com/orbs/registry/orb/travelaudience/deploy)
 - `travelaudience/docker`: [![CircleCI Orb Version](https://img.shields.io/badge/endpoint.svg?url=https://badges.circleci.io/orb/travelaudience/docker)](https://circleci.com/orbs/registry/orb/travelaudience/docker)

@@ -1,0 +1,53 @@
+parameters:
+  gcloud_sql_instance:
+    description: 'Cloudsql instance to connect the proxy to. format: "PROJECT:REGION:CLOUDSQL_INSTANCE"'
+    type: string
+  cloudsql_proxy_sa:
+    type: env_var_name
+    description: 'The SA used to setup the cloudsql connection'
+  migrations_dir:
+    description: 'The directory containing goose migrations'
+    type: string
+    default: 'cloudsql'
+  goose_driver:
+    description: 'Which goose driver to use'
+    type: string
+  goose_commands:
+    description: 'The goose commands to execute'
+    type: string
+  postgres_password:
+    type: env_var_name
+    description: 'The password used to connect to the postgres database'
+  postgres_user:
+    description: 'User to connect to the postgres database. Usually "postgres"'
+    type: string
+  postgres_port:
+    description: 'Port to expose the cloudsql connection'
+    type: string
+    default: '5536'
+  postgres_database:
+    description: 'Database to apply the migrations on'
+    type: string
+steps:
+  - run:
+      name: Run goose command(s)
+      command: |
+        export CLOUDSQL_PROXY_SA="${<<parameters.cloudsql_proxy_sa>>}"
+        export GCLOUD_SQL_INSTANCE="<<parameters.gcloud_sql_instance>>=tcp:localhost:<<parameters.postgres_port>>"
+        export POSTGRES_USER="<<parameters.postgres_user>>"
+        export POSTGRES_DATABASE="<<parameters.postgres_database>>"
+        export POSTGRES_PORT="<<parameters.postgres_port>>"
+        export GOOSE_DRIVER="<<parameters.goose_driver>>"
+        export POSTGRES_PASSWORD="${<<parameters.postgres_password>>}"
+
+        source /startup.sh
+
+        # CD into the folder containing migrations
+        cd <<parameters.migrations_dir>>
+        echo "Contents of migrations dir:"
+        ls -la
+
+        goose status
+
+        # Execute the passed command
+        <<parameters.goose_commands>>

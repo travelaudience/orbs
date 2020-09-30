@@ -1,0 +1,52 @@
+parameters:
+    cloudsql_proxy_sa:
+        type: env_var_name
+        description: 'The SA used to setup the cloudsql connection'
+        default: CLOUDSQL_PROXY_SA
+    postgres_password:
+        type: env_var_name
+        description: 'The password used to connect to the postgres database'
+        default: POSTGRES_PASSWORD
+    migrations_dir:
+        description: 'The directory containing goose migrations'
+        type: string
+        default: 'cloudsql'
+    goose_commands:
+        description: 'The goose commands to execute'
+        type: string
+        default: 'goose status'
+    gcloud_sql_instance:
+        description: 'Cloudsql instance to connect the proxy to. format: "PROJECT:REGION:CLOUDSQL_INSTANCE"'
+        type: string
+    postgres_database:
+        description: 'Database to apply the migrations on'
+        type: string
+    postgres_user:
+        description: 'User to connect to the postgres database. Usually "postgres"'
+        type: string
+        default: 'postgres'
+    postgres_port:
+        description: 'Port to expose the cloudsql connection'
+        type: string
+        default: '5536'
+    goose_driver:
+        description: 'Which goose driver to use'
+        type: string
+        default: 'postgres'
+    executor:
+        description: Executor to use for this job
+        type: executor
+        default: goose_executor
+executor: << parameters.executor >>
+steps:
+    - checkout
+    - goose:
+        gcloud_sql_instance: <<parameters.gcloud_sql_instance>>
+        cloudsql_proxy_sa: <<parameters.cloudsql_proxy_sa>>
+        goose_commands: <<parameters.goose_commands>>
+        migrations_dir: <<parameters.migrations_dir>>
+        goose_driver: <<parameters.goose_driver>>
+        postgres_user: <<parameters.postgres_user>>
+        postgres_port: <<parameters.postgres_port>>
+        postgres_database: <<parameters.postgres_database>>
+        postgres_password: <<parameters.postgres_password>>
