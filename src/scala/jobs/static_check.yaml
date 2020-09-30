@@ -10,7 +10,7 @@ parameters:
     default: scalafmt
   working_directory:
     description: Working directory for this job
-    type: String
+    type: string
     default: .
 
 executor: << parameters.executor >>
