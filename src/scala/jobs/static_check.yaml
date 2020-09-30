@@ -14,7 +14,7 @@ parameters:
     default: .
 
 executor: << parameters.executor >>
-working_directory: << parameters.working_directory >>
 steps:
   - checkout
   - run: scalafmt --test
+      working_directory: << parameters.working_directory >>

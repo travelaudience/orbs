@@ -41,7 +41,6 @@ parameters:
     default: .
 
 executor: << parameters.executor >>
-working_directory: << parameters.working_directory >>
 
 steps:
   - checkout
@@ -59,6 +58,7 @@ steps:
         - docker-orb/dockerlint:
             dockerfile: <<parameters.dockerfile>>
   - docker-orb/build:
+      working_directory: << parameters.working_directory >>
       image: <<parameters.image-name>>
       extra_build_args: '-t "$<< parameters.registry >>"/<< parameters.image-name >>:<< parameters.extra-tag >>  << parameters.extra-build-args >>'
       registry: "$<<parameters.registry>>"

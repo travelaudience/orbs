@@ -35,21 +35,24 @@ parameters:
     default: .
 
 executor: << parameters.executor >>
-working_directory: << parameters.working_directory >>
 
 steps:
   - checkout
   - restore_cache:
+      working_directory: << parameters.working_directory >>
       keys:
         - dependencies-{{ checksum "build.sbt" }}
   - test:
+      working_directory: << parameters.working_directory >>
       project_base: << parameters.project_base >>
       with_coverage: << parameters.with_coverage >>
       path_to_coverage_file: << parameters.path_to_coverage_file >>
       memory_limit_for_heap: << parameters.memory_limit_for_heap >>
   - compile:
+      working_directory: << parameters.working_directory >>
       submodule: << parameters.submodule >>
   - save_cache:
+      working_directory: << parameters.working_directory >>
       paths:
         - ~/.ivy2
         - ~/.sbt
