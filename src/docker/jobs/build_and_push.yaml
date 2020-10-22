@@ -4,6 +4,12 @@ parameters:
   image-name:
     description: Name of image to build
     type: string
+  docker-context:
+    default: .
+    description: >
+      Path to the directory containing your build context, defaults to .
+      (working directory)
+    type: string
   dockerfile:
     description: Relative or absolute path, including name, to the Dockerfile
     type: string
@@ -56,6 +62,7 @@ steps:
       extra_build_args: '-t "$<< parameters.registry >>"/<< parameters.image-name >>:<< parameters.extra-tag >>  << parameters.extra-build-args >>'
       registry: "$<<parameters.registry>>"
       dockerfile: <<parameters.dockerfile>>
+      docker-context: <<parameters.docker-context>>
   - docker-orb/push:
       image: <<parameters.image-name>>
       registry: "$<<parameters.registry>>"
