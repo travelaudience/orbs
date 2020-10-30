@@ -30,6 +30,14 @@ parameters:
     description: Name of environment variable storing your Docker password
     type: env_var_name
     default: NEXUS_PASSWORD
+  docker-hub-username:
+    description: Name of environment variable storing your Docker username
+    type: env_var_name
+    default: DOCKER_HUB_USERNAME
+  docker-hub-password:
+    description: Name of environment variable storing your Docker password
+    type: env_var_name
+    default: DOCKER_HUB_PASSWORD
   extra-tag:
     description: Additional tag to apply to the image besides the default SHA tag. Defaults to the change name (git branch OR tag)
     type: string
@@ -37,6 +45,7 @@ parameters:
   extra-build-args:
     description: Additional docker build flags
     type: string
+    default: ""
   executor:
     description: Executor to use for this job
     default: default
@@ -51,6 +60,9 @@ steps:
       registry: "$<< parameters.registry >>"
       docker-username: << parameters.docker-username >>
       docker-password: << parameters.docker-password >>
+  - docker-orb/check:
+      docker-username: << parameters.docker-hub-username >>
+      docker-password: << parameters.docker-hub-password >>
   - get_change_name
   - when:
       condition: <<parameters.lint-enabled>>
