@@ -45,6 +45,7 @@ parameters:
   extra-build-args:
     description: Additional docker build flags
     type: string
+    default: ""
   executor:
     description: Executor to use for this job
     default: default
