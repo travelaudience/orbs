@@ -22,6 +22,10 @@ parameters:
     description: The path where packaged charts will be saved (defaults to a local, relative path)
     type: string
     default: ".cr-release-packages"
+  chart_stable_branch:
+    description: The branch that should be used to store a chart in stable repository
+    type: string
+    default: "master"
 steps:
   - run:
       shell: /bin/sh
@@ -37,7 +41,7 @@ steps:
             helm dependency build "$chart"
 
             # set the version different for incubator
-            if [ "$CIRCLE_BRANCH" == "master" ]; then
+            if [ "$CIRCLE_BRANCH" == <<parameters.chart_stable_branch>> ]; then
               helm package "$chart" --destination <<parameters.chart_package_path>>
             else
               ver=$(helm inspect chart "$chart" | grep version | cut -d' ' -f2)
@@ -63,9 +67,9 @@ steps:
         fi
         rm -rf <<parameters.chart_package_path>>; mkdir <<parameters.chart_package_path>>
 
-        # 'ct list-changed' doesn't work on master branch
+        # 'ct list-changed' doesn't work on main branch
         #   see https://github.com/helm/chart-testing/pull/159
-        if [ "$CIRCLE_BRANCH" == "master" ]; then
+        if [ "$CIRCLE_BRANCH" == <<parameters.chart_stable_branch>> ]; then
             git diff --diff-filter=d --name-only $(git merge-base HEAD^ HEAD) -- <<parameters.chart_dir_override>>  | while IFS= read -r file ; do
                 if echo "$file" | grep -q "/Chart.yaml"; then
                     chart=$(echo "$file" | sed 's/\/Chart.yaml$//')

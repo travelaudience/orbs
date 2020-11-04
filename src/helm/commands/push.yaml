@@ -13,6 +13,10 @@ parameters:
   retry_count:
     type: integer
     default: 8
+  chart_stable_branch:
+    description: The branch that should be used to store a chart in stable repository
+    type: string
+    default: "master"
 steps:
   - run: git clone --depth <<parameters.clone_depth>> <<parameters.chart_git_repo>> .helmPath
   - run:
@@ -29,7 +33,7 @@ steps:
 
             git fetch
             git reset --hard origin/master
-            if [ "$CIRCLE_BRANCH" == "master" ]; then
+            if [ "$CIRCLE_BRANCH" == <<parameters.chart_stable_branch>> ]; then
               cp ../<<parameters.chart_package_path>>/* stable/
               cd stable
               helm repo index .
