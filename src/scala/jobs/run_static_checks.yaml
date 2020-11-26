@@ -52,7 +52,7 @@ steps:
       steps:
         - run:
             name: Run tests
-            command: sbt coverageOn +test coverageOff coverageAggregate
+            command: sbt +test
 
   - run:
       name: Save test results
