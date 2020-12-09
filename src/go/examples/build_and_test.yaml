@@ -28,6 +28,9 @@ usage:
         - ta-go/test_and_coverage:
             exec: golang-executor
             additional_flags: "--prefix=v3"
+        - ta-go/private_tool:
+            go_pkg: "github.com/travelaudience/our-awesome-checker"
+            cmd_name: "our-awesome-checker ./..."
         - ta-go/build:
             exec: golang-executor
             requires:
