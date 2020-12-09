@@ -10,4 +10,4 @@ parameters:
     type: string
 steps:
   - run: cd ../ && go get -u <<parameters.go_pkg>>
-  - run: <<cmd_name>>
+  - run: <<parameters.cmd_name>>
