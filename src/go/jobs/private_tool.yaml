@@ -20,6 +20,6 @@ executor: << parameters.exec >>
 
 steps:
   - checkout
-  - go/private_tool:
+  - private_tool:
       go_pkg: << parameters.go_pkg >>
       cmd_name: << parameters.cmd_name >>
