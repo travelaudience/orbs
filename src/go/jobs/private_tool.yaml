@@ -1,0 +1,25 @@
+description: |
+  Run various command line tools on current directory. CLI tools may
+  be in a private Git repository.
+
+parameters:
+  exec:
+    description: Executor to use for this job
+    type: executor
+    default: go_executor
+  go_pkg:
+    description: "Name of the package where to find the tool."
+    default: ""
+    type: string
+  cmd_name:
+    description: "Command to run after installation."
+    default: ""
+    type: string
+
+executor: << parameters.exec >>
+
+steps:
+  - checkout
+  - private_tool:
+      go_pkg: << parameters.go_pkg >>
+      cmd_name: << parameters.cmd_name >>

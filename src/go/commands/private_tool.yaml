@@ -1,0 +1,13 @@
+description: "Download and run a private repository as a Go CLI for validation purposes."
+parameters:
+  go_pkg:
+    description: "Name of the package where to find the tool."
+    default: ""
+    type: string
+  cmd_name:
+    description: "Command to run after installation."
+    default: ""
+    type: string
+steps:
+  - run: cd ../ && go get -u <<parameters.go_pkg>>
+  - run: <<parameters.cmd_name>>
