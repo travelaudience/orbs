@@ -1,7 +1,7 @@
 description: Install the Code Climate rest reporter.
 parameters:
   version:
-    default: latest
+    default: 0.7.0
     description: The version of Code Climate test reporter to download. (default latest)
     type: string
 steps:
