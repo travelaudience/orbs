@@ -54,12 +54,12 @@ steps:
             echo "'$chart' packaged"
             echo "-----"
         }
-        
+
         # Hack to upgrade helm version
         rm /usr/local/bin/helm
         curl -LO "https://kubernetes-helm.storage.googleapis.com/helm-v2.17.0-linux-amd64.tar.gz" && mkdir -p "/usr/local/helm-v2.17.0" && tar -xzf "helm-v2.17.0-linux-amd64.tar.gz" -C "/usr/local/helm-v2.17.
         0" && ln -s "/usr/local/helm-v2.17.0/linux-amd64/helm" /usr/local/bin/helm && rm -f "helm-v2.17.0-linux-amd64.tar.gz"
-        
+
         helm init --client-only  || true  # this step is required for helm v2
         helm version -c
         if [ "$CT_CHART_REPOS" ]; then
