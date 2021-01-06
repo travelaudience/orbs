@@ -13,7 +13,7 @@ steps:
     shell: /bin/sh
     command: |
       set -e
-      
+
       # Hack to upgrade helm version
       rm $(which helm)
       curl -LO "https://kubernetes-helm.storage.googleapis.com/helm-v2.17.0-linux-amd64.tar.gz" && mkdir -p "/usr/local/helm-v2.17.0" && tar -xzf "helm-v2.17.0-linux-amd64.tar.gz" -C "/usr/local/helm-v2.17.0" && ln -s "/usr/local/helm-v2.17.0/linux-amd64/helm" /usr/local/bin/helm && rm -f "helm-v2.17.0-linux-amd64.tar.gz"
