@@ -53,6 +53,8 @@ parameters:
 executor: <<parameters.executor>>
 steps:
   - checkout
+  - run: git submodule sync
+  - run: git submodule update --init
   - setup_remote_docker
   - attach_workspace:
       at: ./
