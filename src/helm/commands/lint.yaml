@@ -1,4 +1,7 @@
-description: Run helm validation with Chart Tester
+description: |
+  Run helm validation with Chart Tester
+  You can add multiple chart repos by defining the following environment variable in your context
+  CT_CHART_REPOS=repo_name1=repo_url1,repo_name2=repo_url2
 parameters:
   chart_test_config:
     description: |
@@ -18,5 +21,14 @@ steps:
         # Hack to upgrade helm version
         rm $(which helm)
         curl -LO "https://kubernetes-helm.storage.googleapis.com/helm-v2.17.0-linux-amd64.tar.gz" && mkdir -p "/usr/local/helm-v2.17.0" && tar -xzf "helm-v2.17.0-linux-amd64.tar.gz" -C "/usr/local/helm-v2.17.0" && ln -s "/usr/local/helm-v2.17.0/linux-amd64/helm" /usr/local/bin/helm && rm -f "helm-v2.17.0-linux-amd64.tar.gz"
+
+        if [ "$CT_CHART_REPOS" ]; then
+            for i in $(echo $CT_CHART_REPOS | tr "," " ");
+            do
+                repo_name=$(echo "$i" | cut -d'=' -f1)
+                repo_url=$(echo "$i" | cut -d'=' -f2)
+                helm repo add $repo_name $repo_url
+            done
+        fi
 
         ct lint --config <<parameters.chart_test_config>>
