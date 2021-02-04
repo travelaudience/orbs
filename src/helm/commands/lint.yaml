@@ -23,6 +23,7 @@ steps:
         curl -LO "https://kubernetes-helm.storage.googleapis.com/helm-v2.17.0-linux-amd64.tar.gz" && mkdir -p "/usr/local/helm-v2.17.0" && tar -xzf "helm-v2.17.0-linux-amd64.tar.gz" -C "/usr/local/helm-v2.17.0" && ln -s "/usr/local/helm-v2.17.0/linux-amd64/helm" /usr/local/bin/helm && rm -f "helm-v2.17.0-linux-amd64.tar.gz"
 
         if [ "$CT_CHART_REPOS" ]; then
+            helm init --client-only
             for i in $(echo $CT_CHART_REPOS | tr "," " ");
             do
                 repo_name=$(echo "$i" | cut -d'=' -f1)
