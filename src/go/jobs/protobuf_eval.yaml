@@ -16,9 +16,9 @@ executor: <<parameters.exec>>
 steps:
   - protobuf/install:
       version: <<parameters.protobuf_version>>
-  # as a work around to the permissions being broken in v3.6.1
+  # as a work around to the permissions being broken in v3.6.1+
   #   neeed to run a chmod on these files
-  # - run: sudo chmod -R +r /usr/local/include/google
+  - run: sudo chmod -R +r /usr/local/include/google
   - checkout
   - go/load-cache
   - make-gen:
