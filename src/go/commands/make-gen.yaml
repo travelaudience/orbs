@@ -4,11 +4,16 @@ parameters:
     description: Version of protoc-gen-go to install
     default: "v1.4.3"
     type: string
+  protobuf_version:
+    description: Version of protobuf to install
+    default: "v1.25.0"
+    type: string
 steps:
   - run:
       name: '[go] install deps'
       command: |
         cd ../
         go get -u golang.org/x/tools/cmd/goimports \
-        github.com/golang/protobuf/protoc-gen-go@<<parameters.protoc_version>>
+        github.com/golang/protobuf/protoc-gen-go@<<parameters.protoc_version>> \
+        google.golang.org/protobuf@<<parameters.protobuf_version>>
   - run: make gen
