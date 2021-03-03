@@ -2,7 +2,7 @@ description: Execute make gen in order to rebuild the generated protobuf files l
 parameters:
   protoc_version:
     description: Version of protoc-gen-go to install
-    default: "v1.3.2"
+    default: "v1.4.3"
     type: string
 steps:
   - run:
