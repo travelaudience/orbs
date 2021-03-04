@@ -14,20 +14,14 @@ parameters:
     type: string
 executor: <<parameters.exec>>
 steps:
-  - protobuf/install:
-      version: <<parameters.protobuf_version>>
+  # - protobuf/install:
+  #     version: <<parameters.protobuf_version>>
   # as a work around to the permissions being broken in v3.6.1+
   #   neeed to run a chmod on these files
-  - run: sudo ls -l /usr/local/include/google/protobuf
-  - run: sudo ls -l /usr/local/bin/protoc
-  - run: sudo chmod -R -vv +rX /usr/local/include/google
-  - run: sudo chmod +x /usr/local/bin/protoc
-  - run: ls -l /usr/local/include/google/protobuf
-  - run: ls -l /usr/local/bin/protoc
-  - run: cat /usr/local/include/google/protobuf/wrappers.proto
+  # - run: sudo chmod -R -vv +rX /usr/local/include/google
+  # - run: sudo chmod +x /usr/local/bin/protoc
   - checkout
   - go/load-cache
-  - make-gen:
-      protoc_version: <<parameters.protoc_version>>
+  - run: make gen
   - compare
   - go/save-cache
