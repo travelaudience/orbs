@@ -18,12 +18,12 @@ steps:
       version: <<parameters.protobuf_version>>
   # as a work around to the permissions being broken in v3.6.1+
   #   neeed to run a chmod on these files
-  - run: sudo ls -lf /usr/local/include/google
-  - run: sudo ls -lf /usr/local/bin/protoc
+  - run: sudo ls -l /usr/local/include/google/protobuf
+  - run: sudo ls -l /usr/local/bin/protoc
   - run: sudo chmod -R +r /usr/local/include/google
   - run: sudo chmod +x /usr/local/bin/protoc
-  - run: sudo ls -lf /usr/local/include/google
-  - run: sudo ls -lf /usr/local/bin/protoc
+  - run: sudo ls -l /usr/local/include/google/protobuf
+  - run: sudo ls -l /usr/local/bin/protoc
   - checkout
   - go/load-cache
   - make-gen:
