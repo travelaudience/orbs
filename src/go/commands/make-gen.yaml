@@ -2,11 +2,9 @@ description: Execute make gen in order to rebuild the generated protobuf files a
 parameters:
   protoc_version:
     description: Version of protoc-gen-go to install
-    default: "v1.3.5"
     type: string
   mockery_version:
     description: Version of mockery to install
-    default: "v1.1.2"
     type: string
 steps:
   - run:
