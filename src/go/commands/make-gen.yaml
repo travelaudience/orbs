@@ -14,6 +14,6 @@ steps:
       command: |
         cd ../
         go get -u github.com/golang/protobuf/protoc-gen-go@<<parameters.protoc_version>> \
-        go get -u github.com/vektra/mockery/cmd/mockery@<<parametersmockery_ersion>> \
+        github.com/vektra/mockery/cmd/mockery@<<parameters.mockery_version>> \
         golang.org/x/tools/cmd/goimports
   - run: make gen

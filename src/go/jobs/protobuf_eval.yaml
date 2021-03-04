@@ -27,7 +27,7 @@ steps:
   - checkout
   - go/load-cache
   - make-gen:
-    protoc_version: <<parameters.protoc_version>>
-    mockery_version: <<parameters.mockery_version>>
+      protoc_version: <<parameters.protoc_version>>
+      mockery_version: <<parameters.mockery_version>>
   - compare
   - go/save-cache
