@@ -22,8 +22,9 @@ steps:
   - run: sudo ls -l /usr/local/bin/protoc
   - run: sudo chmod -R +r /usr/local/include/google
   - run: sudo chmod +x /usr/local/bin/protoc
-  - run: sudo ls -l /usr/local/include/google/protobuf
-  - run: sudo ls -l /usr/local/bin/protoc
+  - run: ls -l /usr/local/include/google/protobuf
+  - run: ls -l /usr/local/bin/protoc
+  - run: cat /usr/local/include/google/protobuf/wrappers.proto
   - checkout
   - go/load-cache
   - make-gen:
