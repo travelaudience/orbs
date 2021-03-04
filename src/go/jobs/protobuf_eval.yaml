@@ -20,7 +20,7 @@ steps:
   #   neeed to run a chmod on these files
   - run: sudo ls -l /usr/local/include/google/protobuf
   - run: sudo ls -l /usr/local/bin/protoc
-  - run: sudo chmod -R +r /usr/local/include/google
+  - run: sudo chmod -R -vv +rX /usr/local/include/google
   - run: sudo chmod +x /usr/local/bin/protoc
   - run: ls -l /usr/local/include/google/protobuf
   - run: ls -l /usr/local/bin/protoc
