@@ -1,15 +1,19 @@
-description: Execute make gen in order to rebuild the generated protobuf files locally
+description: Execute make gen in order to rebuild the generated protobuf files and mocks locally
 parameters:
   protoc_version:
     description: Version of protoc-gen-go to install
-    default: "v1.4.3"
+    default: "v1.3.5"
+    type: string
+  mockery_version:
+    description: Version of mockery to install
+    default: "v1.1.2"
     type: string
 steps:
   - run:
       name: '[go] install deps'
       command: |
         cd ../
-        go get -u github.com/vektra/mockery/cmd/mockery \
-        golang.org/x/tools/cmd/goimports \
-        github.com/golang/protobuf/protoc-gen-go@<<parameters.protoc_version>>
+        go get -u github.com/golang/protobuf/protoc-gen-go@<<parameters.protoc_version>> \
+        go get -u github.com/vektra/mockery/cmd/mockery@<<parametersmockery_ersion>> \
+        golang.org/x/tools/cmd/goimports
   - run: make gen
