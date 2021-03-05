@@ -47,6 +47,17 @@ steps:
         - run:
             name: Check code coverage and run tests
             command: sbt coverageOn +test coverageOff coverageAggregate
+        - run:
+            name: Save coverage results
+            command: |
+              mkdir -p coverage-reports
+              cp -r "$(find . -type d -name 'scoverage-report' -print)" coverage-reports/
+        - store_artifacts:
+            path: coverage-reports/scoverage-report
+            destination: scoverage-report
+        - run:
+            name: Clean coverage results
+            command: rm -rf coverage-reports
   - unless:
       condition: << parameters.with_sbtcoverage >>
       steps:
