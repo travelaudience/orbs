@@ -43,6 +43,9 @@ steps:
   - when:
       condition: << parameters.with_coverage >>
       steps:
+        - store_artifacts:
+            path: << parameters.project_base >>/scala-*/scoverage-report
+            destination: scoverage-report
         - code-climate/format_coverage:
             coverage_file: << parameters.project_base >>/<< parameters.path_to_coverage_file >>
             input_type: cobertura
