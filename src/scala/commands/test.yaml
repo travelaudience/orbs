@@ -43,12 +43,27 @@ steps:
   - when:
       condition: << parameters.with_coverage >>
       steps:
-        - store_artifacts:
-            path: << parameters.project_base >>/scala-2.13/scoverage-report
-            destination: scoverage-report
         - code-climate/format_coverage:
             coverage_file: << parameters.project_base >>/<< parameters.path_to_coverage_file >>
             input_type: cobertura
         - code-climate/upload_coverage
+        - run:
+            name: Save coverage results
+            command: |
+              mkdir -p coverage-reports
+              cp -r "$(find . -type d -name 'scoverage-report' -print)" coverage-reports/
+        - store_artifacts:
+            path: coverage-reports/scoverage-report
+            destination: scoverage-report
+        - run:
+            name: Clean coverage results
+            command: rm -rf coverage-reports
+
+  - run:
+      name: Save test results
+      command: |
+        mkdir -p test-reports
+        find . -type f -regex ".*/target/test-reports/.*xml" -exec cp {} test-reports/ \;
+
   - store_test_results:
-      path: << parameters.project_base >>
+      path: test-reports
