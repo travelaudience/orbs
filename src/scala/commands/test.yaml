@@ -34,7 +34,7 @@ steps:
   - when:
       condition: << parameters.with_coverage >>
       steps:
-        - run: sbt coverage test:test coverageReport
+        - run: sbt coverage test:test
         - run: SBT_OPTS="-Xmx<<parameters.memory_limit_for_heap>>" sbt coverageAggregate
   - unless:
       condition: << parameters.with_coverage >>
