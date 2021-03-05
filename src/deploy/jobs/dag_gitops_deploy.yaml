@@ -40,7 +40,7 @@ steps:
       command: |
         cd dag-cd
         git checkout -b <<parameters.dag_name>>-<<parameters.version>>
-        find "<<parameters.dag_name>>/" -name "*.ini" -exec sed -i -e "s/docker_tag=.*/docker_tag=<<parameters.version>>/g" {} +
+        find "<<parameters.dag_name>>/" -name "*.ini" -exec sed -i -e "s/docker_tag\s*=\s*.*/docker_tag = <<parameters.version>>/g" {} +
   - run:
       name: "Create Pull Request"
       command: |
