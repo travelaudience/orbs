@@ -29,6 +29,10 @@ parameters:
     description: aggregating the test coverage requires more memory to be defined
     type: string
     default: 1524M
+  skip_fat_jar_assembly:
+    description: Whether to skip building fat-jar. Saves some time when the main sbt project is used as aggregator only.
+    type: boolean
+    default: false
 
 executor: << parameters.executor >>
 
@@ -42,8 +46,11 @@ steps:
       with_coverage: << parameters.with_coverage >>
       path_to_coverage_file: << parameters.path_to_coverage_file >>
       memory_limit_for_heap: << parameters.memory_limit_for_heap >>
-  - compile:
-      submodule: << parameters.submodule >>
+  - unless:
+      condition: << parameters.skip_fat_jar_assembly >>
+      steps:
+        - compile:
+            submodule: << parameters.submodule >>
   - save_cache:
       paths:
         - ~/.ivy2
