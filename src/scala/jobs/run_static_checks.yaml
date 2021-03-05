@@ -55,6 +55,9 @@ steps:
         - store_artifacts:
             path: coverage-reports/scoverage-report
             destination: scoverage-report
+        - run:
+            name: Clean coverage results
+            command: rm -rf coverage-reports
   - unless:
       condition: << parameters.with_sbtcoverage >>
       steps:
