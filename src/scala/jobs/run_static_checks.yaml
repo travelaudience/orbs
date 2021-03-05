@@ -47,6 +47,14 @@ steps:
         - run:
             name: Check code coverage and run tests
             command: sbt coverageOn +test coverageOff coverageAggregate
+        - run:
+            name: Save coverage results
+            command: |
+              mkdir -p coverage-reports
+              cp -r "$(find . -type d -name 'scoverage-report' -print) coverage-reports/"
+        - store_artifacts:
+            path: coverage-reports/scoverage-report
+            destination: scoverage-report
   - unless:
       condition: << parameters.with_sbtcoverage >>
       steps:
@@ -55,7 +63,7 @@ steps:
             command: sbt +test
 
   - run:
-      name: Save test results
+      name: Find test results
       command: |
         mkdir -p test-reports
         find . -type f -regex ".*/target/test-reports/.*xml" -exec cp {} test-reports/ \;
@@ -63,7 +71,9 @@ steps:
   - store_test_results:
       path: test-reports
 
-  # TODO add codeclimate (check how to make wildcard for any scala version)
+  - store_artifacts:
+      path: test-reports
+      destination: test-reports
 
   - write_cache:
       cache_key: << parameters.cache_key >>
