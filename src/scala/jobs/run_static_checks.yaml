@@ -70,6 +70,8 @@ steps:
 
   - store_test_results:
       path: test-reports
+      
+  # TODO add codeclimate (check how to make wildcard for any scala version)
 
   - write_cache:
       cache_key: << parameters.cache_key >>
