@@ -63,17 +63,13 @@ steps:
             command: sbt +test
 
   - run:
-      name: Find test results
+      name: Save test results
       command: |
         mkdir -p test-reports
         find . -type f -regex ".*/target/test-reports/.*xml" -exec cp {} test-reports/ \;
 
   - store_test_results:
       path: test-reports
-
-  - store_artifacts:
-      path: test-reports
-      destination: test-reports
 
   - write_cache:
       cache_key: << parameters.cache_key >>
