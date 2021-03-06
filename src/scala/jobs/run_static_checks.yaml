@@ -1,5 +1,5 @@
 description: |
-  Run unit tests, check formatting and coverage optionally.
+  Run static code analysis checks.
 
 parameters:
   executor:
@@ -12,10 +12,6 @@ parameters:
     default: ''
   with_scalafmt:
     description: Whether to check formatting with Scalafmt
-    type: boolean
-    default: true
-  with_sbtcoverage:
-    description: Whether to check code coverage with sbtcoverage
     type: boolean
     default: true
   with_scalafix:
@@ -49,45 +45,6 @@ steps:
         - run:
             name: Check formatting with Scalafmt
             command: sbt scalafmtCheckAll
-
-  - run:
-      name: Compile test code
-      command: sbt +test:compile
-
-  - when:
-      condition: << parameters.with_sbtcoverage >>
-      steps:
-        - run:
-            name: Check code coverage and run tests
-            command: sbt coverageOn +test coverageOff coverageAggregate
-        - run:
-            name: Save coverage results
-            command: |
-              mkdir -p coverage-reports
-              cp -r "$(find . -type d -name 'scoverage-report' -print)" coverage-reports/
-        - store_artifacts:
-            path: coverage-reports/scoverage-report
-            destination: scoverage-report
-        - run:
-            name: Clean coverage results
-            command: rm -rf coverage-reports
-  - unless:
-      condition: << parameters.with_sbtcoverage >>
-      steps:
-        - run:
-            name: Run tests
-            command: sbt +test
-
-  - run:
-      name: Save test results
-      command: |
-        mkdir -p test-reports
-        find . -type f -regex ".*/target/test-reports/.*xml" -exec cp {} test-reports/ \;
-
-  - store_test_results:
-      path: test-reports
-
-  # TODO add codeclimate (check how to make wildcard for any scala version)
 
   - write_cache:
       cache_key: << parameters.cache_key >>

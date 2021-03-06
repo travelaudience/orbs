@@ -25,10 +25,17 @@ usage:
             filters:
               tags:
                 only: /.*/
-        - ta-scala/compile:
+        - ta-scala/run_tests:
             <<: *app_cache_key
             requires:
               - ta-scala/run_static_checks
+            filters:
+              tags:
+                only: /.*/
+        - ta-scala/compile:
+            <<: *app_cache_key
+            requires:
+              - ta-scala/run_tests
             filters:
               tags:
                 only: /.*/
