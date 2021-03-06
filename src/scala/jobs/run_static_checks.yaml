@@ -47,14 +47,30 @@ steps:
         - run:
             name: Check code coverage and run tests
             command: sbt coverageOn +test coverageOff coverageAggregate
+
+        # To upload in code climate UI
         - run:
-            name: Save coverage results
+            name: Find cobertura.xml coverage-report
+            command: |
+              mkdir -p coverage-reports
+              cp "$(find . -type f -name 'cobertura.xml' -print)" coverage-reports/
+        - code-climate/format_coverage:
+            coverage_file: coverage-reports/cobertura.xml
+            input_type: cobertura
+        - code-climate/upload_coverage
+
+        # To show in CirleCI UI Artifacts tab
+        - run:
+            name: Find coverage results
             command: |
               mkdir -p coverage-reports
               cp -r "$(find . -type d -name 'scoverage-report' -print)" coverage-reports/
+              scala-2.13/coverage-report/cobertura.xml
         - store_artifacts:
             path: coverage-reports/scoverage-report
             destination: scoverage-report
+
+        # Clean all reports to reduce the cache size
         - run:
             name: Clean coverage results
             command: rm -rf coverage-reports
@@ -66,15 +82,17 @@ steps:
             command: sbt +test
 
   - run:
-      name: Save test results
+      name: Find test reports
       command: |
         mkdir -p test-reports
         find . -type f -regex ".*/target/test-reports/.*xml" -exec cp {} test-reports/ \;
-
   - store_test_results:
       path: test-reports
 
-  # TODO add codeclimate (check how to make wildcard for any scala version)
+  # Clean test reports to reduce the cache size
+  - run:
+      name: Clean test reports
+      command: rm -rf test-reports
 
   - write_cache:
       cache_key: << parameters.cache_key >>
