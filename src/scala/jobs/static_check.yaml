@@ -1,14 +1,46 @@
 description: |
-  Run `scalafmt` against the repo. Outputs the issues which change suggestions.
-  To run locally, try:
-    `docker run -v $(PWD)/src:/src --rm -it mrothy/scalafmt-native /src`
-  This is a smaller image, and version might not align with CI, but is a quick way to reproduce.
+  Run unit tests, check formatting and coverage optionally.
+
 parameters:
   executor:
     description: Executor to use for this job
     type: executor
-    default: scalafmt
+    default: scala
+  with_scalafmt:
+    description: Whether to check formatting with Scalafmt
+    type: boolean
+    default: true
+  with_scalafix:
+    description: |
+      Whether to check rewritings with scalafix.
+      Please set rules in .scalafix.conf file and respective `scalacOptions` in build.sbt
+    type: boolean
+    default: true
 executor: << parameters.executor >>
+
 steps:
   - checkout
-  - run: scalafmt --test
+  - restore_cache:
+      keys:
+        - dependencies-{{ checksum "build.sbt" }}
+
+  - when:
+      condition: << parameters.with_scalafix >>
+      steps:
+        - run:
+            name: Check formatting with Scalafmt
+            command: sbt scalafixAll -check
+
+  - when:
+      condition: << parameters.with_scalafmt >>
+      steps:
+        - run:
+            name: Check formatting with Scalafmt
+            command: sbt scalafmtCheckAll
+
+  - save_cache:
+      paths:
+        - ~/.ivy2
+        - ~/.sbt
+        - ~/.m2
+      key: dependencies-{{ checksum "build.sbt" }}
