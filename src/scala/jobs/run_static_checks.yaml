@@ -68,7 +68,6 @@ steps:
             command: |
               mkdir -p coverage-reports
               cp -r "$(find . -type d -name 'scoverage-report' -print)" coverage-reports/
-              scala-2.13/coverage-report/cobertura.xml
         - store_artifacts:
             path: coverage-reports/scoverage-report
             destination: scoverage-report
