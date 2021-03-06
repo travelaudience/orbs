@@ -44,6 +44,9 @@ steps:
   - when:
       condition: << parameters.with_sbtcoverage >>
       steps:
+        - code-climate/install
+        - run: cc-test-reporter before-build
+
         - run:
             name: Check code coverage and run tests
             command: sbt coverageOn +test coverageOff coverageAggregate
