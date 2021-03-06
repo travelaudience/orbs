@@ -18,6 +18,12 @@ parameters:
     description: Whether to check code coverage with sbtcoverage
     type: boolean
     default: true
+  with_scalafix:
+    description: |
+      Whether to check rewritings with scalafix.
+      Please set rules in .scalafix.conf file and respective `scalacOptions` in build.sbt
+    type: boolean
+    default: true
 
 executor: << parameters.executor >>
 
@@ -29,6 +35,13 @@ steps:
   - run:
       name: Clean sbt project
       command: sbt clean
+
+  - when:
+      condition: << parameters.with_scalafix >>
+      steps:
+        - run:
+            name: Check formatting with Scalafmt
+            command: sbt scalafixAll -check
 
   - when:
       condition: << parameters.with_scalafmt >>
