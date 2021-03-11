@@ -36,8 +36,8 @@ steps:
       condition: << parameters.with_scalafix >>
       steps:
         - run:
-            name: Check formatting with Scalafmt
-            command: sbt scalafixAll -check
+            name: Check rules with scalafix
+            command: sbt scalafixAll
 
   - when:
       condition: << parameters.with_scalafmt >>
