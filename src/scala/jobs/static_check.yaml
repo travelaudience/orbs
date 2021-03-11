@@ -25,18 +25,20 @@ steps:
         - dependencies-{{ checksum "build.sbt" }}
 
   - when:
-      condition: << parameters.with_scalafix >>
-      steps:
-        - run:
-            name: Check formatting with Scalafmt
-            command: sbt scalafixAll -check
-
-  - when:
       condition: << parameters.with_scalafmt >>
       steps:
         - run:
             name: Check formatting with Scalafmt
             command: sbt scalafmtCheckAll
+
+  - when:
+      condition: << parameters.with_scalafix >>
+      steps:
+        - run:
+            name: Check rules with scalafix
+            command: sbt scalafixAll -check
+
+
 
   - save_cache:
       paths:
