@@ -1,0 +1,27 @@
+description: |
+  Compile a fat-jar for adding to a docker image.
+
+parameters:
+  executor:
+    description: Executor to use for this job
+    type: executor
+  submodule:
+    description: sbt submodule to assembly. Leave empty for main module.
+    type: string
+
+executor: << parameters.executor >>
+
+steps:
+  - checkout
+  - restore_cache:
+      keys:
+        - dependencies-{{ checksum "build.sbt" }}
+  - compile:
+      submodule: << parameters.submodule >>
+  - save_cache:
+      paths:
+        - ~/.ivy2
+        - ~/.sbt
+        - ~/.m2
+      key: dependencies-{{ checksum "build.sbt" }}
+
