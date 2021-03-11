@@ -18,17 +18,24 @@ usage:
             filters:
               tags:
                 only: /.*/
-        - ta-scala/run_static_checks:
+        - ta-scala/run_checks:
             <<: *app_cache_key
             requires:
               - ta-scala/checkout_with_nexus_credentials
             filters:
               tags:
                 only: /.*/
+        - ta-scala/run_tests:
+            <<: *app_cache_key
+            requires:
+              - ta-scala/run_checks
+            filters:
+              tags:
+                only: /.*/
         - ta-scala/compile:
             <<: *app_cache_key
             requires:
-              - ta-scala/run_static_checks
+              - ta-scala/run_tests
             filters:
               tags:
                 only: /.*/

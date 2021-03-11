@@ -1,5 +1,5 @@
 description: |
-  Run unit tests, check formatting and coverage optionally.
+  Run unit tests and coverage optionally.
 
 parameters:
   executor:
@@ -10,18 +10,8 @@ parameters:
     description: Checksum-based key used to identify cache
     type: string
     default: ''
-  with_scalafmt:
-    description: Whether to check formatting with Scalafmt
-    type: boolean
-    default: true
   with_sbtcoverage:
     description: Whether to check code coverage with sbtcoverage
-    type: boolean
-    default: true
-  with_scalafix:
-    description: |
-      Whether to check rewritings with scalafix.
-      Please set rules in .scalafix.conf file and respective `scalacOptions` in build.sbt
     type: boolean
     default: true
 
@@ -31,24 +21,6 @@ steps:
   - read_workspace
   - read_cache:
       cache_key: << parameters.cache_key >>
-
-  - run:
-      name: Clean sbt project
-      command: sbt clean
-
-  - when:
-      condition: << parameters.with_scalafix >>
-      steps:
-        - run:
-            name: Check formatting with Scalafmt
-            command: sbt scalafixAll -check
-
-  - when:
-      condition: << parameters.with_scalafmt >>
-      steps:
-        - run:
-            name: Check formatting with Scalafmt
-            command: sbt scalafmtCheckAll
 
   - run:
       name: Compile test code
