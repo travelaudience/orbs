@@ -37,7 +37,7 @@ steps:
       steps:
         - run:
             name: Check rules with scalafix
-            command: sbt scalafixAll
+            command: sbt scalafix  --check
 
   - when:
       condition: << parameters.with_scalafmt >>

@@ -36,7 +36,7 @@ steps:
       steps:
         - run:
             name: Check rules with scalafix
-            command: sbt scalafixAll
+            command: sbt scalafix --check
 
   - save_cache:
       paths:
