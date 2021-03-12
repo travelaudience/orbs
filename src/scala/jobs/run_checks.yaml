@@ -44,7 +44,7 @@ steps:
       steps:
         - run:
             name: Check rules with scalafix
-            command: sbt scalafixAll info --check
+            command: sbt "scalafixAll --check"
 
   - write_cache:
       cache_key: << parameters.cache_key >>
