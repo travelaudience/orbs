@@ -18,7 +18,7 @@ parameters:
   path_to_coverage_file:
     description: Where the test coverage report gets created.
     type: string
-    default: scala-2.12/coverage-report/cobertura.xml
+    default: scala-2.13/coverage-report/cobertura.xml
   memory_limit_for_heap:
     description: aggregating the test coverage requires more memory to be defined
     type: string
