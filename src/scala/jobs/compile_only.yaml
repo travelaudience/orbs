@@ -23,5 +23,6 @@ steps:
         - ~/.ivy2
         - ~/.sbt
         - ~/.m2
+        - ~/.cache/coursier
       key: dependencies-{{ checksum "build.sbt" }}
 
