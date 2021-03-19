@@ -5,6 +5,7 @@ parameters:
   executor:
     description: Executor to use for this job
     type: executor
+    default: scala
   submodule:
     description: sbt submodule to assembly. Leave empty for main module.
     type: string
