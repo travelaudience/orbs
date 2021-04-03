@@ -35,7 +35,8 @@ steps:
         - run:
             name: Check code coverage and run tests
             command: |
-              if sbt coverageOn +test coverageOff coverageAggregate; then
+              if sbt coverageOn +test coverageOff coverageAggregate
+              then
                 echo 'export TESTS_STATUS=0' >> $BASH_ENV
               else
                 echo 'export TESTS_STATUS=1' >> $BASH_ENV
@@ -72,7 +73,8 @@ steps:
         - run:
             name: Run tests
             command: |
-              if sbt +test ; then
+              if sbt +test
+              then
                 echo 'export TESTS_STATUS=0' >> $BASH_ENV
               else
                 echo 'export TESTS_STATUS=1' >> $BASH_ENV

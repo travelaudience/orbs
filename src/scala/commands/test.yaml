@@ -37,7 +37,9 @@ steps:
         - run:
             name: Try running tests with coverage
             command: |
-              if SBT_OPTS="-Xmx<<parameters.memory_limit_for_heap>>" sbt coverageOn +test coverageOff coverageAggregate; then
+              export SBT_OPTS="-Xmx<<parameters.memory_limit_for_heap>>"
+              if sbt coverageOn +test coverageOff coverageAggregate
+              then
                 echo 'export TESTS_STATUS=0' >> $BASH_ENV
               else
                 echo 'export TESTS_STATUS=1' >> $BASH_ENV
@@ -48,7 +50,8 @@ steps:
         - run:
             name: Try tunning tests without coverage
             command: |
-              if sbt test ; then
+              if sbt +test
+              then
                 echo 'export TESTS_STATUS=0' >> $BASH_ENV
               else
                 echo 'export TESTS_STATUS=1' >> $BASH_ENV
