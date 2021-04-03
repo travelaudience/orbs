@@ -34,7 +34,12 @@ steps:
         - run: cc-test-reporter before-build
         - run:
             name: Check code coverage and run tests
-            command: sbt coverageOn +test coverageOff coverageAggregate
+            command: |
+              if sbt coverageOn +test coverageOff coverageAggregate; then
+                echo 'export TESTS_STATUS=0' >> $BASH_ENV
+              else
+                echo 'export TESTS_STATUS=1' >> $BASH_ENV
+              fi
 
         # To upload in code climate UI
         - run:
@@ -66,7 +71,12 @@ steps:
       steps:
         - run:
             name: Run tests
-            command: sbt +test
+            command: |
+              if sbt +test ; then
+                echo 'export TESTS_STATUS=0' >> $BASH_ENV
+              else
+                echo 'export TESTS_STATUS=1' >> $BASH_ENV
+              fi
 
   - run:
       name: Find test reports
@@ -80,6 +90,10 @@ steps:
   - run:
       name: Clean test reports
       command: rm -rf test-reports
+
+  - run:
+      name: Fail CI in case tests failed
+      command: exit ${TESTS_STATUS}
 
   - write_cache:
       cache_key: << parameters.cache_key >>
