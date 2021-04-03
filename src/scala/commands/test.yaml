@@ -34,12 +34,26 @@ steps:
   - when:
       condition: << parameters.with_coverage >>
       steps:
-        - run: sbt coverage test:test
+        - run:
+            name: Try running tests with coverage
+            command: |
+              if sbt coverage test:test ; then
+                echo 'export TESTS_STATUS=0' >> $BASH_ENV
+              else
+                echo 'export TESTS_STATUS=1' >> $BASH_ENV
+              fi
         - run: SBT_OPTS="-Xmx<<parameters.memory_limit_for_heap>>" sbt coverageAggregate
   - unless:
       condition: << parameters.with_coverage >>
       steps:
-        - run: sbt test:test
+        - run:
+            name: Try tunning tests without coverage
+            command: |
+              if sbt test:test ; then
+                echo 'export TESTS_STATUS=0' >> $BASH_ENV
+              else
+                echo 'export TESTS_STATUS=1' >> $BASH_ENV
+              fi
   - when:
       condition: << parameters.with_coverage >>
       steps:
@@ -67,3 +81,7 @@ steps:
 
   - store_test_results:
       path: test-reports
+
+  - run:
+      name: Fail CI in case tests failed
+      command: exit ${TESTS_STATUS}
