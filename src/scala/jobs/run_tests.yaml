@@ -14,6 +14,10 @@ parameters:
     description: Whether to check code coverage with sbtcoverage
     type: boolean
     default: true
+  sbt_opts:
+    description: aggregating the test coverage requires more memory and stack size to be defined
+    type: string
+    default: "-Xmx1524M -Xms512m -Xss4m"
 
 executor: << parameters.executor >>
 
@@ -33,8 +37,9 @@ steps:
             version: 0.10.0
         - run: cc-test-reporter before-build
         - run:
-            name: Check code coverage and run tests
+            name: Try running tests with coverage
             command: |
+              export SBT_OPTS="<<parameters.sbt_opts>>"
               if sbt coverageOn +test coverageOff coverageAggregate
               then
                 echo 'export TESTS_STATUS=0' >> $BASH_ENV
@@ -71,7 +76,7 @@ steps:
       condition: << parameters.with_sbtcoverage >>
       steps:
         - run:
-            name: Run tests
+            name: Try running tests without coverage
             command: |
               if sbt +test
               then

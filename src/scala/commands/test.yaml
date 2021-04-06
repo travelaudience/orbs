@@ -19,10 +19,10 @@ parameters:
     description: Where the test coverage report gets created.
     type: string
     default: scala-2.13/coverage-report/cobertura.xml
-  memory_limit_for_heap:
-    description: aggregating the test coverage requires more memory to be defined
+  sbt_opts:
+    description: aggregating the test coverage requires more memory and stack size to be defined
     type: string
-    default: 1524M
+    default: "-Xmx1524M -Xms512m -Xss4m"
 
 steps:
   - when:
@@ -37,7 +37,7 @@ steps:
         - run:
             name: Try running tests with coverage
             command: |
-              export SBT_OPTS="-Xmx<<parameters.memory_limit_for_heap>>"
+              export SBT_OPTS="<<parameters.sbt_opts>>"
               if sbt coverageOn +test coverageOff coverageAggregate
               then
                 echo 'export TESTS_STATUS=0' >> $BASH_ENV
@@ -48,7 +48,7 @@ steps:
       condition: << parameters.with_coverage >>
       steps:
         - run:
-            name: Try tunning tests without coverage
+            name: Try running tests without coverage
             command: |
               if sbt +test
               then
