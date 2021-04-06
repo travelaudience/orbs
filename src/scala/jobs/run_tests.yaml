@@ -35,12 +35,15 @@ steps:
         - run:
             name: Try running tests with coverage
             command: |
-              if sbt coverageOn +test coverageOff coverageAggregate
+              if sbt coverage +test
               then
                 echo 'export TESTS_STATUS=0' >> $BASH_ENV
               else
                 echo 'export TESTS_STATUS=1' >> $BASH_ENV
               fi
+        - run:
+            name: Aggregate coverage reports
+            command: sbt coverageAggregate
 
         # To upload in code climate UI
         - run:

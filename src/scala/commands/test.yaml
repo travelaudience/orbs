@@ -33,27 +33,15 @@ steps:
         - run:
             name: Try running tests with coverage
             command: |
-              if sbt coverageOn +test coverageOff coverageAggregate
+              if sbt coverage test
               then
                 echo 'export TESTS_STATUS=0' >> $BASH_ENV
               else
                 echo 'export TESTS_STATUS=1' >> $BASH_ENV
               fi
-  - unless:
-      condition: << parameters.with_coverage >>
-      steps:
         - run:
-            name: Try running tests without coverage
-            command: |
-              if sbt +test
-              then
-                echo 'export TESTS_STATUS=0' >> $BASH_ENV
-              else
-                echo 'export TESTS_STATUS=1' >> $BASH_ENV
-              fi
-  - when:
-      condition: << parameters.with_coverage >>
-      steps:
+            name: Aggregate coverage reports
+            command: sbt coverageAggregate
         - code-climate/format_coverage:
             coverage_file: << parameters.project_base >>/<< parameters.path_to_coverage_file >>
             input_type: cobertura
@@ -69,9 +57,21 @@ steps:
         - run:
             name: Clean coverage results
             command: rm -rf coverage-reports
+  - unless:
+      condition: << parameters.with_coverage >>
+      steps:
+        - run:
+            name: Try running tests without coverage
+            command: |
+              if sbt test
+              then
+                echo 'export TESTS_STATUS=0' >> $BASH_ENV
+              else
+                echo 'export TESTS_STATUS=1' >> $BASH_ENV
+              fi
 
   - run:
-      name: Save test results
+      name: Find test reports
       command: |
         mkdir -p test-reports
         find . -type f -regex ".*/target/test-reports/.*xml" -exec cp {} test-reports/ \;
