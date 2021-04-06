@@ -40,8 +40,14 @@ steps:
                 echo 'export TESTS_STATUS=1' >> $BASH_ENV
               fi
         - run:
-            name: Aggregate coverage reports
-            command: sbt coverageAggregate
+            name: Check for minimum coverage and aggregate coverage reports
+            command: |
+              if sbt coverageAggregate
+              then
+                echo 'export COVERAGE_STATUS=0' >> $BASH_ENV
+              else
+                echo 'export COVERAGE_STATUS=1' >> $BASH_ENV
+              fi
         - code-climate/format_coverage:
             coverage_file: << parameters.project_base >>/<< parameters.path_to_coverage_file >>
             input_type: cobertura
@@ -82,3 +88,10 @@ steps:
   - run:
       name: Fail CI in case tests failed
       command: exit ${TESTS_STATUS}
+
+  - when:
+      condition: << parameters.with_coverage >>
+      steps:
+        - run:
+            name: Fail CI in case minimum coverage failed
+            command: exit ${COVERAGE_STATUS}
