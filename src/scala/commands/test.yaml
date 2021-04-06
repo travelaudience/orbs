@@ -19,10 +19,6 @@ parameters:
     description: Where the test coverage report gets created.
     type: string
     default: scala-2.13/coverage-report/cobertura.xml
-  sbt_opts:
-    description: aggregating the test coverage requires more memory and stack size to be defined
-    type: string
-    default: "-Xmx1524M -Xms512m -Xss4m"
 
 steps:
   - when:
@@ -37,7 +33,6 @@ steps:
         - run:
             name: Try running tests with coverage
             command: |
-              export SBT_OPTS="<<parameters.sbt_opts>>"
               if sbt coverageOn +test coverageOff coverageAggregate
               then
                 echo 'export TESTS_STATUS=0' >> $BASH_ENV
