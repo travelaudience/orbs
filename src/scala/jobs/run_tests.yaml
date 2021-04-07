@@ -33,8 +33,23 @@ steps:
             version: 0.10.0
         - run: cc-test-reporter before-build
         - run:
-            name: Check code coverage and run tests
-            command: sbt coverageOn +test coverageOff coverageAggregate
+            name: Try running tests with coverage
+            command: |
+              if sbt coverage +test
+              then
+                echo 'export TESTS_STATUS=0' >> $BASH_ENV
+              else
+                echo 'export TESTS_STATUS=1' >> $BASH_ENV
+              fi
+        - run:
+            name: Check for minimum coverage and aggregate coverage reports
+            command: |
+              if sbt coverageAggregate
+              then
+                echo 'export COVERAGE_STATUS=0' >> $BASH_ENV
+              else
+                echo 'export COVERAGE_STATUS=1' >> $BASH_ENV
+              fi
 
         # To upload in code climate UI
         - run:
@@ -65,8 +80,14 @@ steps:
       condition: << parameters.with_sbtcoverage >>
       steps:
         - run:
-            name: Run tests
-            command: sbt +test
+            name: Try running tests without coverage
+            command: |
+              if sbt +test
+              then
+                echo 'export TESTS_STATUS=0' >> $BASH_ENV
+              else
+                echo 'export TESTS_STATUS=1' >> $BASH_ENV
+              fi
 
   - run:
       name: Find test reports
@@ -80,6 +101,17 @@ steps:
   - run:
       name: Clean test reports
       command: rm -rf test-reports
+
+  - run:
+      name: Fail CI in case tests failed
+      command: exit ${TESTS_STATUS}
+
+  - when:
+      condition: << parameters.with_sbtcoverage >>
+      steps:
+        - run:
+            name: Fail CI in case minimum coverage failed
+            command: exit ${COVERAGE_STATUS}
 
   - write_cache:
       cache_key: << parameters.cache_key >>
