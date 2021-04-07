@@ -29,7 +29,7 @@ steps:
 
         if [[ ! -z "$VERSION_TAG" ]]; then
           SNAPSHOT_VERSION=$(echo $VERSION_TAG|sed 's/-SNAPSHOT$//')-SNAPSHOT
-          VERSION_SBT_PATTERN="^ThisBuild / Version := \"$SNAPSHOT_VERSION\"$"
+          VERSION_SBT_PATTERN="^ThisBuild / version := \"$SNAPSHOT_VERSION\"$"
           if egrep "$VERSION_SBT_PATTERN" version.sbt; then
             echo "Publishing $VERSION_TAG ..."
             sbt 'set ThisBuild / version := "'"$VERSION_TAG"'"' +publish
