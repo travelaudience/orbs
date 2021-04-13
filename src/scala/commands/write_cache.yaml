@@ -31,7 +31,7 @@ steps:
   - run:
       name: Clean unwanted .ivy/.sbt process lock files from the cache
       command: |
-        rm -fv $HOME/.ivy2/.sbt.ivy.lock
+        find $HOME/.ivy2/      -name ".sbt.ivy.lock"        -print -delete
         find $HOME/.ivy2/cache -name "ivydata-*.properties" -print -delete
         find $HOME/.sbt        -name "*.lock"               -print -delete
         # Remove ~/.sbt/{1.0|0.13}/staging external `RootProject` dependencies.
