@@ -27,11 +27,11 @@ steps:
 
         if [[ -n "$CIRCLE_TAG" ]]; then
           # extract tag without 'v' prefix
-          JAR_VERSION=$(echo "$CIRCLE_TAG" | grep -P -o '(?<=v).+')
+          BUILD_VERSION=$(echo "$CIRCLE_TAG" | grep -P -o '(?<=v).+')
         elif [[ -n "$CIRCLE_BRANCH" ]]; then
           # replaces branch name undesired chars with hyphen
-          JAR_VERSION=$(echo "$CIRCLE_BRANCH"'-SNAPSHOT' | sed -r 's/[\/=_#]+/-/g')
+          BUILD_VERSION=$(echo "$CIRCLE_BRANCH"'-SNAPSHOT' | sed -r 's/[\/=_#]+/-/g')
         fi
 
-        echo "Publishing version $JAR_VERSION ..."
-        sbt 'set ThisBuild / version := "'"$JAR_VERSION"'"' +publish
+        echo "Publishing version $BUILD_VERSION ..."
+        sbt 'set ThisBuild / version := "'"$BUILD_VERSION"'"' +publish
