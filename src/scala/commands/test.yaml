@@ -1,5 +1,5 @@
 description: |
-  Run `sbt test:test` against the repo. Provides an option to upload coverage report to code climate.
+  Run sbt test against the repo. Provides an option to upload coverage report to code climate.
   If using coverage, it's advisable to add `scoverage` to plugins.sbt
 
 parameters:
@@ -26,7 +26,7 @@ steps:
       steps:
         - code-climate/install
         - run: cc-test-reporter before-build
-  - run: sbt test:compile
+  - run: sbt "Test / compile"
   - when:
       condition: << parameters.with_coverage >>
       steps:
