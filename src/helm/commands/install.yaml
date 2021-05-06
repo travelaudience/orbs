@@ -13,11 +13,11 @@ parameters:
   kind_version:
     description: Version of Kind to be used
     type: string
-    default: "v0.5.1"
+    default: "v0.10.0"
   k8s_version:
     description: K8s version to be run with kind
     type: string
-    default: "v1.15.0"
+    default: "v1.17.0"
 steps:
   - run:
       command: |
@@ -28,15 +28,10 @@ steps:
           chmod +x kind
           mv kind /usr/local/bin/kind
           echo "Creating cluster..."
-          // TODO: docker executable is required for this to run. IE, needs a different executor type
           kind create cluster --name "chart-testing" --config .circleci/kind-config.yaml --image "kindest/node:<<parameters.k8s_version>>" --wait 60s
-
           echo $(kubectl get nodes)
           kubectl delete storageclass standard
           kubectl apply -f https://raw.githubusercontent.com/rancher/local-path-provisioner/master/deploy/local-path-storage.yaml
-          kubectl --namespace kube-system create sa tiller
-          kubectl create clusterrolebinding tiller-cluster-rule --clusterrole=cluster-admin --serviceaccount=kube-system:tiller
-          helm init --service-account tiller --upgrade --wait
           echo $(helm version)
 
           ct install

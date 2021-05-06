@@ -39,6 +39,14 @@ Then create a release on Github with the new tag.
 
 Or, if you prefer you can just create the release on Github and it will automatically create a tag.
 
+## Local develpoment
+
+To validate orbs locally, feel free to use [CircleCI Local CLI](https://circleci.com/docs/2.0/local-cli/).
+
+```bash
+circleci orb validate <orb.yml>
+```
+
 ## Contributing
 
 Contributions are welcomed. However, these Orbs are used for travel audience CI process, and have been made in an opionated way. More information on how to contribute is in our guide: [Contributing Guide](CONTRIBUTING.md).
