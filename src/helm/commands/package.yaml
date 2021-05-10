@@ -46,7 +46,7 @@ steps:
             else
               ver=$(helm inspect chart "$chart" | grep version | cut -d' ' -f2)
               [[ -z $CIRCLE_TAG ]] && BRANCH="$CIRCLE_BRANCH" || BRANCH="$CIRCLE_TAG"
-              VERSION="$(echo "${ver}-${BRANCH}" | sed -r 's/[\/=_#]+/-/g')"
+              VERSION="$(echo "${ver}-${BRANCH}" | sed -r 's/[\/=_#]+/-/g')" | tr -d " \t\n\r"
               echo "packaging $chart with version: ${VERSION}"
               helm package "$chart" -u --version "${VERSION}" --destination .cr-release-packages
             fi
