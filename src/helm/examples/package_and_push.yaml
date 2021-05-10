@@ -17,7 +17,7 @@ usage:
   version: 2.1
 
   orbs:
-    ta-helm: travelaudience/helm@0.2.12
+    ta-helm: travelaudience/helm@0.2.13
 
   workflows:
     build_and_test:
