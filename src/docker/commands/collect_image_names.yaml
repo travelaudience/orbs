@@ -6,14 +6,9 @@ parameters:
     type: string
     default: $CHANGE_NAME
 steps:
-  - run: mkdir -p tmp/image-names
-  - run: |
-      ls -la .
-      ls -la tmp/
-      ls -la tmp/image-names/
-      ls -la tmp/image-names/ta-docker
-      echo "<<parameters.image>>:<<parameters.tag>>" >> tmp/image-names/"${CIRCLE_JOB}".txt
+  - run: mkdir -p /tmp/image-names
+  - run: echo "<<parameters.image>>:<<parameters.tag>>" >> /tmp/image-names/"${CIRCLE_JOB}".txt
   - persist_to_workspace:
-      root: tmp
+      root: /tmp
       paths:
         - image-names/*
