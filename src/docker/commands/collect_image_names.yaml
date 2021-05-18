@@ -6,8 +6,8 @@ parameters:
     type: string
     default: $CHANGE_NAME
 steps:
-  - run: mkdir -p tmp/image-names
-  - run: echo "<<parameters.image>>:<<parameters.tag>> " >> tmp/image-names/${CIRCLE_JOB}.txt
+  - run: mkdir -p "$(dirname tmp/image-names/"${CIRCLE_JOB}".txt)"
+  - run: echo "<<parameters.image>>:<<parameters.tag>>" >> tmp/image-names/${CIRCLE_JOB}.txt
   - persist_to_workspace:
       root: tmp
       paths:
