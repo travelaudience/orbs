@@ -53,12 +53,12 @@ parameters:
       and CIRCLE_TAG for production releases
     type: string
     default: $CHANGE_NAME
-  helm_version:
+  chart_version:
     description: |
       Optional. Version of the helm release to deploy
     type: string
     default: ""
-  helm_chart_dir_override:
+  chart_dir_override:
     description: |
       Place where the helm chart is located inside the application repository
       Defaulting to searching in 'helm' dir to look for changes.
@@ -86,25 +86,25 @@ steps:
       steps:
         - replace_image_tag:
             file_location: <<parameters.releases_repo_name>>/<<parameters.release_repo_app_path>>
-        - replace_helm_version:
+        - replace_chart_version:
             file_location: <<parameters.releases_repo_name>>/<<parameters.release_repo_app_path>>
-            helm_version: <<parameters.helm_version>>
-            helm_chart_dir_override: <<parameters.helm_chart_dir_override>>
+            chart_version: <<parameters.chart_version>>
+            chart_dir_override: <<parameters.chart_dir_override>>
   - unless:
       condition: << parameters.release_repo_app_path >>
       steps:
         - replace_image_tag:
             file_location: <<parameters.releases_repo_name>>/<<parameters.app>>
-        - replace_helm_version:
+        - replace_chart_version:
             file_location: <<parameters.releases_repo_name>>/<<parameters.app>>
-            helm_version: <<parameters.helm_version>>
-            helm_chart_dir_override: <<parameters.helm_chart_dir_override>>
+            chart_version: <<parameters.chart_version>>
+            chart_dir_override: <<parameters.chart_dir_override>>
   - create_pull_request:
       git_repository_name: <<parameters.releases_repo_name>>
       github_token: <<parameters.github_token>>
       pr_auto_merge: <<parameters.pr_auto_merge>>
       pr_merge_type: <<parameters.pr_merge_type>>
-      new_branch_name: <<parameters.app>>-<<parameters.helm_version>>-<<parameters.docker_image_tag>>
-      commit_description: "Bump <<parameters.app>> to version <<parameters.helm_version>>|<<parameters.docker_image_tag>>"
-      pr_title: "[AUTO CD] Releasing <<parameters.app>> with version <<parameters.helm_version>>|<<parameters.docker_image_tag>>"
+      new_branch_name: <<parameters.app>>-<<parameters.chart_version>>-<<parameters.docker_image_tag>>
+      commit_description: "Bump <<parameters.app>> to version <<parameters.chart_version>>|<<parameters.docker_image_tag>>"
+      pr_title: "[AUTO CD] Releasing <<parameters.app>> with version <<parameters.chart_version>>|<<parameters.docker_image_tag>>"
       reviewers: << parameters.reviewers >>

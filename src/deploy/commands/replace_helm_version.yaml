@@ -6,12 +6,12 @@ parameters:
       Location of the files to perform the replacemente
     type: string
     default: ""
-  helm_version:
+  chart_version:
     description: |
       Optional. Version of the helm release to deploy
     type: string
     default: ""
-  helm_chart_dir_override:
+  chart_dir_override:
     description: |
       Place where the helm chart is located inside the application repository
       Defaulting to searching in 'helm' dir to look for changes.
@@ -19,23 +19,23 @@ parameters:
     default: "helm"
 steps:
   - when:
-      condition: << parameters.helm_version >>
+      condition: << parameters.chart_version >>
       steps:
         - run:
             command: |
               cd <<parameters.file_location>>
-              sed -i -e "s/version\s*:\s*.*/version: <<parameters.helm_version>>/g" *
+              sed -i -e "s/version\s*:\s*.*/version: <<parameters.chart_version>>/g" *
             name: Perform Replacements for Helm
   - unless:
-      condition: << parameters.helm_version >>
+      condition: << parameters.chart_version >>
       steps:
-        - checkout
         - run:
+            shell: /bin/sh
             command: |
+              set -e
               ls
-              chartVersion=$(find  <<parameters.helm_chart_dir_override>> -name "Chart.yaml" -exec yq e '.version' {} \;)
+              chartVersion=$(find <<parameters.chart_dir_override>> -name "Chart.yaml" -exec yq e '.version' {} \;)
               echo "Found chart version "$chartVersion
-              cd ../
               cd <<parameters.file_location>>
-              sed -i -e "s/version\s*:\s*.*/version: <<parameters.helm_version>>/g" *
+              sed -i -e "s/version\s*:\s*.*/version: <<parameters.chart_version>>/g" *
             name: Find current chart version and perform Replacements for Helm
