@@ -96,14 +96,27 @@ steps:
         git commit --allow-empty -m "Releasing <<parameters.app>> helm version <<parameters.docker_image_tag>>"
         git push origin <<parameters.app>>-<<parameters.docker_image_tag>>
       name: Git commit and push
-  - run:
-      command: |
-        cd <<parameters.releases_repo_name>>
-        GITHUB_TOKEN=$<<parameters.github_token>> gh pr create \
-          --title "[C] Add Application <<parameters.app>>-<<parameters.docker_image_tag>>" \
-          --body ":robot: This PR was created by <<parameters.app>>'s CI job. ${CIRCLE_BUILD_URL}" \
-          --reviewers <<parameters.docker_image_tag>>
-      name: Create PullRequest
+  - when:
+      condition: << parameters.reviewers >>
+      steps:
+        - run:
+            command: |
+              cd <<parameters.releases_repo_name>>
+              GITHUB_TOKEN=$<<parameters.github_token>> gh pr create \
+                --title "[C] Add Application <<parameters.app>>-<<parameters.docker_image_tag>>" \
+                --body ":robot: This PR was created by <<parameters.app>>'s CI job. ${CIRCLE_BUILD_URL}" \
+                --reviewer <<parameters.reviewers>>
+            name: Create PullRequest with Reviewers
+  - unless:
+      condition: << parameters.reviewers >>
+      steps:
+        - run:
+            command: |
+              cd <<parameters.releases_repo_name>>
+              GITHUB_TOKEN=$<<parameters.github_token>> gh pr create \
+                --title "[C] Add Application <<parameters.app>>-<<parameters.docker_image_tag>>" \
+                --body ":robot: This PR was created by <<parameters.app>>'s CI job. ${CIRCLE_BUILD_URL}"
+            name: Create PullRequest without Reviewers
   - when:
       condition: <<parameters.pr_auto_merge>>
       steps:
