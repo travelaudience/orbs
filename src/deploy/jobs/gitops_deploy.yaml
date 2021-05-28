@@ -1,0 +1,118 @@
+description: >
+  This job is to deploy our applications using gitops approach on our TA k8s clusters.
+  The job will reflect changes from app repository to releases repository.
+  In order to run this job correctly, the releases repository must have the required structure.
+docker:
+  # OPTIMISATION: to increase job speed we must use alpine image with git cli installed
+  - image: "cimg/base:stable-20.04"
+parameters:
+  releases_repo_name:
+    type: string
+    description: |
+      Name of repo to apply CD using gitops
+  github_token:
+    description: |
+      Name of environment variable storing your secret githun token.
+    type: env_var_name
+    default: GIT_PUSH_TOKEN
+  github_user_email:
+    description: |
+      Name of environment variable storing your github email
+    type: env_var_name
+    default: GIT_EMAIL
+  github_user_name:
+    description: User name to create PR to github-repo.
+    type: env_var_name
+    default: GIT_USERNAME
+  github_cli_version:
+    default: 1.10.3
+    description: GitHub CLI version.
+    type: string
+  pr_auto_merge:
+    default: false
+    description: Merge PR automatically.
+    type: boolean
+  pr_merge_type:
+    description: >-
+      merge type of `gh pr merge`, available values are (merge|rebase|squash).
+      The default is "merge".
+    type: enum
+    enum:
+      - merge
+      - rebase
+      - squash
+    default: squash
+  app:
+    description: Application name.
+    type: string
+  app_path:
+    description: Optional. Application name.
+    type: string
+    default: ""
+  docker_image_tag:
+    description: |
+      Version of the docker image to deploy - we recommend using CHANGE_NAME for regular merges to master
+      and CIRCLE_TAG for production releases
+    type: string
+    default: $CHANGE_NAME
+  helm_version:
+    description: |
+      Optional. Version of the helm release to deploy
+    type: string
+    default: ""
+  reviewers:
+    description: Optional. A comma-separated list (no spaces around the comma) of GitHub handles to request a review from.
+    type: string
+    default: ""
+  executor:
+    description: Github executor to use for this job
+    type: executor
+    default: cimg
+executor: << parameters.executor >>
+steps:
+  - run:
+      command: |
+        if [ ! $(gh) ]; then
+          curl -OL https://github.com/cli/cli/releases/download/v<<parameters.github_cli_version>>/gh_<<parameters.github_cli_version>>_linux_amd64.deb
+          sudo apt install ./gh_<<parameters.github_cli_version>>_linux_amd64.deb
+        fi
+      name: Install GitHub CLI
+  - run:
+      command: |
+        git config --global user.name "$<<parameters.github_user_name>>"
+        git config --global user.email "$<<parameters.github_user_email>>"
+      name: Git config
+  - run: git clone "https://$<<parameters.github_token>>@github.com/travelaudience/<<parameters.releases_repo_name>>.git"
+  - run:
+      command: |
+        cd <<parameters.releases_repo_name>>/<<parameters.app>>
+        sed -i -e "s/retries\s*:\s*.*/retries: <<parameters.docker_image_tag>>/g" *
+      name: Perform Replacements
+  - run:
+      command: |
+        cd <<parameters.releases_repo_name>>
+        git checkout -b <<parameters.app>>-<<parameters.docker_image_tag>>
+        git add .
+        git commit --allow-empty -m "Releasing <<parameters.app>> helm version <<parameters.docker_image_tag>>"
+        git push origin <<parameters.app>>-<<parameters.docker_image_tag>>
+      name: Git commit and push
+  - run:
+      command: |
+        cd <<parameters.releases_repo_name>>
+        GITHUB_TOKEN=$<<parameters.github_token>> gh pr create \
+          --title "[C] Add Application <<parameters.app>>-<<parameters.docker_image_tag>>" \
+          --body ":robot: This PR was created by <<parameters.app>>'s CI job. ${CIRCLE_BUILD_URL}" \
+          --reviewers <<parameters.docker_image_tag>>
+      name: Create PullRequest
+  - when:
+      condition: <<parameters.pr_auto_merge>>
+      steps:
+        - run:
+            command: |
+              sleep 10
+            name: Wait PullRequest creation completed
+        - run:
+            command: |
+              cd <<parameters.releases_repo_name>>
+              GITHUB_TOKEN=$<<parameters.github_token>> gh pr merge --<<parameters.pr_merge_type>>
+            name: Merge PullRequest
