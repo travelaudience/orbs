@@ -16,5 +16,5 @@ steps:
   - run:
       command: |
         cd <<parameters.file_location>>
-        sed -i -e "s/retries\s*:\s*.*/retries: <<parameters.docker_image_tag>>/g" *
+        sed -i -e 's/image.tag\s*:\s*.*/image.tag: "<<parameters.docker_image_tag>>"/g' *
       name: Perform Replacements for docker image

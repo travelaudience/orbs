@@ -24,7 +24,7 @@ steps:
         - run:
             command: |
               cd <<parameters.file_location>>
-              sed -i -e "s/version\s*:\s*.*/version: <<parameters.chart_version>>/g" *
+              sed -i -e 's/version\s*:\s*.*/version: "<<parameters.chart_version>>"/g' *
             name: Perform Replacements for Helm
   - unless:
       condition: << parameters.chart_version >>
@@ -34,8 +34,8 @@ steps:
             command: |
               set -e
               ls
-              chartVersion=$(find <<parameters.chart_dir_override>> -name "Chart.yaml" -exec yq e '.version' {} \;)
+              chartVersion=$(find <<parameters.chart_dir_override>> -name "Chart.yaml" -exec awk '/version:/{print $NF}' {} \;)
               echo "Found chart version "$chartVersion
               cd <<parameters.file_location>>
-              sed -i -e "s/version\s*:\s*.*/version: <<parameters.chart_version>>/g" *
+              sed -i -e 's/version\s*:\s*.*/version: "'$chartVersion'"/g' *
             name: Find current chart version and perform Replacements for Helm

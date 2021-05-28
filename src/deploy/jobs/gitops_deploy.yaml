@@ -49,10 +49,10 @@ parameters:
     default: ""
   docker_image_tag:
     description: |
-      Version of the docker image to deploy - we recommend using CHANGE_NAME for regular merges to master
+      Version of the docker image to deploy - we recommend using CIRCLE_BRANCH for regular merges to master
       and CIRCLE_TAG for production releases
-    type: string
-    default: $CHANGE_NAME
+    type: env_var_name
+    default: CIRCLE_BRANCH
   chart_version:
     description: |
       Optional. Version of the helm release to deploy
@@ -86,7 +86,7 @@ steps:
       steps:
         - replace_image_tag:
             file_location: <<parameters.releases_repo_name>>/<<parameters.release_repo_app_path>>
-            docker_image_tag: <<parameters.docker_image_tag>>
+            docker_image_tag: $<<parameters.docker_image_tag>>
         - replace_chart_version:
             file_location: <<parameters.releases_repo_name>>/<<parameters.release_repo_app_path>>
             chart_version: <<parameters.chart_version>>
@@ -96,7 +96,7 @@ steps:
       steps:
         - replace_image_tag:
             file_location: <<parameters.releases_repo_name>>/<<parameters.app>>
-            docker_image_tag: <<parameters.docker_image_tag>>
+            docker_image_tag: $<<parameters.docker_image_tag>>
         - replace_chart_version:
             file_location: <<parameters.releases_repo_name>>/<<parameters.app>>
             chart_version: <<parameters.chart_version>>
