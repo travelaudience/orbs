@@ -12,7 +12,7 @@ parameters:
     default: GIT_USERNAME
 steps:
   - run:
-    command: |
-      git config --global user.name "$<<parameters.github_user_name>>"
-      git config --global user.email "$<<parameters.github_user_email>>"
-    name: Git config
+      command: |
+        git config --global user.name "$<<parameters.github_user_name>>"
+        git config --global user.email "$<<parameters.github_user_email>>"
+      name: Git config

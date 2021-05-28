@@ -67,7 +67,7 @@ steps:
               cd <<parameters.git_repository_name>>
               GITHUB_TOKEN=$<<parameters.github_token>> gh pr create \
                 --title "<<parameters.pr_title>>" \
-                --body ":robot: This PR was created by <<parameters.app>>'s CD job. ${CIRCLE_BUILD_URL}"
+                --body ":robot: This PR was created by ${CIRCLE_BUILD_URL} CD job."
             name: Create PullRequest without Reviewers
   - when:
       condition: <<parameters.pr_auto_merge>>

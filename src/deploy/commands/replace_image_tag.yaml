@@ -6,6 +6,12 @@ parameters:
       Location of the files to perform the replacemente
     type: string
     default: ""
+  docker_image_tag:
+    description: |
+      Version of the docker image to deploy - we recommend using CHANGE_NAME for regular merges to master
+      and CIRCLE_TAG for production releases
+    type: string
+    default: ""
 steps:
   - run:
       command: |
