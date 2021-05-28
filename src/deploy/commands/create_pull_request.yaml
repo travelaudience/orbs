@@ -45,7 +45,7 @@ steps:
         cd <<parameters.git_repository_name>>
         git checkout -b <<parameters.new_branch_name>>
         git add .
-        git commit --allow-empty -m <<parameters.commit_description>>
+        git commit --allow-empty -m "<<parameters.commit_description>>"
         git push origin <<parameters.new_branch_name>>
       name: Git commit and push
   - when:

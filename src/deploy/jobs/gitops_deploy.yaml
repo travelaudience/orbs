@@ -86,6 +86,7 @@ steps:
       steps:
         - replace_image_tag:
             file_location: <<parameters.releases_repo_name>>/<<parameters.release_repo_app_path>>
+            docker_image_tag: <<parameters.docker_image_tag>>
         - replace_chart_version:
             file_location: <<parameters.releases_repo_name>>/<<parameters.release_repo_app_path>>
             chart_version: <<parameters.chart_version>>
@@ -95,6 +96,7 @@ steps:
       steps:
         - replace_image_tag:
             file_location: <<parameters.releases_repo_name>>/<<parameters.app>>
+            docker_image_tag: <<parameters.docker_image_tag>>
         - replace_chart_version:
             file_location: <<parameters.releases_repo_name>>/<<parameters.app>>
             chart_version: <<parameters.chart_version>>
