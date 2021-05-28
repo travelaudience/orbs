@@ -1,0 +1,18 @@
+description: |
+  Setup global configurations for git
+parameters:
+  github_user_email:
+    description: |
+      Name of environment variable storing your github email
+    type: env_var_name
+    default: GIT_EMAIL
+  github_user_name:
+    description: User name to create PR to github-repo.
+    type: env_var_name
+    default: GIT_USERNAME
+steps:
+  - run:
+    command: |
+      git config --global user.name "$<<parameters.github_user_name>>"
+      git config --global user.email "$<<parameters.github_user_email>>"
+    name: Git config

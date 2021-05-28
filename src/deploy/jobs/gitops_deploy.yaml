@@ -2,9 +2,9 @@ description: >
   This job is to deploy our applications using gitops approach on our TA k8s clusters.
   The job will reflect changes from app repository to releases repository.
   In order to run this job correctly, the releases repository must have the required structure.
-docker:
-  # OPTIMISATION: to increase job speed we must use alpine image with git cli installed
-  - image: "cimg/base:stable-20.04"
+  This job interacts with two repositories: 
+  the application repository - where your code is
+  the releases repository - the repository that manage the releases
 parameters:
   releases_repo_name:
     type: string
@@ -24,10 +24,6 @@ parameters:
     description: User name to create PR to github-repo.
     type: env_var_name
     default: GIT_USERNAME
-  github_cli_version:
-    default: 1.10.3
-    description: GitHub CLI version.
-    type: string
   pr_auto_merge:
     default: false
     description: Merge PR automatically.
@@ -45,8 +41,10 @@ parameters:
   app:
     description: Application name.
     type: string
-  app_path:
-    description: Optional. Application name.
+  release_repo_app_path:
+    description: |
+      Optional. Path for application artifacts inside releases repo.
+      Github repo name by dafault.
     type: string
     default: ""
   docker_image_tag:
@@ -60,6 +58,12 @@ parameters:
       Optional. Version of the helm release to deploy
     type: string
     default: ""
+  helm_chart_dir_override:
+    description: |
+      Place where the helm chart is located inside the application repository
+      Defaulting to searching in 'helm' dir to look for changes.
+    type: string
+    default: "helm"
   reviewers:
     description: Optional. A comma-separated list (no spaces around the comma) of GitHub handles to request a review from.
     type: string
@@ -67,65 +71,39 @@ parameters:
   executor:
     description: Github executor to use for this job
     type: executor
+    # OPTIMISATION: to increase job speed we must use alpine image with git cli installed
     default: cimg
 executor: << parameters.executor >>
 steps:
-  - run:
-      command: |
-        if [ ! $(gh) ]; then
-          curl -OL https://github.com/cli/cli/releases/download/v<<parameters.github_cli_version>>/gh_<<parameters.github_cli_version>>_linux_amd64.deb
-          sudo apt install ./gh_<<parameters.github_cli_version>>_linux_amd64.deb
-        fi
-      name: Install GitHub CLI
-  - run:
-      command: |
-        git config --global user.name "$<<parameters.github_user_name>>"
-        git config --global user.email "$<<parameters.github_user_email>>"
-      name: Git config
+  - install_git_cli
+  - git_config:
+      github_user_name: <<parameters.github_user_name>>
+      github_user_email: <<parameters.github_user_email>>
   - run: git clone "https://$<<parameters.github_token>>@github.com/travelaudience/<<parameters.releases_repo_name>>.git"
-  - run:
-      command: |
-        cd <<parameters.releases_repo_name>>/<<parameters.app>>
-        sed -i -e "s/retries\s*:\s*.*/retries: <<parameters.docker_image_tag>>/g" *
-      name: Perform Replacements
-  - run:
-      command: |
-        cd <<parameters.releases_repo_name>>
-        git checkout -b <<parameters.app>>-<<parameters.docker_image_tag>>
-        git add .
-        git commit --allow-empty -m "Releasing <<parameters.app>> helm version <<parameters.docker_image_tag>>"
-        git push origin <<parameters.app>>-<<parameters.docker_image_tag>>
-      name: Git commit and push
   - when:
-      condition: << parameters.reviewers >>
+      condition: << parameters.release_repo_app_path >>
       steps:
-        - run:
-            command: |
-              cd <<parameters.releases_repo_name>>
-              GITHUB_TOKEN=$<<parameters.github_token>> gh pr create \
-                --title "[C] Add Application <<parameters.app>>-<<parameters.docker_image_tag>>" \
-                --body ":robot: This PR was created by <<parameters.app>>'s CI job. ${CIRCLE_BUILD_URL}" \
-                --reviewer <<parameters.reviewers>>
-            name: Create PullRequest with Reviewers
+        - replace_image_tag:
+            file_location: <<parameters.releases_repo_name>>/<<parameters.release_repo_app_path>>
+        - replace_helm_version:
+            file_location: <<parameters.releases_repo_name>>/<<parameters.release_repo_app_path>>
+            helm_version: <<parameters.helm_version>>
+            helm_version: <<parameters.helm_chart_dir_override>>
   - unless:
-      condition: << parameters.reviewers >>
+      condition: << parameters.release_repo_app_path >>
       steps:
-        - run:
-            command: |
-              cd <<parameters.releases_repo_name>>
-              GITHUB_TOKEN=$<<parameters.github_token>> gh pr create \
-                --title "[C] Add Application <<parameters.app>>-<<parameters.docker_image_tag>>" \
-                --body ":robot: This PR was created by <<parameters.app>>'s CI job. ${CIRCLE_BUILD_URL}"
-            name: Create PullRequest without Reviewers
-  - when:
-      condition: <<parameters.pr_auto_merge>>
-      steps:
-        - run:
-            command: |
-              sleep 10
-            name: Wait PullRequest creation completed
-        - run:
-            command: |
-              cd <<parameters.releases_repo_name>>
-              GITHUB_TOKEN=$<<parameters.github_token>> gh pr merge --<<parameters.pr_merge_type>>
-            name: Merge PullRequest
+        - replace_image_tag:
+            file_location: <<parameters.releases_repo_name>>/<<parameters.app>>
+        - replace_helm_version:
+            file_location: <<parameters.releases_repo_name>>/<<parameters.app>>
+            helm_version: <<parameters.helm_version>>
+            helm_version: <<parameters.helm_chart_dir_override>>
+  - create_pull_request:
+      git_repository_name: <<parameters.releases_repo_name>>
+      github_token: <<parameters.github_token>>
+      pr_auto_merge: <<parameters.pr_auto_merge>>
+      pr_merge_type: <<parameters.pr_merge_type>>
+      new_branch_name: <<parameters.app>>-<<parameters.helm_version>>-<<parameters.docker_image_tag>>
+      commit_description: "Bump <<parameters.app>> to version <<parameters.helm_version>>|<<parameters.docker_image_tag>>"
+      pr_title: "[AUTO CD] Releasing <<parameters.app>> with version <<parameters.helm_version>>|<<parameters.docker_image_tag>>"
+      reviewers: << parameters.reviewers >>

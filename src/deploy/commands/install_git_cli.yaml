@@ -1,0 +1,15 @@
+description: |
+  Install git cli if not present
+parameters:
+  github_cli_version:
+    default: 1.10.3
+    description: GitHub CLI version.
+    type: string
+steps:
+  - run:
+      command: |
+        if [ ! $(gh) ]; then
+          curl -OL https://github.com/cli/cli/releases/download/v<<parameters.github_cli_version>>/gh_<<parameters.github_cli_version>>_linux_amd64.deb
+          sudo apt install ./gh_<<parameters.github_cli_version>>_linux_amd64.deb
+        fi
+      name: Install GitHub CLI
