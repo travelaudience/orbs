@@ -75,6 +75,7 @@ parameters:
     default: cimg
 executor: << parameters.executor >>
 steps:
+  - checkout
   - install_git_cli
   - git_config:
       github_user_name: <<parameters.github_user_name>>
