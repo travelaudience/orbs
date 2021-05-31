@@ -51,8 +51,8 @@ parameters:
     description: |
       Version of the docker image to deploy - we recommend using CIRCLE_BRANCH for regular merges to master
       and CIRCLE_TAG for production releases
-    type: env_var_name
-    default: CIRCLE_BRANCH
+    type: string
+    default: $CHANGE_NAME
   chart_version:
     description: |
       Optional. Version of the helm release to deploy
@@ -72,11 +72,12 @@ parameters:
     description: Github executor to use for this job
     type: executor
     # OPTIMISATION: to increase job speed we must use alpine image with git cli installed
-    default: cimg
+    default: default
 executor: << parameters.executor >>
 steps:
   - checkout
   - install_git_cli
+  - get_change_name
   - git_config:
       github_user_name: <<parameters.github_user_name>>
       github_user_email: <<parameters.github_user_email>>
@@ -86,7 +87,7 @@ steps:
       steps:
         - replace_image_tag:
             file_location: <<parameters.releases_repo_name>>/<<parameters.release_repo_app_path>>
-            docker_image_tag: $<<parameters.docker_image_tag>>
+            docker_image_tag: "<<parameters.docker_image_tag>>"
         - replace_chart_version:
             file_location: <<parameters.releases_repo_name>>/<<parameters.release_repo_app_path>>
             chart_version: <<parameters.chart_version>>
@@ -96,7 +97,7 @@ steps:
       steps:
         - replace_image_tag:
             file_location: <<parameters.releases_repo_name>>/<<parameters.app>>
-            docker_image_tag: $<<parameters.docker_image_tag>>
+            docker_image_tag: "<<parameters.docker_image_tag>>"
         - replace_chart_version:
             file_location: <<parameters.releases_repo_name>>/<<parameters.app>>
             chart_version: <<parameters.chart_version>>

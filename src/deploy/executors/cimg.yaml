@@ -1,3 +1,0 @@
-description: Any executor with curl installed should be sufficient
-docker:
-  - image: circleci/python:latest
