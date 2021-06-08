@@ -50,8 +50,16 @@ parameters:
     description: Executor to use for this job
     default: default
     type: executor
+  lfs-enabled:
+    description: Enable git-lfs
+    type: boolean
+    default: false
 executor: <<parameters.executor>>
 steps:
+  - when:
+      condition: <<parameters.lfs-enabled>>
+      steps:
+        - run: sudo apt update && sudo apt install -y git-lfs
   - checkout
   - run: git submodule sync
   - run: git submodule update --init
