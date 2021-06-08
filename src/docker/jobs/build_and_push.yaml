@@ -58,7 +58,8 @@ executor: <<parameters.executor>>
 steps:
   - when:
       condition: <<parameters.lfs-enabled>>
-    run: sudo apt update && sudo apt install -y git-lfs
+      steps:
+        - run: sudo apt update && sudo apt install -y git-lfs
   - checkout
   - run: git submodule sync
   - run: git submodule update --init
