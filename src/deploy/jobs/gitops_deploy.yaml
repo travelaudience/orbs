@@ -12,7 +12,7 @@ parameters:
       Name of repo to apply CD using gitops
   github_token:
     description: |
-      Name of environment variable storing your secret githun token.
+      Name of environment variable storing your secret github token.
     type: env_var_name
     default: GIT_PUSH_TOKEN
   github_user_email:
