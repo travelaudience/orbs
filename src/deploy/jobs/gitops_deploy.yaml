@@ -109,5 +109,5 @@ steps:
       pr_merge_type: <<parameters.pr_merge_type>>
       new_branch_name: <<parameters.app>>-<<parameters.chart_version>>-<<parameters.docker_image_tag>>
       commit_description: "Bump <<parameters.app>> to version <<parameters.chart_version>>|<<parameters.docker_image_tag>>"
-      pr_title: "[AUTO CD] Releasing <<parameters.app>> with version <<parameters.chart_version>>|<<parameters.docker_image_tag>>"
+      pr_title: "[ReleaseBot] Releasing <<parameters.app>> with version <<parameters.chart_version>>|<<parameters.docker_image_tag>>"
       reviewers: << parameters.reviewers >>
