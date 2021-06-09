@@ -29,7 +29,7 @@ parameters:
     type: string
   commit_description:
     description: |
-      Descirption of the commit
+      Description of the commit
     type: string
   pr_title:
     description: |
