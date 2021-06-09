@@ -3,7 +3,7 @@ description: |
 parameters:
   file_location:
     description: |
-      Location of the files to perform the replacemente
+      Location of the files to perform the replacement
     type: string
     default: ""
   docker_image_tag:
