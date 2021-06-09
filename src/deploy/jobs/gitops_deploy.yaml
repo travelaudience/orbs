@@ -3,8 +3,8 @@ description: >
   The job will reflect changes from app repository to releases repository.
   In order to run this job correctly, the releases repository must have the required structure.
   This job interacts with two repositories:
-  the application repository - where your code is
-  the releases repository - the repository that manage the releases
+    - the application repository - where your code is
+    - the releases repository - the repository that manage the releases
 parameters:
   releases_repo_name:
     type: string
