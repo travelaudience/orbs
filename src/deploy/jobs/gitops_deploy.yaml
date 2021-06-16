@@ -10,6 +10,11 @@ parameters:
     type: string
     description: |
       Name of repo to apply CD using gitops
+  releases_repo_org:
+    type: string
+    description: |
+      Name of github org to apply CD using gitops
+    default: "travelaudience"
   github_token:
     description: |
       Name of environment variable storing your secret github token.
@@ -81,7 +86,7 @@ steps:
   - git_config:
       github_user_name: <<parameters.github_user_name>>
       github_user_email: <<parameters.github_user_email>>
-  - run: git clone "https://$<<parameters.github_token>>@github.com/travelaudience/<<parameters.releases_repo_name>>.git"
+  - run: git clone "https://$<<parameters.github_token>>@github.com/<<parameters.releases_repo_org>>/<<parameters.releases_repo_name>>.git"
   - when:
       condition: << parameters.release_repo_app_path >>
       steps:
