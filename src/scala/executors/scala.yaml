@@ -15,5 +15,6 @@ parameters:
     default: "~/repo"
 docker:
   - image: hseeberger/scala-sbt:<< parameters.version >>
+    user: sbtuser
 working_directory: <<parameters.working_directory>>
 resource_class: <<parameters.resource_class>>
