@@ -5,4 +5,4 @@ description: |
   see github page for more info: https://github.com/travelaudience/orbs
 
 orbs:
-  code-climate: travelaudience/code-climate@0.1
+  code-climate: travelaudience/code-climate@dev:run_scala_orb_containers_as_nonroot_sbtuser
