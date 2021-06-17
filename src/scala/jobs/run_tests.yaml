@@ -31,7 +31,7 @@ steps:
       steps:
         - code-climate/install:
             version: 0.10.0
-        - run: cc-test-reporter before-build
+        - run: /tmp/code-climate/cc-test-reporter before-build
         - run:
             name: Try running tests with coverage
             command: |

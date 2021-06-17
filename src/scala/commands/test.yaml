@@ -25,7 +25,7 @@ steps:
       condition: << parameters.with_coverage >>
       steps:
         - code-climate/install
-        - run: cc-test-reporter before-build
+        - run: /tmp/code-climate/cc-test-reporter before-build
   - run: sbt test:compile
   - when:
       condition: << parameters.with_coverage >>

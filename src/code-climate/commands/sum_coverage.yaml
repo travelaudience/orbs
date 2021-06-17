@@ -13,5 +13,5 @@ parameters:
     type: integer
 steps:
   - run:
-      command: cc-test-reporter sum-coverage <<parameters.input>> --parts <<parameters.parts>> --output "<<parameters.output>>"
+      command: /tmp/code-climate/cc-test-reporter sum-coverage <<parameters.input>> --parts <<parameters.parts>> --output "<<parameters.output>>"
       name: Combining coverage reports

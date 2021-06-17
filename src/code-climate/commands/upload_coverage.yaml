@@ -6,5 +6,5 @@ parameters:
     type: string
 steps:
   - run:
-      command: cc-test-reporter upload-coverage --input "<<parameters.input>>"
+      command: /tmp/code-climate/cc-test-reporter upload-coverage --input "<<parameters.input>>"
       name: Uploading coverage report

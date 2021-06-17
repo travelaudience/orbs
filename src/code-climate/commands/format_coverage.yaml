@@ -26,5 +26,5 @@ parameters:
     type: string
 steps:
   - run:
-      command: cc-test-reporter format-coverage <<# parameters.additional_flags>> "<<parameters.additional_flags>>" <</ parameters.additional_flags>> "<<parameters.coverage_file>>" --input-type <<parameters.input_type>> --output "<<parameters.output>>"
+      command: /tmp/code-climate/cc-test-reporter format-coverage <<# parameters.additional_flags>> "<<parameters.additional_flags>>" <</ parameters.additional_flags>> "<<parameters.coverage_file>>" --input-type <<parameters.input_type>> --output "<<parameters.output>>"
       name: Formatting coverage report
