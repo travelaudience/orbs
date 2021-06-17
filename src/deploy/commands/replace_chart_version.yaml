@@ -1,0 +1,41 @@
+description: |
+  Replace image tag
+parameters:
+  file_location:
+    description: |
+      Location of the files to perform the replacement
+    type: string
+    default: ""
+  chart_version:
+    description: |
+      Optional. Version of the helm release to deploy
+    type: string
+    default: ""
+  chart_dir_override:
+    description: |
+      Place where the helm chart is located inside the application repository
+      Defaulting to searching in 'helm' dir to look for changes.
+    type: string
+    default: "helm"
+steps:
+  - when:
+      condition: << parameters.chart_version >>
+      steps:
+        - run:
+            command: |
+              cd <<parameters.file_location>>
+              sed -i -e 's/version\s*:\s*.*/version: "<<parameters.chart_version>>"/g' *
+            name: Perform Replacements for Helm
+  - unless:
+      condition: << parameters.chart_version >>
+      steps:
+        - run:
+            shell: /bin/sh
+            command: |
+              set -e
+              ls
+              chartVersion=$(find <<parameters.chart_dir_override>> -name "Chart.yaml" -exec awk '/version:/{print $NF}' {} \;)
+              echo "Found chart version "$chartVersion
+              cd <<parameters.file_location>>
+              sed -i -e 's/version\s*:\s*.*/version: "'$chartVersion'"/g' *
+            name: Find current chart version and perform Replacements for Helm

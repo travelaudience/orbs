@@ -1,0 +1,21 @@
+description: |
+  Replace image tag
+parameters:
+  file_location:
+    description: |
+      Location of the files to perform the replacement
+    type: string
+    default: ""
+  docker_image_tag:
+    description: |
+      Version of the docker image to deploy - we recommend using CHANGE_NAME for regular merges to master
+      and CIRCLE_TAG for production releases
+    type: string
+    default: ""
+steps:
+  - run:
+      command: |
+        echo "Going to replace docker image tag with "<<parameters.docker_image_tag>>
+        cd <<parameters.file_location>>
+        sed -i -e 's/image.tag\s*:\s*.*/image.tag: "'<<parameters.docker_image_tag>>'"/g' *
+      name: Perform Replacements for docker image

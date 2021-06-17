@@ -1,0 +1,83 @@
+description: |
+  Create pull request in github
+parameters:
+  git_repository_name:
+    type: string
+    description: |
+      Name of repo to apply CD using gitops
+  github_token:
+    description: |
+      Name of environment variable storing your secret GitHub token.
+    type: env_var_name
+    default: GIT_PUSH_TOKEN
+  pr_auto_merge:
+    default: false
+    description: Merge PR automatically.
+    type: boolean
+  pr_merge_type:
+    description: >-
+      merge type of `gh pr merge`, available values are (merge|rebase|squash).
+      The default is "merge".
+    type: enum
+    enum:
+      - merge
+      - rebase
+      - squash
+    default: squash
+  new_branch_name:
+    description: Branch name to be created.
+    type: string
+  commit_description:
+    description: |
+      Description of the commit
+    type: string
+  pr_title:
+    description: |
+      Title of the pull request to create
+    type: string
+  reviewers:
+    description: Optional. A comma-separated list (no spaces around the comma) of GitHub handles to request a review from.
+    type: string
+    default: ""
+steps:
+  - run:
+      command: |
+        cd <<parameters.git_repository_name>>
+        git checkout -b <<parameters.new_branch_name>>
+        git add .
+        git commit --allow-empty -m "<<parameters.commit_description>>"
+        git push origin <<parameters.new_branch_name>>
+      name: Git commit and push
+  - when:
+      condition: << parameters.reviewers >>
+      steps:
+        - run:
+            command: |
+              cd <<parameters.git_repository_name>>
+              GITHUB_TOKEN=$<<parameters.github_token>> gh pr create \
+                --title "<<parameters.pr_title>>" \
+                --body ":robot: This PR was created by ${CIRCLE_BUILD_URL} CD job." \
+                --reviewer <<parameters.reviewers>>
+            name: Create PullRequest with Reviewers
+  - unless:
+      condition: << parameters.reviewers >>
+      steps:
+        - run:
+            command: |
+              cd <<parameters.git_repository_name>>
+              GITHUB_TOKEN=$<<parameters.github_token>> gh pr create \
+                --title "<<parameters.pr_title>>" \
+                --body ":robot: This PR was created by ${CIRCLE_BUILD_URL} CD job."
+            name: Create PullRequest without Reviewers
+  - when:
+      condition: <<parameters.pr_auto_merge>>
+      steps:
+        - run:
+            command: |
+              sleep 10
+            name: Wait PullRequest creation completed
+        - run:
+            command: |
+              cd <<parameters.git_repository_name>>
+              GITHUB_TOKEN=$<<parameters.github_token>> gh pr merge --<<parameters.pr_merge_type>>
+            name: Merge PullRequest
