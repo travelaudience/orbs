@@ -199,6 +199,7 @@ workflows:
           requires:
             - scala-lint
             - scala-pack
+            - code-climate-dev-publish
 
       # Python
       - orb-tools/lint:
@@ -219,6 +220,7 @@ workflows:
           requires:
             - python-lint
             - python-pack
+            - code-climate-dev-publish
 
   orb-promotion:
     jobs:
