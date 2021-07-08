@@ -5,7 +5,7 @@ parameters:
   version:
     description: golang version to use (docker tag)
     type: string
-    default: "1.13"
+    default: "1.16"
   working_directory:
     description: directory path for this job
     type: string
