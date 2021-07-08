@@ -24,7 +24,7 @@ steps:
 
   - run:
       name: Compile test code
-      command: sbt +test:compile
+      command: sbt "+Test / compile"
 
   - when:
       condition: << parameters.with_sbtcoverage >>
