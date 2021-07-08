@@ -1,4 +1,4 @@
-version: 2.1
+version: 2.1.1
 
 description: |
   CircleCI Orb for scala CI. Provides static analysis, sbt test, sbt compile, amongst other things...
