@@ -19,7 +19,10 @@ steps:
       cache_key: << parameters.cache_key >>
   - run:
       name: Package .jar files
-      command: sbt +package
+      command: |
+        # make sure we have the latest key fingerprints
+        ssh-keyscan github.com >> ~/.ssh/known_hosts
+        sbt +package
   - run:
       name: Publish .jar files
       command: |
