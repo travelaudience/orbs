@@ -1,4 +1,4 @@
-version: 2.1
+version: 2.2
 
 description: |
   CircleCI Orb for deploying. Provides an option for triggering jobs in Jenkins
